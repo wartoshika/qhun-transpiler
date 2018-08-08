@@ -1,0 +1,47 @@
+stages:
+    - build
+    - test
+    - deploy
+
+cache:
+  paths:
+  - node_modules/
+
+################
+# node 10
+################
+    
+build:node10:
+    stage: build
+    image: node:10
+    script:
+        - npm install
+        - npm run build
+    artifacts:
+        name: "qhun-cli.$CI_COMMIT_REF_SLUG.$CI_PIPELINE_IID"
+        when: on_success
+        paths:
+            - dist/
+            - readme.md
+            - package.json
+            - LICENSE
+
+test:node10:
+    stage: test
+    image: node:10
+    script:
+        - npm install
+        - npm run coverage
+    coverage: '/\d+\.\d+\%\ \(/'
+
+################
+# DEPLOY
+################
+deploy:NPM:
+    stage: deploy
+    dependencies:
+      - build:node10
+    script:
+        - ls -la
+    only:
+        - master
