@@ -69,6 +69,18 @@ export interface Target {
     transpileVariableStatement(node: ts.VariableStatement): string;
 
     /**
+     * transpiles a variable declaration list
+     * @param node the node to transpile
+     */
+    transpileVariableDeclarationList(node: ts.VariableDeclarationList): string;
+
+    /**
+     * transpiles a variable declaration
+     * @param node the node to transpile
+     */
+    transpileVariableDeclaration(node: ts.VariableDeclaration): string;
+
+    /**
      * transpiles a return statement
      * @param node the node to transpile
      */
@@ -216,7 +228,7 @@ export interface Target {
      * transpiles a keyword
      * @param keyword the keyword to transpile
      */
-    transpileKeyword(keyword: ts.KeywordTypeNode): string;
+    transpileKeyword(keyword: ts.Node): string;
 
     /**
      * transpiles a postfix unary expression

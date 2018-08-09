@@ -7,6 +7,7 @@ export class LuaVariableStatement implements Partial<Target> {
 
     public transpileVariableStatement(node: ts.VariableStatement): string {
 
-        return "VARIABLE";
+        // iterate the declaration list
+        return this.transpileNode(node.declarationList);
     }
 }

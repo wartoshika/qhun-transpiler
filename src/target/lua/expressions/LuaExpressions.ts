@@ -13,7 +13,7 @@ import { LuaFunctionExpression } from "./LuaFunctionExpression";
 import { LuaNewExpression } from "./LuaNewExpression";
 import { LuaParenthesizedExpression } from "./LuaParenthesizedExpression";
 import { LuaAsExpression } from "./LuaAsExpression";
-import { LuaTypeOfExpression } from "./LuaTypeofExpression";
+import { LuaTypeOfExpression } from "./LuaTypeOfExpression";
 
 export interface LuaExpressions extends LuaBinaryExpression, LuaConditionalExpression, LuaCallExpression, LuaPropertyAccessExpression,
     LuaElementAccessExpression, LuaTemplateExpression, LuaPostfixUnaryExpression, LuaPrefixUnaryExpression, LuaObjectLiteralExpression,

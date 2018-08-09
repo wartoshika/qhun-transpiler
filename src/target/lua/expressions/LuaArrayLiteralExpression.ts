@@ -7,6 +7,10 @@ export class LuaArrayLiteralExpression implements Partial<Target> {
 
     public transpileArrayLiteralExpression(node: ts.ArrayLiteralExpression): string {
 
-        return "ARRAY_LITERAL_EXPRESSION";
+        // use bracket chars to wrap the whole element list
+        const elementList: string[] = node.elements.map(element => this.transpileNode(element));
+
+        // join them by the commata symbol
+        return `{${elementList.join(",")}}`;
     }
 }

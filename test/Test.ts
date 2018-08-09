@@ -1,6 +1,7 @@
 import { Config } from "../src/config/Config";
-import { SupportedTargets } from "../src/target/TargetFactory";
+import { SupportedTargets, TargetFactory } from "../src/target/TargetFactory";
 import { Project } from "../src/config/Project";
+import { Transpiler } from "../src/transpiler/Transpiler";
 import * as ts from "typescript";
 
 export abstract class Test {
@@ -44,5 +45,45 @@ export abstract class Test {
 
         const program = ts.createProgram([], this.getCompilerOptions());
         return program.getTypeChecker();
+    }
+
+    /**
+     * get a transpiler target
+     * @param target the target to get
+     * @param config the optional project config
+     */
+    protected getTarget<T extends keyof SupportedTargets, C extends Config>(target: T, config?: C): SupportedTargets[T] {
+
+        const targetFactory = new TargetFactory();
+        return targetFactory.create(target, this.getProject(target, config), this.getTypeChecker());
+    }
+
+    /**
+     * get the transpiler instance
+     * @param target the target to get
+     * @param config the optional project config
+     */
+    protected getTranspiler<T extends keyof SupportedTargets, C extends Config>(target: T, config?: C): Transpiler {
+
+        return new Transpiler(this.getTarget(target, config));
+    }
+
+    /**
+     * creates a sorucefile from a code base
+     * @param code the code to put into the created source file
+     */
+    protected getSourceFile(code: string): ts.SourceFile {
+
+        return ts.createSourceFile("test.ts", code, ts.ScriptTarget.ESNext);
+    }
+
+    /**
+     * transpiles the given code using the given transpiler. it also splits the string by new line char
+     * @param transpiler the transpile to use
+     * @param code the code to transpile
+     */
+    protected transpile(transpiler: Transpiler, code: string): string[] {
+
+        return transpiler.transpile(this.getSourceFile(code)).split("\n");
     }
 }

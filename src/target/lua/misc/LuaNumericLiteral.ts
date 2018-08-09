@@ -7,6 +7,7 @@ export class LuaNumericLiteral implements Partial<Target> {
 
     public transpileNumericLiteral(node: ts.NumericLiteral): string {
 
-        return "NUMERIC_LITERAL";
+        // get the text content as numeric literal
+        return node.text;
     }
 }

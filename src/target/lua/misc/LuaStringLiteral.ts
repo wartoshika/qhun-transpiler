@@ -7,6 +7,7 @@ export class LuaStringLiteral implements Partial<Target> {
 
     public transpileStringLiteral(node: ts.StringLiteral): string {
 
-        return "STRING_LITERAL";
+        // get the token text with quotes
+        return `"${node.text}"`;
     }
 }

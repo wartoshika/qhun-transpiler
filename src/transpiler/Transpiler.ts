@@ -47,6 +47,11 @@ export class Transpiler {
      */
     private transpileNode(node: ts.Node): string {
 
+        // check for an empty node
+        if (!node) {
+            return "";
+        }
+
         // check the node kind and decide what to do with this node kind
         switch (node.kind) {
             case ts.SyntaxKind.ImportDeclaration:
@@ -63,6 +68,10 @@ export class Transpiler {
                 return this.target.transpileFunctionDeclaration(node as ts.FunctionDeclaration);
             case ts.SyntaxKind.VariableStatement:
                 return this.target.transpileVariableStatement(node as ts.VariableStatement);
+            case ts.SyntaxKind.VariableDeclarationList:
+                return this.target.transpileVariableDeclarationList(node as ts.VariableDeclarationList);
+            case ts.SyntaxKind.VariableDeclaration:
+                return this.target.transpileVariableDeclaration(node as ts.VariableDeclaration);
             case ts.SyntaxKind.ExpressionStatement:
                 return this.transpileNode((node as ts.ExpressionStatement).expression);
             case ts.SyntaxKind.ReturnStatement:
@@ -120,7 +129,7 @@ export class Transpiler {
             case ts.SyntaxKind.UndefinedKeyword:
             case ts.SyntaxKind.ThisKeyword:
             case ts.SyntaxKind.SuperKeyword:
-                return this.target.transpileKeyword(node as ts.KeywordTypeNode);
+                return this.target.transpileKeyword(node as any);
             case ts.SyntaxKind.PostfixUnaryExpression:
                 return this.target.transpilePostfixUnaryExpression(node as ts.PostfixUnaryExpression);
             case ts.SyntaxKind.PrefixUnaryExpression:

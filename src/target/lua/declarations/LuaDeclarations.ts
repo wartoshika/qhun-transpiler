@@ -7,6 +7,8 @@ import { LuaTypeAliasDeclaration } from "./LuaTypeAliasDeclaration";
 import { LuaInterfaceDeclaration } from "./LuaInterfaceDeclaration";
 import { LuaExportDeclaration } from "./LuaExportDeclaration";
 import { LuaImportEqualsDeclaration } from "./LuaImportEqualsDeclaration";
+import { LuaVariableDeclaration } from "./LuaVariableDeclaration";
 
 export interface LuaDeclarations extends LuaClassDeclaration, LuaEnumDeclaration, LuaFunctionDeclaration, LuaImportDeclaration,
-    LuaModuleDeclaration, LuaTypeAliasDeclaration, LuaInterfaceDeclaration, LuaExportDeclaration, LuaImportEqualsDeclaration { }
+    LuaModuleDeclaration, LuaTypeAliasDeclaration, LuaInterfaceDeclaration, LuaExportDeclaration, LuaImportEqualsDeclaration,
+    LuaVariableDeclaration { }

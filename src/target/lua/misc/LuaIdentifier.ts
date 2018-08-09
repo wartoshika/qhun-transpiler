@@ -7,6 +7,7 @@ export class LuaIdentifier implements Partial<Target> {
 
     public transpileIdentifier(node: ts.Identifier): string {
 
-        return "IDENTIFIER";
+        // get the identifier name
+        return node.escapedText.toString();
     }
 }

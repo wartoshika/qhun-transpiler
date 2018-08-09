@@ -26,6 +26,7 @@ export class LuaTarget extends BaseTarget implements Target {
         luaTrait.LuaInterfaceDeclaration,
         luaTrait.LuaExportDeclaration,
         luaTrait.LuaImportEqualsDeclaration,
+        luaTrait.LuaVariableDeclaration,
         // statements
         luaTrait.LuaVariableStatement,
         luaTrait.LuaReturnStatement,
@@ -67,7 +68,8 @@ export class LuaTarget extends BaseTarget implements Target {
         luaTrait.LuaKeyword,
         luaTrait.LuaComputedPropertyName,
         luaTrait.LuaTypeAssertion,
-        luaTrait.LuaExportAssignment
+        luaTrait.LuaExportAssignment,
+        luaTrait.LuaVariableDeclarationList
     ) protected this: LuaTarget;
 
     /**
