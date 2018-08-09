@@ -1,6 +1,5 @@
-import { Project } from "../config/Project";
 import * as ts from "typescript";
-import { Target } from "../targets/Target";
+import { Target } from "../target/Target";
 import { UnsupportedError } from "../error/UnsupportedError";
 
 /**

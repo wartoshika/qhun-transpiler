@@ -1,6 +1,6 @@
 import { Project } from "./config/Project";
 import * as ts from "typescript";
-import { TargetFactory } from "./targets/TargetFactory";
+import { TargetFactory } from "./target/TargetFactory";
 import { Transpiler } from "./transpiler/Transpiler";
 
 export class Compiler {

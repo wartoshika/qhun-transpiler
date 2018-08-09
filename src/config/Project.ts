@@ -1,6 +1,6 @@
 import { Config } from "./Config";
 import * as ts from "typescript";
-import { SupportedTargets } from "../targets/TargetFactory";
+import { SupportedTargets } from "../target/TargetFactory";
 
 /**
  * the project data read from the qhun-transpiler.json file
