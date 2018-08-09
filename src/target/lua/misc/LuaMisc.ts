@@ -6,6 +6,7 @@ import { LuaNumericLiteral } from "./LuaNumericLiteral";
 import { LuaKeyword } from "./LuaKeyword";
 import { LuaComputedPropertyName } from "./LuaComputedPropertyName";
 import { LuaTypeAssertion } from "./LuaTypeAssertion";
+import { LuaExportAssignment } from "./LuaExportAssignment";
 
 export interface LuaMisc extends LuaBlock, LuaEndOfFileToken, LuaIdentifier, LuaStringLiteral, LuaNumericLiteral, LuaKeyword, LuaComputedPropertyName,
-    LuaTypeAssertion { }
+    LuaTypeAssertion, LuaExportAssignment { }

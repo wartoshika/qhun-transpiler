@@ -148,6 +148,12 @@ export class Transpiler {
                 return this.target.transpileTypeOfExpression(node as ts.TypeOfExpression);
             case ts.SyntaxKind.EmptyStatement:
                 return this.target.transpileEmptyStatement(node as ts.EmptyStatement);
+            case ts.SyntaxKind.ExportAssignment:
+                return this.target.transpileExportAssignment(node as ts.ExportAssignment);
+            case ts.SyntaxKind.ExportDeclaration:
+                return this.target.transpileExportDeclaration(node as ts.ExportDeclaration);
+            case ts.SyntaxKind.ImportEqualsDeclaration:
+                return this.target.transpileImportEqualsDeclaration(node as ts.ImportEqualsDeclaration);
             default:
                 throw new UnsupportedError(`Unsupported expression: ${ts.SyntaxKind[node.kind]}`);
         }

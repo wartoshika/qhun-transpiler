@@ -6,6 +6,7 @@ export * from "./LuaNumericLiteral";
 export * from "./LuaKeyword";
 export * from "./LuaComputedPropertyName";
 export * from "./LuaTypeAssertion";
+export * from "./LuaExportAssignment";
 
 // misc bundle interface
 export * from "./LuaMisc";

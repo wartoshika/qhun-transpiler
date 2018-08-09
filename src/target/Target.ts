@@ -295,4 +295,22 @@ export interface Target {
      * @param node the node to transpile
      */
     transpileEmptyStatement(node: ts.EmptyStatement): string;
+
+    /**
+     * transpiles an export assignment
+     * @param node the node to transpile
+     */
+    transpileExportAssignment(node: ts.ExportAssignment): string;
+
+    /**
+     * transpiles an export declaration
+     * @param node the node to transpile
+     */
+    transpileExportDeclaration(node: ts.ExportDeclaration): string;
+
+    /**
+     * transpiles an import equals declaration
+     * @param node the node to transpile
+     */
+    transpileImportEqualsDeclaration(node: ts.ImportEqualsDeclaration): string;
 }
