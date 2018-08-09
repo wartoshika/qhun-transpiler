@@ -8,7 +8,6 @@
         "emitDecoratorMetadata": true,
         "outDir": "dist",
         "moduleResolution": "node",
-        "baseUrl": "src",
         "target": "es5"
     },
     "include": [

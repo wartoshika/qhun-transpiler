@@ -21,7 +21,7 @@ export class TargetFactory {
     /**
      * a stack of supported targets
      */
-    private readonly supportedTargets: SupportedTargetConstructors = {
+    public static readonly supportedTargets: SupportedTargetConstructors = {
         lua: LuaTarget,
         wow: WowTarget
     };
@@ -34,6 +34,6 @@ export class TargetFactory {
      */
     public create<T extends keyof SupportedTargetConstructors>(target: T, project: Project, typeChecker: ts.TypeChecker): SupportedTargets[T] {
 
-        return new this.supportedTargets[target](project, typeChecker);
+        return new TargetFactory.supportedTargets[target](project, typeChecker);
     }
 }
