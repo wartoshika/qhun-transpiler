@@ -5,9 +5,7 @@ import * as luaTrait from "./traits";
 import * as ts from "typescript";
 import { use } from "typescript-mix";
 
-export interface LuaTarget extends BaseTarget, Target,
-    luaTrait.LuaBlock, luaTrait.LuaClassDeclaration, luaTrait.LuaEnumDeclaration, luaTrait.LuaFunctionDeclaration,
-    luaTrait.LuaImportDeclaration, luaTrait.LuaModuleDeclaration, luaTrait.LuaVariableStatement { }
+export interface LuaTarget extends BaseTarget, Target, luaTrait.LuaDeclarations, luaTrait.LuaDeclarations, luaTrait.LuaExpressions, luaTrait.LuaMisc { }
 
 /**
  * the lua target
@@ -18,13 +16,55 @@ export class LuaTarget extends BaseTarget implements Target {
      * import traits
      */
     @use(
-        luaTrait.LuaBlock,
+        // declarations
         luaTrait.LuaClassDeclaration,
         luaTrait.LuaEnumDeclaration,
         luaTrait.LuaFunctionDeclaration,
         luaTrait.LuaImportDeclaration,
         luaTrait.LuaModuleDeclaration,
-        luaTrait.LuaVariableStatement
+        luaTrait.LuaTypeAliasDeclaration,
+        luaTrait.LuaInterfaceDeclaration,
+        // statements
+        luaTrait.LuaVariableStatement,
+        luaTrait.LuaReturnStatement,
+        luaTrait.LuaIfStatement,
+        luaTrait.LuaWhileStatement,
+        luaTrait.LuaDoStatement,
+        luaTrait.LuaForStatement,
+        luaTrait.LuaForOfStatement,
+        luaTrait.LuaForInStatement,
+        luaTrait.LuaSwitchStatement,
+        luaTrait.LuaBreakStatement,
+        luaTrait.LuaTryStatement,
+        luaTrait.LuaThrowStatement,
+        luaTrait.LuaContinueStatement,
+        luaTrait.LuaEmptyStatement,
+        // expressions
+        luaTrait.LuaBinaryExpression,
+        luaTrait.LuaConditionalExpression,
+        luaTrait.LuaCallExpression,
+        luaTrait.LuaPropertyAccessExpression,
+        luaTrait.LuaElementAccessExpression,
+        luaTrait.LuaTemplateExpression,
+        luaTrait.LuaPostfixUnaryExpression,
+        luaTrait.LuaPrefixUnaryExpression,
+        luaTrait.LuaObjectLiteralExpression,
+        luaTrait.LuaArrayLiteralExpression,
+        luaTrait.LuaDeleteExpression,
+        luaTrait.LuaFunctionExpression,
+        luaTrait.LuaNewExpression,
+        luaTrait.LuaParenthesizedExpression,
+        luaTrait.LuaAsExpression,
+        luaTrait.LuaTypeOfExpression,
+        // misc
+        luaTrait.LuaBlock,
+        luaTrait.LuaEndOfFileToken,
+        luaTrait.LuaIdentifier,
+        luaTrait.LuaStringLiteral,
+        luaTrait.LuaNumericLiteral,
+        luaTrait.LuaKeyword,
+        luaTrait.LuaComputedPropertyName,
+        luaTrait.LuaTypeAssertion
     ) protected this: LuaTarget;
 
     /**
