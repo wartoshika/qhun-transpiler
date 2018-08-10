@@ -1,9 +1,5 @@
 import { suite, test } from "mocha-typescript";
-import { UnitTest, TestCodeAndResult } from "../../UnitTest";
-import { LuaTarget } from "../../../src/target/lua/LuaTarget";
-
-import * as ts from "typescript";
-import { Transpiler } from "../../../src/transpiler/Transpiler";
+import { UnitTest } from "../../UnitTest";
 
 @suite("[Unit] Target: Lua") class LuaBinaryExpressions extends UnitTest {
 

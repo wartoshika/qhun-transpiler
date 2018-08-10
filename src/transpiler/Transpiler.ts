@@ -76,6 +76,8 @@ export class Transpiler {
                 return this.transpileNode((node as ts.ExpressionStatement).expression);
             case ts.SyntaxKind.ReturnStatement:
                 return this.target.transpileReturnStatement(node as ts.ReturnStatement);
+            case ts.SyntaxKind.Block:
+                return this.target.transpileBlock(node as ts.Block);
             case ts.SyntaxKind.IfStatement:
                 return this.target.transpileIfStatement(node as ts.IfStatement);
             case ts.SyntaxKind.WhileStatement:
