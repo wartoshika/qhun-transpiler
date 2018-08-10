@@ -14,6 +14,6 @@ export class LuaVariableDeclaration implements Partial<Target> {
         const initializer = this.transpileNode(node.initializer);
 
         // write the code
-        return `local ${name} = ${initializer || "nil"}`;
+        return `local ${name} = ${initializer || "nil"}\n`;
     }
 }

@@ -3,6 +3,10 @@ import { SupportedTargets, TargetFactory } from "../src/target/TargetFactory";
 import { Project } from "../src/config/Project";
 import { Transpiler } from "../src/transpiler/Transpiler";
 import * as ts from "typescript";
+import * as fs from "fs";
+import * as path from "path";
+
+const libSource = fs.readFileSync(path.join(path.dirname(require.resolve("typescript")), "lib.es6.d.ts")).toString();
 
 export abstract class Test {
 
@@ -39,51 +43,49 @@ export abstract class Test {
     }
 
     /**
-     * get a typechecker instance
+     * an inline transpiler function
+     * @param target the target 
+     * @param code the code to transpile into the target language
      */
-    protected getTypeChecker(): ts.TypeChecker {
+    protected transpile(target: keyof SupportedTargets, code: string): string[] {
 
-        const program = ts.createProgram([], this.getCompilerOptions());
-        return program.getTypeChecker();
-    }
+        // build compiler host
+        const compilerHost = {
+            directoryExists: () => true,
+            fileExists: (fileName: string): boolean => true,
+            getCanonicalFileName: (fileName: string) => fileName,
+            getCurrentDirectory: () => "",
+            getDefaultLibFileName: () => "lib.es6.d.ts",
+            getDirectories: (): any[] => [],
+            getNewLine: () => "\n",
+            getSourceFile: (filename: string, languageVersion: any) => {
+                if (filename === "test.ts") {
+                    return ts.createSourceFile(filename, code, ts.ScriptTarget.Latest, false);
+                }
+                if (filename === "lib.es6.d.ts") {
+                    return ts.createSourceFile(filename, libSource, ts.ScriptTarget.Latest, false);
+                }
+                return undefined;
+            },
+            readFile: () => "",
+            useCaseSensitiveFileNames: () => false,
+            writeFile: (name: string, text: string, writeByteOrderMark: any): any => null,
+        };
 
-    /**
-     * get a transpiler target
-     * @param target the target to get
-     * @param config the optional project config
-     */
-    protected getTarget<T extends keyof SupportedTargets, C extends Config>(target: T, config?: C): SupportedTargets[T] {
+        // build program
+        const program = ts.createProgram(["test.ts"], this.getCompilerOptions(), compilerHost);
 
+        // build target
         const targetFactory = new TargetFactory();
-        return targetFactory.create(target, this.getProject(target, config), this.getTypeChecker());
-    }
+        const targetTranspiler = targetFactory.create(target, this.getProject(target), program.getTypeChecker());
 
-    /**
-     * get the transpiler instance
-     * @param target the target to get
-     * @param config the optional project config
-     */
-    protected getTranspiler<T extends keyof SupportedTargets, C extends Config>(target: T, config?: C): Transpiler {
+        // build transpiler
+        const transpiler = new Transpiler(targetTranspiler);
 
-        return new Transpiler(this.getTarget(target, config));
-    }
-
-    /**
-     * creates a sorucefile from a code base
-     * @param code the code to put into the created source file
-     */
-    protected getSourceFile(code: string): ts.SourceFile {
-
-        return ts.createSourceFile("test.ts", code, ts.ScriptTarget.ESNext);
-    }
-
-    /**
-     * transpiles the given code using the given transpiler. it also splits the string by new line char
-     * @param transpiler the transpile to use
-     * @param code the code to transpile
-     */
-    protected transpile(transpiler: Transpiler, code: string): string[] {
-
-        return transpiler.transpile(this.getSourceFile(code)).split("\n");
+        // return the transpiled code
+        return transpiler
+            .transpile(program.getSourceFile("test.ts"))
+            .split("\n")
+            .filter(line => !!line);
     }
 }

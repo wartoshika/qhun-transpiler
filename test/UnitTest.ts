@@ -1,6 +1,6 @@
 import { Test } from "./Test";
 import { expect } from "chai";
-import { Transpiler } from "../src/transpiler/Transpiler";
+import { SupportedTargets } from "../src/target/TargetFactory";
 
 export declare type TestCodeAndResult = {
     code: string,
@@ -10,17 +10,11 @@ export declare type TestCodeAndResult = {
 
 export abstract class UnitTest extends Test {
 
-    private transpiler: Transpiler;
-
-    public before(): void {
-        this.transpiler = this.getTranspiler("lua");
-    }
-
-    protected runCodeAndExpectResult(test: TestCodeAndResult): void {
+    protected runCodeAndExpectResult(target: keyof SupportedTargets, test: TestCodeAndResult): void {
 
         test.forEach(oneCase => {
 
-            expect(this.transpile(this.transpiler, oneCase.code))
+            expect(this.transpile(target, oneCase.code))
                 .to.deep.equal(oneCase.expected, oneCase.message);
         });
     }

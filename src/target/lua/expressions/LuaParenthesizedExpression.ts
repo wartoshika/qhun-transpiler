@@ -7,6 +7,8 @@ export class LuaParenthesizedExpression implements Partial<Target> {
 
     public transpileParenthesizedExpression(node: ts.ParenthesizedExpression): string {
 
-        return "Parenthesized_EXPRESSION";
+        // wrap the inner expression
+        const expression = this.transpileNode(node.expression);
+        return `(${expression})`;
     }
 }

@@ -164,7 +164,7 @@ export class Transpiler {
             case ts.SyntaxKind.ImportEqualsDeclaration:
                 return this.target.transpileImportEqualsDeclaration(node as ts.ImportEqualsDeclaration);
             default:
-                throw new UnsupportedError(`Unsupported expression: ${ts.SyntaxKind[node.kind]}`);
+                throw new UnsupportedError(`Unsupported expression: ${ts.SyntaxKind[node.kind]}`, node);
         }
     }
 }

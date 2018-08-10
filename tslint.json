@@ -15,6 +15,7 @@
         "no-empty-interface": false,
         "arrow-parens": false,
         "interface-over-type-literal": false,
-        "ordered-imports": false
+        "ordered-imports": false,
+        "no-bitwise": false
     }
 }

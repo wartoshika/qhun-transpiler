@@ -19,7 +19,7 @@ export class LuaObjectLiteralExpression implements Partial<Target> {
             if (ts.isPropertyAssignment(property)) {
                 initializer = this.transpileNode(property.initializer);
             } else {
-                throw new UnsupportedError(`ObjectLiterals Element ${ts.SyntaxKind[property.kind]} is unsupported!`);
+                throw new UnsupportedError(`ObjectLiterals Element ${ts.SyntaxKind[property.kind]} is unsupported!`, property);
             }
 
             // add the property

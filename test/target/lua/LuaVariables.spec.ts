@@ -10,7 +10,7 @@ import { Transpiler } from "../../../src/transpiler/Transpiler";
 
     @test "Variables with StringLiterals"() {
 
-        this.runCodeAndExpectResult([
+        this.runCodeAndExpectResult("lua", [
             {
                 code: `const myVar = "test";`,
                 expected: [`local myVar = "test"`]
@@ -24,7 +24,7 @@ import { Transpiler } from "../../../src/transpiler/Transpiler";
 
     @test "Variables with NumericLiterals"() {
 
-        this.runCodeAndExpectResult([
+        this.runCodeAndExpectResult("lua", [
             {
                 code: `let myNumber = 5;`,
                 expected: [`local myNumber = 5`]
@@ -37,7 +37,7 @@ import { Transpiler } from "../../../src/transpiler/Transpiler";
 
     @test "Variables with ArrayLiterals"() {
 
-        this.runCodeAndExpectResult([
+        this.runCodeAndExpectResult("lua", [
             {
                 code: `const myArray = [];`,
                 expected: [`local myArray = {}`]
@@ -50,7 +50,7 @@ import { Transpiler } from "../../../src/transpiler/Transpiler";
 
     @test "Variables with ObjectLiterals"() {
 
-        this.runCodeAndExpectResult([
+        this.runCodeAndExpectResult("lua", [
             {
                 code: `const myObj = {};`,
                 expected: [`local myObj = {}`]

@@ -1,6 +1,8 @@
 import { Target } from "../../Target";
 import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
+import { UnsupportedError } from "../../../error/UnsupportedError";
+import { Types } from "../../../transpiler/Types";
 
 export interface LuaBinaryExpression extends BaseTarget, Target { }
 export class LuaBinaryExpression implements Partial<Target> {
@@ -11,22 +13,67 @@ export class LuaBinaryExpression implements Partial<Target> {
         const left = this.transpileNode(node.left);
         const right = this.transpileNode(node.right);
 
-        // check that operator
+        // get the operator
+        const operator = this.getOperatorForToken(node);
+
+        // put everything together
+        return `${left} ${operator} ${right}`;
+    }
+
+    /**
+     * get a lua operator from a token object
+     * @param token the token object
+     */
+    private getOperatorForToken(node: ts.BinaryExpression): string {
+
+        // check the token kindF
         switch (node.operatorToken.kind) {
             case ts.SyntaxKind.AmpersandAmpersandToken:
-                return `${left} and ${right}`;
+                return "and";
             case ts.SyntaxKind.BarBarToken:
-                return `${left} or ${right}`;
+                return "or";
             case ts.SyntaxKind.AsteriskAsteriskToken:
-                return `${left}^${right}`;
+                return "^";
             case ts.SyntaxKind.EqualsEqualsEqualsToken:
-                return `${left}==${right}`;
-            case ts.SyntaxKind.ExclamationEqualsEqualsToken:
+            case ts.SyntaxKind.EqualsEqualsToken:
+                return "==";
+            case ts.SyntaxKind.EqualsToken:
+                return "=";
             case ts.SyntaxKind.ExclamationEqualsToken:
-                return `${left}~=${right}`;
+            case ts.SyntaxKind.ExclamationEqualsEqualsToken:
+                return "~=";
+            case ts.SyntaxKind.AsteriskAsteriskToken:
+                return "*";
+            case ts.SyntaxKind.MinusToken:
+                return "-";
+            case ts.SyntaxKind.SlashToken:
+                return "/";
+            case ts.SyntaxKind.PercentToken:
+                return "%";
+            case ts.SyntaxKind.GreaterThanToken:
+                return ">";
+            case ts.SyntaxKind.GreaterThanEqualsToken:
+                return ">=";
+            case ts.SyntaxKind.LessThanToken:
+                return "<";
+            case ts.SyntaxKind.LessThanEqualsToken:
+                return "<=";
+            case ts.SyntaxKind.PlusToken:
+
+                // the plus token is a special case because lua concats a string with the .. operator and numeric additions with the + token.
+                // if the left or the right node is a string type, use .. as concat. otherwise the + token
+                // test if one of the types are strings
+                if (Types.isString(node.left, this.typeChecker) || Types.isString(node.right, this.typeChecker)) {
+
+                    // yes strings are available
+                    return "..";
+                } else {
+
+                    // no string available
+                    return "+";
+                }
             default:
-                const operator = node.operatorToken.getText();
-                return `${left} ${operator} ${right}`;
+                throw new UnsupportedError(`The given Binary operator token ${ts.SyntaxKind[node.operatorToken.kind]} is not supported!`, node);
         }
     }
 }
