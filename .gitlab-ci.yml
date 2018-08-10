@@ -18,7 +18,7 @@ build:node10:
         - npm install
         - npm run build
     artifacts:
-        name: "qhun-cli.$CI_COMMIT_REF_SLUG.$CI_PIPELINE_IID"
+        name: "qhun-transpiler.$CI_COMMIT_REF_SLUG.$CI_PIPELINE_IID"
         when: on_success
         paths:
             - dist/
