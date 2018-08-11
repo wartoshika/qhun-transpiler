@@ -7,6 +7,7 @@ export class LuaTypeAssertion implements Partial<Target> {
 
     public transpileTypeAssertion(node: ts.TypeAssertion): string {
 
-        return "TYPE_ASSERTION";
+        // just transpile the expression, lua does not know types
+        return this.transpileNode(node.expression);
     }
 }

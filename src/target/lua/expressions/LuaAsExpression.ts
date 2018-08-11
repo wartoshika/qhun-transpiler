@@ -7,6 +7,7 @@ export class LuaAsExpression implements Partial<Target> {
 
     public transpileAsExpression(node: ts.AsExpression): string {
 
-        return "AS_EXPRESSION";
+        // just transpile the expression, lua cannot cast
+        return this.transpileNode(node.expression);
     }
 }
