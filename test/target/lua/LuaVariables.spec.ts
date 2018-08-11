@@ -1,10 +1,10 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
 
-@suite("[Unit] Target: Lua", slow(1000), timeout(10000)) class LuaVariables extends UnitTest {
+@suite("[Unit] Target: Lua | Variables", slow(1000), timeout(10000)) class LuaVariables extends UnitTest {
 
 
-    @test "Variables with StringLiterals"() {
+    @test "StringLiterals"() {
 
         this.runCodeAndExpectResult("lua", [
             {
@@ -18,7 +18,7 @@ import { UnitTest } from "../../UnitTest";
 
     }
 
-    @test "Variables with NumericLiterals"() {
+    @test "NumericLiterals"() {
 
         this.runCodeAndExpectResult("lua", [
             {
@@ -31,7 +31,7 @@ import { UnitTest } from "../../UnitTest";
         ]);
     }
 
-    @test "Variables with ArrayLiterals"() {
+    @test "ArrayLiterals"() {
 
         this.runCodeAndExpectResult("lua", [
             {
@@ -44,7 +44,7 @@ import { UnitTest } from "../../UnitTest";
         ]);
     }
 
-    @test "Variables with ObjectLiterals"() {
+    @test "ObjectLiterals"() {
 
         this.runCodeAndExpectResult("lua", [
             {
@@ -56,6 +56,16 @@ import { UnitTest } from "../../UnitTest";
             }, {
                 code: `const myObj = {a: {deep: {obj: true}}};`,
                 expected: [`local myObj = {a={deep={obj=true}}}`]
+            }
+        ]);
+    }
+
+    @test "Export variables"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `export const a = "b";`,
+                expected: [`local a = "b"`]
             }
         ]);
     }

@@ -55,4 +55,22 @@ export abstract class BaseTarget implements Partial<Target> {
         }
         return str;
     }
+
+    /**
+     * check if the given node has an export modifier
+     * @param node the node to check
+     */
+    protected hasExportModifier(node: ts.Node): boolean {
+
+        return node.modifiers && node.modifiers.some((x) => x.kind === ts.SyntaxKind.ExportKeyword);
+    }
+
+    /**
+     * removes empty lines from the given string
+     * @param str the string
+     */
+    protected removeEmptyLines(str: string): string {
+
+        return str.split("\n").filter(line => !!(line.trim())).join("\n");
+    }
 }

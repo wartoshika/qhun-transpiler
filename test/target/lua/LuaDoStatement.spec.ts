@@ -1,45 +1,48 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
 
-@suite("[Unit] Target: Lua | Misc", slow(1000), timeout(10000)) class LuaIfStatement extends UnitTest {
+@suite("[Unit] Target: Lua | Do", slow(1000), timeout(10000)) class LuaEnum extends UnitTest {
 
 
-    @test "Unrechable code after return"() {
-
-        this.runCodeAndExpectResult("lua", [
-            {
-                code: `if(true) { return true; const a = false; }`,
-                expected: [
-                    `if true then`,
-                    `  return true`,
-                    `end`
-                ]
-            }
-        ]);
-
-    }
-
-    @test "Unrechable code after break"() {
+    @test "Simple do while statement"() {
 
         this.runCodeAndExpectResult("lua", [
             {
                 code: `
-                    while (true) {
-                        if(true) {
-                            break;
-                            const a = true;
-                        }
-                    }
+                    do {
+                        const a = "1";
+                    } while(a > 10);
                 `,
                 expected: [
-                    `while true do`,
-                    `  if true then`,
-                    `    break`,
-                    `  end`,
-                    `end`
+                    `repeat`,
+                    `  local a = "1"`,
+                    `until not (a > 10)`
                 ]
             }
         ]);
 
     }
+
+    @test "Do statement with break"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `
+                    do {
+                        if(true) {
+                            break;
+                        }
+                    } while(a > 10);
+                `,
+                expected: [
+                    `repeat`,
+                    `  if true then`,
+                    `    break`,
+                    `  end`,
+                    `until not (a > 10)`
+                ]
+            }
+        ]);
+    }
+
 }

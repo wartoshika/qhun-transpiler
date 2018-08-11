@@ -1,10 +1,10 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
 
-@suite("[Unit] Target: Lua", slow(1000), timeout(10000)) class LuaBinaryExpressions extends UnitTest {
+@suite("[Unit] Target: Lua | Binary expressions", slow(1000), timeout(10000)) class LuaBinaryExpressions extends UnitTest {
 
 
-    @test "Binary expressions"() {
+    @test "&&, **, ||, ===, ==, !=, !=="() {
 
         this.runCodeAndExpectResult("lua", [
             {
@@ -30,7 +30,7 @@ import { UnitTest } from "../../UnitTest";
 
     }
 
-    @test "Binary expression plus token"() {
+    @test "+ token"() {
 
         this.runCodeAndExpectResult("lua", [
             {

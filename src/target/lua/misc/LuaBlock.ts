@@ -14,8 +14,8 @@ export class LuaBlock implements Partial<Target> {
             // transpile the statement
             statementStack.push(this.transpileNode(statement));
 
-            // stop when the return statement is here
-            return ts.isReturnStatement(statement);
+            // stop when the return or break statement is here
+            return ts.isReturnStatement(statement) || ts.isBreakStatement(statement);
         });
 
         // join statements by new line character

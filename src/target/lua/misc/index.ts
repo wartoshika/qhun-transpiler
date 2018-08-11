@@ -8,6 +8,8 @@ export * from "./LuaComputedPropertyName";
 export * from "./LuaTypeAssertion";
 export * from "./LuaExportAssignment";
 export * from "./LuaVariableDeclarationList";
+export * from "./LuaArrayBindingPattern";
+export * from "./LuaObjectBindingPattern";
 
 // misc bundle interface
 export * from "./LuaMisc";

@@ -17,6 +17,13 @@ export interface Target {
     getNodeTranspiler(): (node: ts.Node) => string;
 
     /**
+     * add a node export
+     * @param name the name of the exported variable
+     * @param node the node that should be exported
+     */
+    addExport(name: string, node: ts.Node): void;
+
+    /**
      * a function that is called before the transpiling process begins
      */
     preTranspile(): string | void;
@@ -325,4 +332,16 @@ export interface Target {
      * @param node the node to transpile
      */
     transpileImportEqualsDeclaration(node: ts.ImportEqualsDeclaration): string;
+
+    /**
+     * transpiles an array binding pattern
+     * @param node the node to transpile
+     */
+    transpileArrayBindingPattern(node: ts.ArrayBindingPattern): string;
+
+    /**
+     * transpiles an object binding pattern
+     * @param node the node to transpile
+     */
+    transpileObjectBindingPattern(node: ts.ObjectBindingPattern): string;
 }

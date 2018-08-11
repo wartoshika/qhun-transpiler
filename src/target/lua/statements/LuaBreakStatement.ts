@@ -7,6 +7,7 @@ export class LuaBreakStatement implements Partial<Target> {
 
     public transpileBreakStatement(node: ts.BreakStatement): string {
 
-        return "BREAK";
+        // break in ts is equal to lua's impl.
+        return "break";
     }
 }

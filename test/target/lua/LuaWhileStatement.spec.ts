@@ -1,17 +1,16 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
 
-@suite("[Unit] Target: Lua | Misc", slow(1000), timeout(10000)) class LuaIfStatement extends UnitTest {
+@suite("[Unit] Target: Lua | Variables", slow(1000), timeout(10000)) class LuaWhileStatement extends UnitTest {
 
 
-    @test "Unrechable code after return"() {
+    @test "Simple while"() {
 
         this.runCodeAndExpectResult("lua", [
             {
-                code: `if(true) { return true; const a = false; }`,
+                code: `while (true) {}`,
                 expected: [
-                    `if true then`,
-                    `  return true`,
+                    `while true do`,
                     `end`
                 ]
             }
@@ -19,27 +18,26 @@ import { UnitTest } from "../../UnitTest";
 
     }
 
-    @test "Unrechable code after break"() {
+    @test "With while body and break"() {
 
         this.runCodeAndExpectResult("lua", [
             {
                 code: `
-                    while (true) {
-                        if(true) {
+                    while (a && (b || c)) {
+                        if(a) {
                             break;
-                            const a = true;
                         }
                     }
                 `,
                 expected: [
-                    `while true do`,
-                    `  if true then`,
+                    `while a and (b or c) do`,
+                    `  if a then`,
                     `    break`,
                     `  end`,
                     `end`
                 ]
             }
         ]);
-
     }
+
 }

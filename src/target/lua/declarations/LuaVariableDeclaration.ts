@@ -10,6 +10,11 @@ export class LuaVariableDeclaration implements Partial<Target> {
         // get the variable name
         const name = this.transpileNode(node.name);
 
+        // check for a possible export
+        if (this.hasExportModifier(node)) {
+            this.addExport(name, node);
+        }
+
         // get the possible initializer
         const initializer = this.transpileNode(node.initializer);
 

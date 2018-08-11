@@ -7,6 +7,17 @@ export class LuaWhileStatement implements Partial<Target> {
 
     public transpileWhileStatement(node: ts.WhileStatement): string {
 
-        return "WHILE";
+        // parse the condition
+        const condition = this.transpileNode(node.expression);
+
+        // transpile the body
+        const body = this.removeEmptyLines(this.addSpacesToString(this.transpileNode(node.statement), 2));
+
+        // put everything together
+        return [
+            `while ${condition} do`,
+            body,
+            `end`
+        ].join("\n");
     }
 }

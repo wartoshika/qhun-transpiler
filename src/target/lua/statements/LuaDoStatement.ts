@@ -7,6 +7,18 @@ export class LuaDoStatement implements Partial<Target> {
 
     public transpileDoStatement(node: ts.DoStatement): string {
 
-        return "DO";
+        // get the footer condition
+        const condition = this.transpileNode(node.expression);
+
+        // get the body
+        const body = this.transpileNode(node.statement);
+
+        // put everything together
+        return [
+            `repeat`,
+            this.removeEmptyLines(this.addSpacesToString(body, 2)),
+            // the condition must be negated!
+            `until not (${condition})`
+        ].join("\n");
     }
 }

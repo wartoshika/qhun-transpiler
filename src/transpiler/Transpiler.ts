@@ -118,6 +118,10 @@ export class Transpiler {
                 return this.target.transpileElementAccessExpression(node as ts.ElementAccessExpression);
             case ts.SyntaxKind.Identifier:
                 return this.target.transpileIdentifier(node as ts.Identifier);
+            case ts.SyntaxKind.ArrayBindingPattern:
+                return this.target.transpileArrayBindingPattern(node as ts.ArrayBindingPattern);
+            case ts.SyntaxKind.ObjectBindingPattern:
+                return this.target.transpileObjectBindingPattern(node as ts.ObjectBindingPattern);
             case ts.SyntaxKind.StringLiteral:
             case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
                 return this.target.transpileStringLiteral(node as ts.StringLiteral);

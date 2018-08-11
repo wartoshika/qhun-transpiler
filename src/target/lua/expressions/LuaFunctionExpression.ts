@@ -7,6 +7,21 @@ export class LuaFunctionExpression implements Partial<Target> {
 
     public transpileFunctionExpression(node: ts.FunctionExpression | ts.ArrowFunction): string {
 
-        return "FUNCTION_EXPRESSION";
+        // reuse the function declaration for function and arrow function expressions
+        const functionDeclaration = this.transpileFunctionDeclaration(ts.createFunctionDeclaration(
+            node.decorators,
+            node.modifiers,
+            node.asteriskToken,
+            node.name,
+            node.typeParameters,
+            node.parameters,
+            node.type,
+            node.body as ts.Block
+        ));
+
+        // remove the local prefix
+        return functionDeclaration.substr(
+            functionDeclaration.indexOf("local ") + 6
+        );
     }
 }

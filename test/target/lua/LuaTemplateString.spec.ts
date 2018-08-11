@@ -1,10 +1,10 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
 
-@suite("[Unit] Target: Lua", slow(1000), timeout(10000)) class LuaTemplateString extends UnitTest {
+@suite("[Unit] Target: Lua | Template strings", slow(1000), timeout(10000)) class LuaTemplateString extends UnitTest {
 
 
-    @test "Template strings"() {
+    @test "Simple string with and without variables"() {
 
         this.runCodeAndExpectResult("lua", [
             {
