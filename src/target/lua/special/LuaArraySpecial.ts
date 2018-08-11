@@ -25,11 +25,34 @@ export class LuaArraySpecial {
     }
 
     /**
+     * transpiles a special array function
+     * @param name the name of the function
+     * @param owner the owner or base object
+     */
+    public transpileSpecialArrayFunction(name: string, owner: string): string {
+        switch (name) {
+            case "join":
+                return this.transpileSpecialArrayFunctionJoin(owner);
+            default:
+                throw new UnsupportedError(`The given array function ${name} is unsupported!`, null);
+        }
+    }
+
+    /**
      * transpiles an array.length into lua
      * @param node the node to transpile
      */
     private transpileSpecialArrayPropertyLength(node: ts.PropertyAccessExpression): string {
 
         return `#${this.transpileNode(node.expression)}`;
+    }
+
+    /**
+     * an impl. for the string.replace function in lua
+     * @param owner the owner or base object
+     */
+    private transpileSpecialArrayFunctionJoin(owner: string): string {
+
+        return `(function(___a) return table.concat(${owner}, ___a) end)`;
     }
 }

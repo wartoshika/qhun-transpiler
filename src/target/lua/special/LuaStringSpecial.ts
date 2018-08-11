@@ -53,6 +53,6 @@ export class LuaStringSpecial {
      */
     private transpileSpecialStringFunctionReplace(owner: string): string {
 
-        return `(function(a,b,c) return String.gsub(${owner}, a, b, c) end)`;
+        return `(function(___a,___b,___c) return String.gsub(${owner}, ___a, ___b, ___c) end)`;
     }
 }

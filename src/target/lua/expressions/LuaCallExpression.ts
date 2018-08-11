@@ -34,7 +34,7 @@ export class LuaCallExpression implements Partial<Target> {
 
         // get the called function name
         const functionObj = node.expression as ts.PropertyAccessExpression;
-        const functionName = this.removeQuotes(this.transpileNode(functionObj.name));
+        const functionName = this.transpileNode(functionObj.name);
 
         // check if the function call comes from an known object that
         // supports special functions
@@ -47,8 +47,6 @@ export class LuaCallExpression implements Partial<Target> {
             ownerNameCheck = "String";
         } else if (Types.isArray(owner, this.typeChecker)) {
             ownerNameCheck = "Array";
-        } else if (Types.isObject(owner, this.typeChecker)) {
-            ownerNameCheck = "Object";
         }
 
         // generate a function signature string
@@ -57,15 +55,14 @@ export class LuaCallExpression implements Partial<Target> {
         // check if there are some special objects
         switch (ownerNameCheck) {
             case "Object":
-
+                signature = this.transpileSpecialObjectFunction(functionName, ownerName);
                 break;
             case "String":
                 signature = this.transpileSpecialStringFunction(functionName, ownerName);
                 break;
             case "Array":
-
+                signature = this.transpileSpecialArrayFunction(functionName, ownerName);
                 break;
-
             case "Math":
 
                 break;
