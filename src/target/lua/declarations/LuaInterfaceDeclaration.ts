@@ -7,6 +7,7 @@ export class LuaInterfaceDeclaration implements Partial<Target> {
 
     public transpileInterfaceDeclaration(node: ts.InterfaceDeclaration): string {
 
-        return "INTERFACE";
+        // interfaces are skipped!
+        return "";
     }
 }
