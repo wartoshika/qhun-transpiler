@@ -3,6 +3,30 @@ import * as ts from "typescript";
 export class Types {
 
     /**
+     * check if the given node has a static modifier
+     * @param node the node to check
+     */
+    public static isStatic(node: ts.Node): boolean {
+
+        return node.modifiers && node.modifiers.some(mod => mod.kind === ts.SyntaxKind.StaticKeyword);
+    }
+
+    /**
+     * test if the given node has an explicit visibility modifier
+     * @param node the node to test
+     */
+    public static hasExplicitVisibility(node: ts.Node): boolean {
+
+        const visibilityStack: ts.SyntaxKind[] = [
+            ts.SyntaxKind.PrivateKeyword,
+            ts.SyntaxKind.ProtectedKeyword,
+            ts.SyntaxKind.PublicKeyword
+        ];
+
+        return node.modifiers && node.modifiers.some(mod => visibilityStack.indexOf(mod.kind) !== -1);
+    }
+
+    /**
      * check if the given node is a string literal
      * @param type the type to check
      * @param typeChecker the type checker instance
