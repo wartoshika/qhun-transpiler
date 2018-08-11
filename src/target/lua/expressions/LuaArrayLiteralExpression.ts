@@ -11,6 +11,6 @@ export class LuaArrayLiteralExpression implements Partial<Target> {
         const elementList: string[] = node.elements.map(element => this.transpileNode(element));
 
         // join them by the commata symbol
-        return `{${elementList.join(",")}}`;
+        return `{${elementList.join(", ")}}`;
     }
 }

@@ -29,6 +29,13 @@ import { UnitTest } from "../../UnitTest";
                 expected: [
                     `error(tostring(1))`
                 ]
+            }, {
+                code: `if(a) {throw "test";}`,
+                expected: [
+                    `if a then`,
+                    `  error("test")`,
+                    `end`
+                ]
             }
         ]);
 

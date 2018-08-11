@@ -33,6 +33,8 @@ export class LuaArraySpecial {
         switch (name) {
             case "join":
                 return this.transpileSpecialArrayFunctionJoin(owner);
+            case "push":
+                return this.transpileSpecialArrayFunctionPush(owner);
             default:
                 throw new UnsupportedError(`The given array function ${name} is unsupported!`, null);
         }
@@ -54,5 +56,14 @@ export class LuaArraySpecial {
     private transpileSpecialArrayFunctionJoin(owner: string): string {
 
         return `(function(___a) return table.concat(${owner}, ___a) end)`;
+    }
+
+    /**
+     * an impl. for the string.push function in lua
+     * @param owner the owner or base object
+     */
+    private transpileSpecialArrayFunctionPush(owner: string): string {
+
+        return `(function(...) local ___v = {...} for _, ___e in pairs(___v) do table.insert(${owner}, ___e) end end)`;
     }
 }

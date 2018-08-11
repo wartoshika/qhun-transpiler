@@ -23,10 +23,10 @@ export class LuaObjectLiteralExpression implements Partial<Target> {
             }
 
             // add the property
-            propertyStack.push(`${nameOrKey}=${initializer}`);
+            propertyStack.push(`${nameOrKey} = ${initializer}`);
         });
 
         // wrap all properties
-        return `{${propertyStack.join(",")}}`;
+        return `{${propertyStack.join(", ")}}`;
     }
 }

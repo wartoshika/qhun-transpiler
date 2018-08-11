@@ -3,6 +3,9 @@ import * as ts from "typescript";
 import { TargetFactory } from "./target/TargetFactory";
 import { Transpiler } from "./transpiler/Transpiler";
 
+import * as path from "path";
+import * as fs from "fs";
+
 export class Compiler {
 
     /**
@@ -31,7 +34,7 @@ export class Compiler {
         const transpiler = new Transpiler(target);
 
         // iterate over every source file
-        program.getSourceFiles().forEach(sourceFile => {
+        program.getSourceFiles().filter(file => !file.isDeclarationFile).forEach(sourceFile => {
 
             // transpile this file
             const transpiledCode = transpiler.transpile(sourceFile);

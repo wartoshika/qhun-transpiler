@@ -39,7 +39,7 @@ import { UnitTest } from "../../UnitTest";
                 expected: [`local myArray = {}`]
             }, {
                 code: `let myArray = [5,1,"test"];`,
-                expected: [`local myArray = {5,1,"test"}`]
+                expected: [`local myArray = {5, 1, "test"}`]
             }
         ]);
     }
@@ -52,10 +52,10 @@ import { UnitTest } from "../../UnitTest";
                 expected: [`local myObj = {}`]
             }, {
                 code: `let myObj = {flat: 1, object: "test"};`,
-                expected: [`local myObj = {flat=1,object="test"}`]
+                expected: [`local myObj = {flat = 1, object = "test"}`]
             }, {
                 code: `const myObj = {a: {deep: {obj: true}}};`,
-                expected: [`local myObj = {a={deep={obj=true}}}`]
+                expected: [`local myObj = {a = {deep = {obj = true}}}`]
             }
         ]);
     }

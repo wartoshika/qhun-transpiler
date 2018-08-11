@@ -16,7 +16,7 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
                     }
                 `,
                 expected: [
-                    `local a = {b=true}`,
+                    `local a = {b = true}`,
                     `if a.b then`,
                     `  a.b = false`,
                     `end`
@@ -42,7 +42,7 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
             }, {
                 code: `const a = {length: 5}; let b = a.length;`,
                 expected: [
-                    `local a = {length=5}`,
+                    `local a = {length = 5}`,
                     `local b = a.length`
                 ]
             }
@@ -54,13 +54,13 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
             {
                 code: `const a: any[] = [1,2]; let b = a.length;`,
                 expected: [
-                    `local a = {1,2}`,
+                    `local a = {1, 2}`,
                     `local b = #a`
                 ]
             }, {
                 code: `const a = [1,2].length;`,
                 expected: [
-                    `local a = #{1,2}`
+                    `local a = #{1, 2}`
                 ]
             }
         ]);

@@ -96,7 +96,7 @@ export class Transpiler {
                 return this.target.transpileBreakStatement(node as ts.BreakStatement);
             case ts.SyntaxKind.TryStatement:
                 return this.target.transpileTryStatement(node as ts.TryStatement);
-            case ts.SyntaxKind.ThrowKeyword:
+            case ts.SyntaxKind.ThrowStatement:
                 return this.target.transpileThrowStatement(node as ts.ThrowStatement);
             case ts.SyntaxKind.ContinueStatement:
                 return this.target.transpileContinueStatement(node as ts.ContinueStatement);

@@ -47,6 +47,6 @@ export class LuaImportDeclaration implements Partial<Target> {
         }
 
         // return all imported elements
-        return importedElements.join("\n");
+        return importedElements.join("\n") + "\n";
     }
 }
