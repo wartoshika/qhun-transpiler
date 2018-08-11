@@ -25,11 +25,34 @@ export class LuaStringSpecial {
     }
 
     /**
+     * transpiles a special string function
+     * @param name the name of the function
+     * @param owner the owner or base object
+     */
+    public transpileSpecialStringFunction(name: string, owner: string): string {
+        switch (name) {
+            case "replace":
+                return this.transpileSpecialStringFunctionReplace(owner);
+            default:
+                throw new UnsupportedError(`The given string function ${name} is unsupported!`, null);
+        }
+    }
+
+    /**
      * transpiles a string.length into lua
      * @param node the node to transpile
      */
     private transpileSpecialStringPropertyLength(node: ts.PropertyAccessExpression): string {
 
         return `string.len(${this.transpileNode(node.expression)})`;
+    }
+
+    /**
+     * an impl. for the string.replace function in lua
+     * @param owner the owner or base object
+     */
+    private transpileSpecialStringFunctionReplace(owner: string): string {
+
+        return `(function(a,b,c) return String.gsub(${owner}, a, b, c) end)`;
     }
 }

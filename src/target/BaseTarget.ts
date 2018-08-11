@@ -57,6 +57,17 @@ export abstract class BaseTarget implements Partial<Target> {
     }
 
     /**
+     * remove leading and trailing single and double quotes from a string
+     * @param str the string to remove the quotes from
+     */
+    protected removeQuotes(str: string): string {
+        if (str[0] === `"` || str[0] === `'`) {
+            return str.substr(1, str.length - 1);
+        }
+        return str;
+    }
+
+    /**
      * check if the given node has an export modifier
      * @param node the node to check
      */

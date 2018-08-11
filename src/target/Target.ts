@@ -344,4 +344,10 @@ export interface Target {
      * @param node the node to transpile
      */
     transpileObjectBindingPattern(node: ts.ObjectBindingPattern): string;
+
+    /**
+     * transpiles a spread element
+     * @param node the node to transpile
+     */
+    transpileSpreadElement(node: ts.SpreadElement): string;
 }

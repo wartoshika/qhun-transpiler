@@ -30,4 +30,19 @@ export class Types {
         // make the test
         return nodeType && (nodeType.kind === ts.SyntaxKind.ArrayType || nodeType.kind === ts.SyntaxKind.TupleType);
     }
+
+    /**
+     * check if the given node is an object
+     * @param node the node to check
+     * @param typeChecker the type checker instance
+     */
+    public static isObject(node: ts.Node, typeChecker: ts.TypeChecker): boolean {
+
+        // get the node type
+        const type = typeChecker.getTypeAtLocation(node);
+        const nodeType = typeChecker.typeToTypeNode(type);
+
+        // make the test
+        return nodeType && (nodeType.kind === ts.SyntaxKind.ObjectLiteralExpression);
+    }
 }

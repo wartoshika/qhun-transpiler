@@ -73,6 +73,7 @@ export class LuaTarget extends BaseTarget implements Target {
         luaTrait.LuaVariableDeclarationList,
         luaTrait.LuaArrayBindingPattern,
         luaTrait.LuaObjectBindingPattern,
+        luaTrait.LuaSpreadElement,
         // special
         luaTrait.LuaStringSpecial,
         luaTrait.LuaObjectSpecial,

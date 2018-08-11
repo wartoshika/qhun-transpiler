@@ -10,6 +10,7 @@ export * from "./LuaExportAssignment";
 export * from "./LuaVariableDeclarationList";
 export * from "./LuaArrayBindingPattern";
 export * from "./LuaObjectBindingPattern";
+export * from "./LuaSpreadElement";
 
 // misc bundle interface
 export * from "./LuaMisc";
