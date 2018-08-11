@@ -1,5 +1,6 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
+import { UnsupportedError } from "../../../src/error/UnsupportedError";
 
 @suite("[Unit] Target: Lua | Imports", slow(1000), timeout(10000)) class LuaImportDeclaration extends UnitTest {
 
@@ -35,5 +36,17 @@ import { UnitTest } from "../../UnitTest";
             }
         ]);
 
+    }
+
+    @test "Namespace imports"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `import * as b from "./a";`,
+                expected: [
+                    `local b = require("./a")`
+                ]
+            }
+        ])
     }
 }

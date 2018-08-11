@@ -19,23 +19,32 @@ export class LuaImportDeclaration implements Partial<Target> {
         // get the imports
         const imports = node.importClause.namedBindings;
 
-        // unly named imports are currently supported
-        if (!ts.isNamedImports(imports)) {
-            throw new UnsupportedError(`Unnamed imports are not supported!`, node);
-        }
-
         // get imported elements
-        const importedElements: string[] = imports.elements.map(element => {
+        let importedElements: string[];
+        if (ts.isNamedImports(imports)) {
+            importedElements = imports.elements.map(element => {
 
-            // get import name
-            const givenName = this.transpileNode(element.name);
+                // get import name
+                const givenName = this.transpileNode(element.name);
 
-            // check if there is an alias
-            const moduleName = element.propertyName ? this.transpileNode(element.propertyName) : givenName;
+                // check if there is an alias
+                const moduleName = element.propertyName ? this.transpileNode(element.propertyName) : givenName;
 
-            // build the import
-            return `local ${givenName} = require(${path}).${moduleName}`;
-        });
+                // build the import
+                return `local ${givenName} = require(${path}).${moduleName}`;
+            });
+        } else if (ts.isNamespaceImport(imports)) {
+
+            // get given name
+            const givenName = this.transpileNode(imports.name);
+
+            importedElements = [
+                `local ${givenName} = require(${path})`
+            ];
+        } else {
+            // unsupported import type
+            throw new UnsupportedError(`The given import type is not supported!`, node);
+        }
 
         // return all imported elements
         return importedElements.join("\n");
