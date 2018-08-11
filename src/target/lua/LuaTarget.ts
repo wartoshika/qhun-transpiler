@@ -5,7 +5,8 @@ import * as luaTrait from "./traits";
 import * as ts from "typescript";
 import { use } from "typescript-mix";
 
-export interface LuaTarget extends BaseTarget, Target, luaTrait.LuaDeclarations, luaTrait.LuaDeclarations, luaTrait.LuaExpressions, luaTrait.LuaMisc { }
+export interface LuaTarget extends BaseTarget, Target,
+    luaTrait.LuaDeclarations, luaTrait.LuaDeclarations, luaTrait.LuaExpressions, luaTrait.LuaMisc, luaTrait.LuaSpecial { }
 
 /**
  * the lua target
@@ -71,7 +72,11 @@ export class LuaTarget extends BaseTarget implements Target {
         luaTrait.LuaExportAssignment,
         luaTrait.LuaVariableDeclarationList,
         luaTrait.LuaArrayBindingPattern,
-        luaTrait.LuaObjectBindingPattern
+        luaTrait.LuaObjectBindingPattern,
+        // special
+        luaTrait.LuaStringSpecial,
+        luaTrait.LuaObjectSpecial,
+        luaTrait.LuaArraySpecial
     ) protected this: LuaTarget;
 
     /**

@@ -1,12 +1,34 @@
 import { Target } from "../../Target";
 import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
+import { LuaStringSpecial, LuaObjectSpecial, LuaArraySpecial } from "../special";
+import { Types } from "../../../transpiler/Types";
 
-export interface LuaPropertyAccessExpression extends BaseTarget, Target { }
+export interface LuaPropertyAccessExpression extends BaseTarget, Target, LuaStringSpecial, LuaObjectSpecial, LuaArraySpecial { }
 export class LuaPropertyAccessExpression implements Partial<Target> {
 
     public transpilePropertyAccessExpression(node: ts.PropertyAccessExpression): string {
 
-        return "PROPERTY_ACCESS_EXPRESSION";
+        // get the base property name
+        const name = this.transpileNode(node.name);
+
+        // get the expression by checking its type
+        const expressionType = this.typeChecker.getTypeAtLocation(node.expression);
+
+        switch (expressionType.flags) {
+            case ts.TypeFlags.String:
+            case ts.TypeFlags.StringLiteral:
+                return this.transpileSpecialStringProperty(node);
+            case ts.TypeFlags.Object:
+
+                // check if this is an array
+                if (Types.isArray(node.expression, this.typeChecker)) {
+                    return this.transpileSpecialArrayProperty(node);
+                }
+        }
+
+        // use normal lua property access
+        const expression = this.transpileNode(node.expression);
+        return `${expression}.${name}`;
     }
 }

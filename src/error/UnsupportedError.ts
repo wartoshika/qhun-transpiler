@@ -7,5 +7,8 @@ export class UnsupportedError extends Error {
         public node: ts.Node
     ) {
         super(message);
+        this.node = node;
+
+        (this as any).__proto__ = UnsupportedError.prototype;
     }
 }
