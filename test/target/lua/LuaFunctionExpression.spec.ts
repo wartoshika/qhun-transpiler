@@ -24,4 +24,18 @@ import { UnitTest } from "../../UnitTest";
         ]);
 
     }
+
+    @test "function expression"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `call(function() {run(1);});`,
+                expected: [
+                    `call(function ()`,
+                    `  run(1)`,
+                    `end)`
+                ]
+            }
+        ]);
+    }
 }
