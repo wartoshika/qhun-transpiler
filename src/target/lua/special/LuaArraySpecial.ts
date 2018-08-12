@@ -116,7 +116,7 @@ export class LuaArraySpecial {
         );
 
         // resolve shorthand arguments
-        const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack, this.typeChecker);
+        const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack);
 
         return `__array_foreach(${owner}, ${resolvedArguments.map(this.transpileNode).join(", ")})`;
     }
@@ -143,7 +143,7 @@ export class LuaArraySpecial {
         );
 
         // resolve shorthand arguments
-        const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack, this.typeChecker);
+        const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack);
 
         return `__array_map(${owner}, ${resolvedArguments.map(this.transpileNode).join(", ")})`;
     }
@@ -172,7 +172,7 @@ export class LuaArraySpecial {
         );
 
         // resolve shorthand arguments
-        const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack, this.typeChecker);
+        const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack);
 
         return `__array_filter(${owner}, ${resolvedArguments.map(this.transpileNode).join(", ")})`;
     }

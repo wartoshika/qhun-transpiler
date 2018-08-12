@@ -6,7 +6,7 @@ export class LuaSpecialFunctions {
      * resolves shorhand parameters
      * @param argumentStack the current argument stack
      */
-    public static resolveShorthandCallback(argumentStack: ts.NodeArray<ts.Expression>, typeChecker: ts.TypeChecker): ts.NodeArray<ts.Expression> {
+    public static resolveShorthandCallback(argumentStack: ts.NodeArray<ts.Expression>): ts.NodeArray<ts.Expression> {
 
         return ts.createNodeArray(argumentStack.map(arg => {
             if (ts.isArrowFunction(arg)) {
