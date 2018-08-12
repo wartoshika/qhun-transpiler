@@ -44,6 +44,30 @@ export interface Target {
     transpileClassDeclaration(node: ts.ClassDeclaration): string;
 
     /**
+     * transpiles existing class level decorators
+     * @param node the node to transpile
+     */
+    transpileClassDecorator(node: ts.ClassDeclaration): string;
+
+    /**
+     * transpiles existing property level decorators
+     * @param node the node to transpile
+     */
+    transpilePropertyDecorator(node: ts.PropertyDeclaration): string;
+
+    /**
+     * transpiles existing function level decorators
+     * @param node the node to transpile
+     */
+    transpileFunctionDecorator(node: ts.FunctionDeclaration): string;
+
+    /**
+     * transpiles existing parameter level decorators
+     * @param node the node to transpile
+     */
+    transpileParameterDecorator(node: ts.ParameterDeclaration): string;
+
+    /**
      * transpiles a module declaration
      * @param node the node to transpile
      */

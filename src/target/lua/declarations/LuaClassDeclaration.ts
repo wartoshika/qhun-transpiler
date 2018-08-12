@@ -72,20 +72,27 @@ export class LuaClassDeclaration implements Partial<Target> {
         // add static class initializer function
         classHead.push(...[
             `function ${className}.${LuaKeywords.CLASS_NEW_FUNCTION_NAME}(self, ...)`,
-            this.addSpacesToString(`local instance = setmetatable({}, ${className})`, 2),
+            this.addSpacesToString(`local ${LuaKeywords.CLASS_INSTANCE_LOCAL_NAME} = setmetatable({}, ${className})`, 2),
             // add non static properties
             this.addSpacesToString(
                 nonStaticInitProperties.map(p => {
                     const propertyName = this.transpileNode(p.name);
                     const initializer = this.transpileNode(p.initializer);
-                    return `instance.${propertyName} = ${initializer}`;
+                    return `${LuaKeywords.CLASS_INSTANCE_LOCAL_NAME}.${propertyName} = ${initializer}`;
                 }).join("\n"), 2),
+            // add property decorators
+            this.addSpacesToString(node.members
+                .filter(ts.isPropertyDeclaration)
+                .filter(prop => !!prop.decorators)
+                .map(dec => this.transpilePropertyDecorator(dec))
+                .filter(dec => !!dec)
+                .join("\n"), 2),
             // add the constructor call
             this.addSpacesToString(`if self and ${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME} then`, 2),
-            this.addSpacesToString(`${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}(instance, ...)`, 4),
+            this.addSpacesToString(`${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}(${LuaKeywords.CLASS_INSTANCE_LOCAL_NAME}, ...)`, 4),
             this.addSpacesToString(`end`, 2),
             // return the constructed instance
-            this.addSpacesToString(`return instance`, 2),
+            this.addSpacesToString(`return ${LuaKeywords.CLASS_INSTANCE_LOCAL_NAME}`, 2),
             `end`
         ]);
 

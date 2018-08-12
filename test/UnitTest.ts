@@ -9,6 +9,12 @@ export declare type TestCodeAndResult = {
     message?: string
 }[];
 
+export declare type TestCodeAndContainResult = {
+    code: string,
+    expected: string,
+    message?: string
+}[];
+
 export declare type TestCodeAndThrow = {
     code: string,
     throw: typeof UnsupportedError | typeof Error,
@@ -23,6 +29,22 @@ export abstract class UnitTest extends Test {
 
             expect(this.transpile(target, oneCase.code))
                 .to.deep.equal(oneCase.expected, oneCase.message);
+        });
+    }
+
+    protected runCodeAndExpectResultContains(target: keyof SupportedTargets, test: TestCodeAndResult): void {
+
+        test.forEach(oneCase => {
+
+            expect(this.transpile(target, oneCase.code))
+                .to.satisfy((arr: string[]) => {
+
+                    // trim
+                    arr = arr.map(line => line.trim());
+                    return oneCase.expected.every(line => {
+                        return arr.indexOf(line) !== -1;
+                    });
+                }, oneCase.message);
         });
     }
 

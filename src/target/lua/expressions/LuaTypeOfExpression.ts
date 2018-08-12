@@ -7,6 +7,9 @@ export class LuaTypeOfExpression implements Partial<Target> {
 
     public transpileTypeOfExpression(node: ts.TypeOfExpression): string {
 
-        return "TYPEOF_EXPRESSION";
+        // use the lua function type() to get the type
+        const expression = this.transpileNode(node.expression);
+
+        return `type(${expression})`;
     }
 }
