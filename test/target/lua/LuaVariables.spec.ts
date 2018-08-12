@@ -60,6 +60,17 @@ import { UnitTest } from "../../UnitTest";
         ]);
     }
 
+    @test "ObjectLiterals with computed properties"() {
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `const myObj = { [myKey()]: "test" }`,
+                expected: [
+                    `local myObj = {[myKey()] = "test"}`
+                ]
+            }
+        ]);
+    }
+
     @test "Export variables"() {
 
         this.runCodeAndExpectResult("lua", [

@@ -7,6 +7,9 @@ export class LuaComputedPropertyName implements Partial<Target> {
 
     public transpileComputedPropertyName(node: ts.ComputedPropertyName): string {
 
-        return "COMPUTED_PROPERTY_NAME";
+        // wrap the expression with brackets
+        const expression = this.transpileNode(node.expression);
+
+        return `[${expression}]`;
     }
 }

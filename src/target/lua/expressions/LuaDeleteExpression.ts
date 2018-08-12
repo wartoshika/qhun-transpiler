@@ -7,6 +7,9 @@ export class LuaDeleteExpression implements Partial<Target> {
 
     public transpileDeleteExpression(node: ts.DeleteExpression): string {
 
-        return "DELETE_EXPRESSION";
+        // nillify the expression
+        const expression = this.transpileNode(node.expression);
+
+        return `${expression} = nil\n`;
     }
 }
