@@ -22,169 +22,142 @@ export class LuaClassDeclaration implements Partial<Target> {
             this.addExport(name, node);
         }
 
-        // get the heritage class name if available
+        // return the whole thing
+        return [
+            this.writeClassHead(name, node),
+            this.writeClassMethods(name, node)
+        ].join("\n");
+    }
+
+    /**
+     * writes the class head including static properties
+     * @param className the class name
+     * @param node the class declaration node
+     */
+    private writeClassHead(className: string, node: ts.ClassDeclaration): string {
+
+        // define the class head stack
+        const classHead: string[] = [];
+
+        // get static properties that have initializers
+        const initProperties = node.members
+            .filter(ts.isPropertyDeclaration)
+            .filter(prop => !!prop.initializer);
+
+        const staticInitProperties = initProperties.filter(Types.isStatic);
+        const nonStaticInitProperties = initProperties.filter(p => !Types.isStatic(p));
+
+        // get super class name if available
+        const superClass = this.getSuperClassName(node);
+
+        // add the lua class initializer
+        if (superClass) {
+            classHead.push(`local ${className} = ${superClass}.__init()`);
+            classHead.push(`${className}.__super = ${superClass}`);
+        } else {
+            classHead.push(`local ${className} = {}`);
+        }
+
+        // add the reference index
+        classHead.push(`${className}.__index = ${className}`);
+
+        // add static properties
+        classHead.push(...staticInitProperties.map(prop => {
+            const propertyName = this.transpileNode(prop.name);
+            const initializer = this.transpileNode(prop.initializer);
+            return `${className}.${propertyName} = ${initializer}`;
+        }));
+
+        // add static class initializer function
+        classHead.push(...[
+            `function ${className}.__init(self, ...)`,
+            this.addSpacesToString(`local instance = setmetatable({}, ${className})`, 2),
+            // add non static properties
+            this.addSpacesToString(
+                nonStaticInitProperties.map(p => {
+                    const propertyName = this.transpileNode(p.name);
+                    const initializer = this.transpileNode(p.initializer);
+                    return `instance.${propertyName} = ${initializer}`;
+                }).join("\n"), 2),
+            // add the constructor call
+            this.addSpacesToString(`if self and ${className}.__new then`, 2),
+            this.addSpacesToString(`${className}.__new(instance, ...)`, 4),
+            this.addSpacesToString(`end`, 2),
+            // return the constructed instance
+            this.addSpacesToString(`return instance`, 2),
+            `end`
+        ]);
+
+        return this.removeEmptyLines(classHead.join("\n"));
+    }
+
+    /**
+     * write the class methods including constructor
+     * @param className the class name
+     * @param node the class declaration
+     */
+    private writeClassMethods(className: string, node: ts.ClassDeclaration): string {
+
+        // declare the class method stack
+        const classMethods: string[] = [];
         const superClassName = this.getSuperClassName(node);
 
-        // get all static properties
-        const staticProperties = node.members
-            .filter(ts.isPropertyDeclaration)
-            .filter(Types.isStatic);
+        // get all constructors, ignore overload signatures
+        const constructors = node.members
+            .filter(ts.isConstructorDeclaration)
+            .filter(constructor => !!constructor.body);
 
-        // all non static properties
-        const nonStaticProperties = node.members
-            .filter(ts.isPropertyDeclaration)
-            .filter(prop => !Types.isStatic(prop));
-
-        // all methods that has a valid body
+        // get all methods, ignore overload signatures
         const methods = node.members
             .filter(ts.isMethodDeclaration)
             .filter(method => !!method.body);
 
-        // all constructors that have a body
-        const constructor = node.members
-            .filter(ts.isConstructorDeclaration)
-            .filter(ctor => !!ctor.body);
-
-        // begin by writing the class head
-        const classDeclaration: string[] = [
-            `local ${name} = {}`,
-            `${name}.__index = ${name}`
-        ];
-
-        // add heritage
-        if (superClassName) {
-            classDeclaration.push(`${name}.__super = ${superClassName}`);
-        }
-
-        // other members
-        classDeclaration.push(this.transpileStaticProperties(name, staticProperties));
-        classDeclaration.push(this.transpileConstructor(name, superClassName, nonStaticProperties, constructor, node));
-
-        // return the class declaration
-        return classDeclaration.join("\n");
-
-    }
-
-    /**
-     * transpile the given static properties
-     * @param className the current class name
-     * @param properties the properties to transpile
-     */
-    private transpileStaticProperties(className: string, properties: ts.PropertyDeclaration[]): string {
-
-        return properties.map(property => {
-            // get the property name
-            const propertyName = this.transpileNode(property.name);
-
-            // get the initializer
-            const initializer = this.transpileNode(property.initializer);
-
-            // add those two params
-            return `${className}.${propertyName} = ${initializer || "nil"}`;
-        }).join("\n");
-    }
-
-    /**
-     * transpile the given constructor
-     * @param className the current class name
-     * @param superClassName the super class name
-     * @param nonStaticProperties all non static properties
-     * @param constructors the constructor declaration stack
-     * @param node the current class declaration node
-     */
-    private transpileConstructor(
-        className: string,
-        superClassName: string,
-        nonStaticProperties: ts.PropertyDeclaration[],
-        constructors: ts.ConstructorDeclaration[],
-        node: ts.ClassDeclaration
-    ): string {
-
-        // make sure that there is only one constructor
+        // start by checking the amount of constructors
         if (constructors.length > 1) {
-            throw new UnsupportedError(`Multiple constructors with a body are unsupported!`, node);
-        } else if (constructors.length === 0) {
-
-            // no constructor given, create a new one
-            constructors = [
-                ts.createConstructor([], [], [], ts.createBlock([], true))
-            ];
+            throw new UnsupportedError("Multiple class construcor functions with a body are unsupported!", node);
         }
 
-        // get the one constructor
-        const constructor = constructors[0];
+        // check if there are no constructors available
+        if (constructors.length < 1 && !superClassName) {
 
-        // get all parameters
-        const aditionalParams: ts.ParameterDeclaration[] = [];
-        const constructorParams = ["self", ...constructor.parameters.map(param => {
+            // create an empty constructor because no super constructor is available
+            constructors.push(ts.createConstructor([], [], [], ts.createBlock([])));
+        }
 
-            // check for param modifiers like public, protected and private
-            if (Types.hasExplicitVisibility(param)) {
-                aditionalParams.push(param);
+        // conat constructor and other methods
+        classMethods.push(...[...constructors, ...methods].map(method => {
+
+            // get the name of the method
+            let name: string;
+            if (ts.isConstructorDeclaration(method)) {
+                name = `${className}.__new`;
+            } else if (ts.isMethodDeclaration(method)) {
+                name = `${className}.${this.transpileNode(method.name)}`;
             }
 
-            // get the param name
-            let paramName = this.transpileNode(param.name);
-            if (param.dotDotDotToken) {
-                paramName = "...";
-            }
+            // add the self parameter
+            const parameters: ts.ParameterDeclaration[] = [
+                ts.createParameter([], [], null, "self")
+            ];
+            method.parameters.forEach(param => {
+                parameters.push(param);
+            });
 
-            return paramName;
-        })].filter(param => !!param);
+            // use the function declaration and remove the local prefix
+            return this.transpileNode(ts.createFunctionDeclaration(
+                method.decorators,
+                method.modifiers,
+                method.asteriskToken,
+                ts.createIdentifier(name),
+                method.typeParameters,
+                ts.createNodeArray(parameters),
+                method.type,
+                method.body,
+            )).substr(6);
+        }));
 
-        // write method signature
-        const signature = [
-            `function ${className}.__new(`,
-            constructorParams.join(", "),
-            `)`
-        ].join("");
-
-        // add aditional params and param initializers to the body
-        const bodyHead: string[] = [
-            ...nonStaticProperties.map(param => {
-
-                // get the param name
-                const paramName = this.transpileNode(param.name);
-                const initializer = this.transpileNode(param.initializer);
-
-                // add the var content to the current class context
-                return `self.${paramName} = ${initializer || "nil"}`;
-            }),
-            ...constructor.parameters
-                .filter(param => !!param.initializer || param.dotDotDotToken)
-                .map(param => {
-
-                    // get param name
-                    const paramName = this.transpileNode(param.name);
-                    const initializer = this.transpileNode(param.initializer);
-
-                    // add rest param
-                    if (param.dotDotDotToken) {
-                        return `local ${paramName} = {...}\n`;
-                    }
-
-                    // add the default initializer
-                    return `if ${paramName} == nil then ${paramName} = ${initializer} end`;
-                }),
-            ...aditionalParams.map(param => {
-
-                // get the param name
-                const paramName = this.transpileNode(param.name);
-
-                // add the var content to the current class context
-                return `self.${paramName} = ${paramName}`;
-            })
-        ];
-
-        // get the body of the constructor
-        const bodyTail = this.transpileNode(constructor.body);
-
-        // return the signature and body
-        return [
-            signature,
-            this.removeEmptyLines(this.addSpacesToString([...bodyHead, bodyTail].join("\n"), 2)),
-            `end`
-        ].join("\n");
+        // join by new line
+        return classMethods.join("\n");
     }
 
     /**
@@ -199,7 +172,8 @@ export class LuaClassDeclaration implements Partial<Target> {
         if (node.heritageClauses) {
             node.heritageClauses.some(clause => {
                 if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
-                    superName = this.typeChecker.getTypeAtLocation(node).symbol.escapedName.toString();
+                    const extendedType = clause.types[0];
+                    superName = this.transpileNode(extendedType.expression);
                     return true;
                 }
             });

@@ -15,8 +15,8 @@ import { UnitTest } from "../../UnitTest";
                 `,
                 expected: [
                     `local a = function (a, b, ...)`,
-                    `  local c = {...}`,
                     `  if b == nil then b = true end`,
+                    `  local c = {...}`,
                     `  return a and b`,
                     `end`
                 ]

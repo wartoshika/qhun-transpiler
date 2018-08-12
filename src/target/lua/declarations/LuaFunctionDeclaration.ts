@@ -1,6 +1,7 @@
 import { Target } from "../../Target";
 import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
+import { Types } from "../../../transpiler/Types";
 
 export interface LuaFunctionDeclaration extends BaseTarget, Target { }
 export class LuaFunctionDeclaration implements Partial<Target> {
@@ -39,18 +40,37 @@ export class LuaFunctionDeclaration implements Partial<Target> {
                 return `if ${paramName} == nil then ${paramName} = ${this.transpileNode(param.initializer)} end`;
             });
 
-        // get the function body
-        let body = this.transpileNode(node.body);
+        // add some body head
+        const bodyHead: string[] = [];
 
         // add initializers
         if (paramInitializer.length > 0) {
-            body = paramInitializer.join("\n") + "\n" + body;
+            bodyHead.push(paramInitializer.join("\n"));
         }
 
         // add rest argument if available
         if (restArgumentName) {
-            body = `local ${restArgumentName} = {...}\n${body}`;
+            bodyHead.push(`local ${restArgumentName} = {...}`);
         }
+
+        // add parameters with visibility modifier
+        const visibilityParams = node.parameters
+            .filter(Types.hasExplicitVisibility)
+            .map(param => {
+                const paramName = this.transpileNode(param.name);
+                return `self.${paramName} = ${paramName}`;
+            });
+
+        // add those params
+        if (visibilityParams.length > 0) {
+            bodyHead.push(visibilityParams.join("\n"));
+        }
+
+        // get the function body
+        let body = this.transpileNode(node.body);
+
+        // add the head before the body
+        body = bodyHead.join("\n") + "\n" + body;
 
         // put everything together
         return this.removeEmptyLines([
