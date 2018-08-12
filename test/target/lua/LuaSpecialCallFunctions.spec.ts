@@ -120,6 +120,18 @@ import { UnitTest } from "../../UnitTest";
                     `  return obj >= 2`,
                     `end)`
                 ]
+            }, {
+                code: `[1,2].filter(myFilterFunc)`,
+                expected: [
+                    `__array_filter({1, 2}, myFilterFunc)`
+                ]
+            }, {
+                code: `[1,2].filter(obj => !!obj)`,
+                expected: [
+                    `__array_filter({1, 2}, function (obj)`,
+                    `  return (not (not obj))`,
+                    `end)`
+                ]
             }
         ]);
     }

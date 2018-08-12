@@ -12,8 +12,7 @@ export class LuaSpecialFunctions {
             if (ts.isArrowFunction(arg)) {
 
                 // test if the given body is an expression instead of a block
-                if (arg.body.kind === ts.SyntaxKind.BinaryExpression) {
-
+                if (!ts.isBlock(arg.body)) {
                     // create a block and append the return statement
                     const returnStatement = ts.createReturn(arg.body);
                     arg.body = ts.createBlock(
