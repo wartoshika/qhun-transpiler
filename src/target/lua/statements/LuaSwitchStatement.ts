@@ -55,13 +55,16 @@ export class LuaSwitchStatement implements Partial<Target> {
             ].join("\n");
         }
 
+        // generate a switch variable
+        const switchVar = this.generateUniqueVariableName("switch");
+
         // build the switch object
         return [
-            `local __switch = {`,
+            `local ${switchVar} = {`,
             this.addSpacesToString(cases.join(",\n"), 2),
             `}`,
-            `if type(__switch[${expression}]) == "function" then`,
-            `  __switch[${expression}]()`,
+            `if type(${switchVar}[${expression}]) == "function" then`,
+            `  ${switchVar}[${expression}]()`,
             defaultOrEnd
         ].join("\n");
     }

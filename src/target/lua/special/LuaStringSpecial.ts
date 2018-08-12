@@ -28,11 +28,12 @@ export class LuaStringSpecial {
      * transpiles a special string function
      * @param name the name of the function
      * @param owner the owner or base object
+     * @param argumentStack the given arguments
      */
-    public transpileSpecialStringFunction(name: string, owner: string): string {
+    public transpileSpecialStringFunction(name: string, owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
         switch (name) {
             case "replace":
-                return this.transpileSpecialStringFunctionReplace(owner);
+                return this.transpileSpecialStringFunctionReplace(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given string function ${name} is unsupported!`, null);
         }
@@ -50,9 +51,20 @@ export class LuaStringSpecial {
     /**
      * an impl. for the string.replace function in lua
      * @param owner the owner or base object
+     * @param argumentStack the given arguments
      */
-    private transpileSpecialStringFunctionReplace(owner: string): string {
+    private transpileSpecialStringFunctionReplace(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
 
-        return `(function(___a,___b,___c) return String.gsub(${owner}, ___a, ___b, ___c) end)`;
+        // add declaration
+        this.addDeclaration(
+            "string.replace",
+            [
+                `local function __string_replace(a,b,c)`,
+                this.addSpacesToString(`return string.gsub(a,b,c)`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__string_replace(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
     }
 }

@@ -10,13 +10,13 @@ import { UnitTest } from "../../UnitTest";
             {
                 code: `"test".replace(a)`,
                 expected: [
-                    `(function(___a,___b,___c) return String.gsub("test", ___a, ___b, ___c) end)(a)`
+                    `__string_replace("test", a)`
                 ]
             }, {
                 code: `const a: string = "test"; a.replace("a", "b")`,
                 expected: [
                     `local a = "test"`,
-                    `(function(___a,___b,___c) return String.gsub(a, ___a, ___b, ___c) end)("a", "b")`
+                    `__string_replace(a, "a", "b")`
                 ]
             }, {
                 code: `myObj.replace(1,2,3)`,
@@ -34,13 +34,13 @@ import { UnitTest } from "../../UnitTest";
             {
                 code: `[1,2].join(",")`,
                 expected: [
-                    `(function(___a) return table.concat({1, 2}, ___a) end)(",")`
+                    `__array_join({1, 2}, ",")`
                 ]
             }, {
                 code: `const a: any[] = [1,2]; a.join("|")`,
                 expected: [
                     `local a = {1, 2}`,
-                    `(function(___a) return table.concat(a, ___a) end)("|")`
+                    `__array_join(a, "|")`
                 ]
             }, {
                 code: `myObj.join(",")`,
@@ -58,7 +58,67 @@ import { UnitTest } from "../../UnitTest";
                 code: `const a: any[] = []; a.push(1,2,3,4);`,
                 expected: [
                     `local a = {}`,
-                    `(function(...) local ___v = {...} for _, ___e in pairs(___v) do table.insert(a, ___e) end end)(1, 2, 3, 4)`
+                    `__array_push(a, 1, 2, 3, 4)`
+                ]
+            }
+        ]);
+    }
+
+    @test "Array.forEach(...)"() {
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `
+                    [1,2].forEach((value, key) => {
+                        run(test);
+                    });
+                `,
+                expected: [
+                    `__array_foreach({1, 2}, function (value, key)`,
+                    `  run(test)`,
+                    `end)`
+                ]
+            }
+        ]);
+    }
+
+    @test "Array.map(...)"() {
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `
+                    [1,2].map(num=>{
+                        return "test" + num
+                    });
+                `,
+                expected: [
+                    `__array_map({1, 2}, function (num)`,
+                    `  return "test" .. num`,
+                    `end)`
+                ]
+            }
+        ]);
+    }
+
+    @test "Array.filter(...)"() {
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `
+                    [1,2,3].filter(obj => {
+                        return obj >= 2;
+                    });
+                `,
+                expected: [
+                    `__array_filter({1, 2, 3}, function (obj)`,
+                    `  return obj >= 2`,
+                    `end)`
+                ]
+            }, {
+                code: `
+                    [1,2,3].filter(obj => obj >= 2);
+                `,
+                expected: [
+                    `__array_filter({1, 2, 3}, function (obj)`,
+                    `  return obj >= 2`,
+                    `end)`
                 ]
             }
         ]);
@@ -68,9 +128,9 @@ import { UnitTest } from "../../UnitTest";
 
         this.runCodeAndExpectResult("lua", [
             {
-                code: `const a = Object.keys(a)`,
+                code: `const a = Object.keys(b)`,
                 expected: [
-                    `local a = (function(___a) local keys = {} for k, _ in pairs(___a) do table.insert(keys, k) end return keys end)(a)`
+                    `local a = __object_keys(b)`
                 ]
             }, {
                 code: `myObj.keys()`,

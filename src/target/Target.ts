@@ -17,11 +17,9 @@ export interface Target {
     getNodeTranspiler(): (node: ts.Node) => string;
 
     /**
-     * add a node export
-     * @param name the name of the exported variable
-     * @param node the node that should be exported
+     * get the declaration code that shoule be put to the head of the file
      */
-    addExport(name: string, node: ts.Node): void;
+    getDeclaration(): string[];
 
     /**
      * a function that is called before the transpiling process begins

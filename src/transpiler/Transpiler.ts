@@ -21,9 +21,10 @@ export class Transpiler {
     /**
      * transpiles the given file into the target language
      * @param sourceFile the source file to transpile
+     * @param addDeclarations a flag if special declaration code should be added to the top of the file
      * @returns the transpiles source code
      */
-    public transpile(sourceFile: ts.SourceFile): string {
+    public transpile(sourceFile: ts.SourceFile, addDeclarations: boolean = true): string {
 
         // the transpiled sourcecode will be stored in result
         let result = this.target.preTranspile() || "";
@@ -36,6 +37,14 @@ export class Transpiler {
 
         // add post transpile
         result += this.target.postTranspile() || "";
+
+        // check the declaration flag
+        if (addDeclarations) {
+            result = [
+                ...this.target.getDeclaration(),
+                result
+            ].join("\n");
+        }
 
         // return the final result
         return result;

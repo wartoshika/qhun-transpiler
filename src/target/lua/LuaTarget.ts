@@ -81,14 +81,6 @@ export class LuaTarget extends BaseTarget implements Target {
     ) protected this: LuaTarget;
 
     /**
-     * all declared exports of the file
-     */
-    private exportStack: {
-        name: string,
-        node: ts.Node
-    }[] = [];
-
-    /**
      * a function that is called before the transpiling process begins
      */
     public preTranspile(): string | void {
@@ -100,18 +92,6 @@ export class LuaTarget extends BaseTarget implements Target {
      */
     public postTranspile(): string | void {
         return "";
-    }
-
-    /**
-     * add a node export
-     * @param name the name of the exported variable
-     * @param node the node that should be exported
-     */
-    public addExport(name: string, node: ts.Node): void {
-
-        this.exportStack.push({
-            name, node
-        });
     }
 
 }

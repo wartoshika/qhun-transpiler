@@ -26,7 +26,7 @@ export class LuaClassDeclaration implements Partial<Target> {
         return [
             this.writeClassHead(name, node),
             this.writeClassMethods(name, node)
-        ].join("\n");
+        ].join("\n") + "\n";
     }
 
     /**

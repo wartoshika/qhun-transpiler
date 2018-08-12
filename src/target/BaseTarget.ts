@@ -12,6 +12,26 @@ export abstract class BaseTarget implements Partial<Target> {
      */
     protected transpileNode: (node: ts.Node) => string;
 
+    /**
+     * a variable counter for truely unique vars
+     */
+    private uniqueVariableCounter: number = 0;
+
+    /**
+     * all declared exports of the file
+     */
+    private exportStack: {
+        name: string,
+        node: ts.Node
+    }[] = [];
+
+    /**
+     * a stack of declarations that will be put onto the top of the
+     */
+    private declarationStack: {
+        [uniqueName: string]: string
+    } = {};
+
     constructor(
         protected project: Project,
         protected typeChecker: ts.TypeChecker
@@ -30,6 +50,46 @@ export abstract class BaseTarget implements Partial<Target> {
      */
     public getNodeTranspiler(): (node: ts.Node) => string {
         return this.transpileNode;
+    }
+
+    /**
+     * get the declaration code that shoule be put to the head of the file
+     */
+    public getDeclaration(): string[] {
+
+        return Object.keys(this.declarationStack)
+            .map(key => this.declarationStack[key]);
+    }
+
+    /**
+     * add a node export
+     * @param name the name of the exported variable
+     * @param node the node that should be exported
+     */
+    protected addExport(name: string, node: ts.Node): void {
+
+        this.exportStack.push({
+            name, node
+        });
+    }
+
+    /**
+     * adds a declaration source code to the top of the file. this is a good place for used functions
+     * @param name the unique name of the declaration
+     * @param declaration the source code to declare
+     */
+    protected addDeclaration(name: string, declaration: string): void {
+
+        this.declarationStack[name] = declaration;
+    }
+
+    /**
+     * generate a unique variable that can be addressed locally
+     * @param name the name of the variable
+     */
+    protected generateUniqueVariableName(name: string): string {
+
+        return `__${name}_${this.uniqueVariableCounter++}`;
     }
 
     /**

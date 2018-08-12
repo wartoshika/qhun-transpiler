@@ -23,11 +23,12 @@ export class LuaObjectSpecial {
      * transpiles a special object function
      * @param name the name of the function
      * @param owner the owner or base object
+     * @param argumentStack the argument stack
      */
-    public transpileSpecialObjectFunction(name: string, owner: string): string {
+    public transpileSpecialObjectFunction(name: string, owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
         switch (name) {
             case "keys":
-                return this.transpileSpecialObjectFunctionKeys(owner);
+                return this.transpileSpecialObjectFunctionKeys(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given object function ${name} is unsupported!`, null);
         }
@@ -35,18 +36,25 @@ export class LuaObjectSpecial {
 
     /**
      * an impl. for the Object.keys() function in lua
-     * @param owner the owner or base object
+     * @param owner the owner
+     * @param argumentStack the arguments
      */
-    private transpileSpecialObjectFunctionKeys(owner: string): string {
+    private transpileSpecialObjectFunctionKeys(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
 
-        return [
-            `(function(___a)`,
-            /**/`local keys = {}`,
-            /**/`for k, _ in pairs(___a) do`,
-            /**//**/`table.insert(keys, k)`,
-            /**/`end`,
-            /**/`return keys`,
-            `end)`
-        ].join(" ");
+        // declare object.keys
+        this.addDeclaration(
+            "object.keys",
+            [
+                `local function __object_keys(a)`,
+                this.addSpacesToString(`local keys = {}`, 2),
+                this.addSpacesToString(`for k, _ in pairs(a) do`, 2),
+                this.addSpacesToString(`table.insert(keys, k)`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return keys`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__object_keys(${argumentStack.map(this.transpileNode).join(", ")})`;
     }
 }

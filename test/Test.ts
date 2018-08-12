@@ -84,7 +84,7 @@ export abstract class Test {
 
         // return the transpiled code
         return transpiler
-            .transpile(program.getSourceFile("test.ts"))
+            .transpile(program.getSourceFile("test.ts"), false)
             .split("\n")
             .filter(line => !!line);
     }

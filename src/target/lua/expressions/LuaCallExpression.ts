@@ -10,27 +10,23 @@ export class LuaCallExpression implements Partial<Target> {
 
     public transpileCallExpression(node: ts.CallExpression): string {
 
-        // get arguments
-        const argumentStack: string[] = node.arguments.map(arg => this.transpileNode(arg));
-
         // check if the call expression is from an access expression
         if (ts.isPropertyAccessExpression(node.expression)) {
-            return this.transpileCallExpressionOnProperty(node, argumentStack);
+            return this.transpileCallExpressionOnProperty(node);
         }
 
         // get base expression
         const base = this.transpileNode(node.expression);
 
         // put everything together
-        return `${base}(${argumentStack.join(", ")})`;
+        return `${base}(${node.arguments.map(this.transpileNode).join(", ")})`;
     }
 
     /**
      * transpiles a call expression from a property access expression
      * @param node the node to transpile
-     * @param argumentStack the argument stack
      */
-    private transpileCallExpressionOnProperty(node: ts.CallExpression, argumentStack: string[]): string {
+    private transpileCallExpressionOnProperty(node: ts.CallExpression): string {
 
         // get the called function name
         const functionObj = node.expression as ts.PropertyAccessExpression;
@@ -49,33 +45,19 @@ export class LuaCallExpression implements Partial<Target> {
             ownerNameCheck = "Array";
         }
 
-        // generate a function signature string
-        let signature: string;
-
         // check if there are some special objects
         switch (ownerNameCheck) {
             case "Object":
-                signature = this.transpileSpecialObjectFunction(functionName, ownerName);
-                break;
+                return this.transpileSpecialObjectFunction(functionName, ownerName, node.arguments);
             case "String":
-                signature = this.transpileSpecialStringFunction(functionName, ownerName);
-                break;
+                return this.transpileSpecialStringFunction(functionName, ownerName, node.arguments);
             case "Array":
-                signature = this.transpileSpecialArrayFunction(functionName, ownerName);
-                break;
+                return this.transpileSpecialArrayFunction(functionName, ownerName, node.arguments);
             case "Math":
-
-                break;
+                throw new UnsupportedError("The Math object is currently unsupported!", node);
         }
-
-        // if a signature is available, take this and call it with the given arguments
-        if (signature) {
-            return `${signature}(${argumentStack.join(", ")})`;
-        }
-
-        // @todo: check for class method calls that uses : for non static and . for static calls
 
         // use the default access pattern
-        return `${ownerName}.${functionName}(${argumentStack.join(", ")})`;
+        return `${ownerName}.${functionName}(${node.arguments.map(this.transpileNode).join(", ")})`;
     }
 }

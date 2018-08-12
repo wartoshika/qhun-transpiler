@@ -16,7 +16,7 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
                     }
                 `,
                 expected: [
-                    `local __switch = {`,
+                    `local __switch_0 = {`,
                     `  [1] = function()`,
                     `    run(1)`,
                     `  end,`,
@@ -24,8 +24,8 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
                     `    run(2)`,
                     `  end`,
                     `}`,
-                    `if type(__switch[a]) == "function" then`,
-                    `  __switch[a]()`,
+                    `if type(__switch_0[a]) == "function" then`,
+                    `  __switch_0[a]()`,
                     `end`
                 ]
             }
@@ -46,7 +46,7 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
                     }
                 `,
                 expected: [
-                    `local __switch = {`,
+                    `local __switch_0 = {`,
                     `  [1] = function()`,
                     `    run(1)`,
                     `  end,`,
@@ -54,8 +54,8 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
                     `    run(2)`,
                     `  end`,
                     `}`,
-                    `if type(__switch[a]) == "function" then`,
-                    `  __switch[a]()`,
+                    `if type(__switch_0[a]) == "function" then`,
+                    `  __switch_0[a]()`,
                     `else`,
                     `  run("default")`,
                     `end`
