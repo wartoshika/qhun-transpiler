@@ -21,7 +21,7 @@ import { UnitTest } from "../../UnitTest";
             }, {
                 code: `myObj.replace(1,2,3)`,
                 expected: [
-                    `myObj.replace(1, 2, 3)`
+                    `myObj:replace(1, 2, 3)`
                 ]
             }
         ]);
@@ -45,7 +45,7 @@ import { UnitTest } from "../../UnitTest";
             }, {
                 code: `myObj.join(",")`,
                 expected: [
-                    `myObj.join(",")`
+                    `myObj:join(",")`
                 ]
             }
         ]);
@@ -147,7 +147,7 @@ import { UnitTest } from "../../UnitTest";
             }, {
                 code: `myObj.keys()`,
                 expected: [
-                    `myObj.keys()`
+                    `myObj:keys()`
                 ]
             }
         ]);

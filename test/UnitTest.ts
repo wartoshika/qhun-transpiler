@@ -42,7 +42,11 @@ export abstract class UnitTest extends Test {
                     // trim
                     arr = arr.map(line => line.trim());
                     return oneCase.expected.every(line => {
-                        return arr.indexOf(line) !== -1;
+                        const res = arr.indexOf(line) !== -1;
+                        if (!res) {
+                            console.error("Cannot find", line, "in", arr);
+                        }
+                        return res;
                     });
                 }, oneCase.message);
         });

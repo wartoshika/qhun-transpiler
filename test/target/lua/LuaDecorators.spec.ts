@@ -43,4 +43,23 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
 
     }
 
+    @test "method level decorators"() {
+
+        this.runCodeAndExpectResultContains("lua", [
+            {
+                code: `
+                    class A {
+
+                        @myMethodDecorator
+                        public test(): void {}
+                    }
+                `,
+                expected: [
+                    `myMethodDecorator(self, "test", {})`
+                ]
+            }
+        ]);
+
+    }
+
 }

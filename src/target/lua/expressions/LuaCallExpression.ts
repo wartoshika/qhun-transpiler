@@ -58,6 +58,6 @@ export class LuaCallExpression implements Partial<Target> {
         }
 
         // use the default access pattern
-        return `${ownerName}.${functionName}(${node.arguments.map(this.transpileNode).join(", ")})`;
+        return `${ownerName}:${functionName}(${node.arguments.map(this.transpileNode).join(", ")})`;
     }
 }

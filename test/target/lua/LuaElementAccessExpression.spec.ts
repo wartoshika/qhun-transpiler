@@ -19,7 +19,7 @@ import { UnitTest } from "../../UnitTest";
                     a[b][c[1]].d(d["string"][func()])
                 `,
                 expected: [
-                    `a[b][c[1]].d(d["string"][func()])`
+                    `a[b][c[1]]:d(d["string"][func()])`
                 ]
             }
         ]);

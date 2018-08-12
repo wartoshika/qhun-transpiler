@@ -83,7 +83,7 @@ export class LuaClassDeclaration implements Partial<Target> {
             // add property decorators
             this.addSpacesToString(node.members
                 .filter(ts.isPropertyDeclaration)
-                .filter(prop => !!prop.decorators)
+                .filter(prop => prop.decorators && prop.decorators.length > 0)
                 .map(dec => this.transpilePropertyDecorator(dec))
                 .filter(dec => !!dec)
                 .join("\n"), 2),

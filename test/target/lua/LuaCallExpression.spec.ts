@@ -40,12 +40,12 @@ import { UnitTest } from "../../UnitTest";
             {
                 code: `obj.myFunc(a)`,
                 expected: [
-                    `obj.myFunc(a)`
+                    `obj:myFunc(a)`
                 ]
             }, {
                 code: `a.b.c.d(e)`,
                 expected: [
-                    `a.b.c.d(e)`
+                    `a.b.c:d(e)`
                 ]
             }
         ]);
@@ -57,7 +57,7 @@ import { UnitTest } from "../../UnitTest";
             {
                 code: `obj.myFunc().myOtherFunc().test();`,
                 expected: [
-                    `obj.myFunc().myOtherFunc().test()`
+                    `obj:myFunc():myOtherFunc():test()`
                 ]
             }
         ])

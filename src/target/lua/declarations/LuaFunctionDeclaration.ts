@@ -43,6 +43,11 @@ export class LuaFunctionDeclaration implements Partial<Target> {
         // add some body head
         const bodyHead: string[] = [];
 
+        // add method decorators
+        if (node.decorators && node.decorators.length > 0) {
+            bodyHead.push(this.transpileFunctionDecorator(node));
+        }
+
         // add initializers
         if (paramInitializer.length > 0) {
             bodyHead.push(paramInitializer.join("\n"));
@@ -84,6 +89,6 @@ export class LuaFunctionDeclaration implements Partial<Target> {
             this.addSpacesToString(body, 2),
             // function tail
             `end`
-        ].join("\n"));
+        ].join("\n")) + "\n";
     }
 }

@@ -19,9 +19,10 @@ export class LuaFunctionExpression implements Partial<Target> {
             node.body as ts.Block
         ));
 
-        // remove the local prefix
-        return functionDeclaration.substr(
-            functionDeclaration.indexOf("local ") + 6
+        // remove the local prefix and the new line char
+        return functionDeclaration.substring(
+            functionDeclaration.indexOf("local ") + 6,
+            functionDeclaration.length - 1
         );
     }
 }
