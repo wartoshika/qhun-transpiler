@@ -1,7 +1,7 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
 
-@suite("[Unit] Target: Lua | Misc", slow(1000), timeout(10000)) class LuaIfStatement extends UnitTest {
+@suite("[Unit] Target: Lua | Misc", slow(1000), timeout(10000)) class LuaMisc extends UnitTest {
 
 
     @test "Unrechable code after return"() {

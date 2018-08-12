@@ -3,6 +3,7 @@ import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
 import { Types } from "../../../transpiler/Types";
+import { LuaKeywords } from "../LuaKeywords";
 
 export interface LuaClassDeclaration extends BaseTarget, Target { }
 export class LuaClassDeclaration implements Partial<Target> {
@@ -52,8 +53,8 @@ export class LuaClassDeclaration implements Partial<Target> {
 
         // add the lua class initializer
         if (superClass) {
-            classHead.push(`local ${className} = ${superClass}.__init()`);
-            classHead.push(`${className}.__super = ${superClass}`);
+            classHead.push(`local ${className} = ${superClass}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}()`);
+            classHead.push(`${className}.${LuaKeywords.CLASS_SUPER_REFERENCE_NAME} = ${superClass}`);
         } else {
             classHead.push(`local ${className} = {}`);
         }
@@ -70,7 +71,7 @@ export class LuaClassDeclaration implements Partial<Target> {
 
         // add static class initializer function
         classHead.push(...[
-            `function ${className}.__init(self, ...)`,
+            `function ${className}.${LuaKeywords.CLASS_NEW_FUNCTION_NAME}(self, ...)`,
             this.addSpacesToString(`local instance = setmetatable({}, ${className})`, 2),
             // add non static properties
             this.addSpacesToString(
@@ -80,8 +81,8 @@ export class LuaClassDeclaration implements Partial<Target> {
                     return `instance.${propertyName} = ${initializer}`;
                 }).join("\n"), 2),
             // add the constructor call
-            this.addSpacesToString(`if self and ${className}.__new then`, 2),
-            this.addSpacesToString(`${className}.__new(instance, ...)`, 4),
+            this.addSpacesToString(`if self and ${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME} then`, 2),
+            this.addSpacesToString(`${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}(instance, ...)`, 4),
             this.addSpacesToString(`end`, 2),
             // return the constructed instance
             this.addSpacesToString(`return instance`, 2),
@@ -130,7 +131,7 @@ export class LuaClassDeclaration implements Partial<Target> {
             // get the name of the method
             let name: string;
             if (ts.isConstructorDeclaration(method)) {
-                name = `${className}.__new`;
+                name = `${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}`;
             } else if (ts.isMethodDeclaration(method)) {
                 name = `${className}.${this.transpileNode(method.name)}`;
             }
