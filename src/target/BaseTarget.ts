@@ -62,6 +62,28 @@ export abstract class BaseTarget implements Partial<Target> {
     }
 
     /**
+     * adds a declaration source code to the top of the file. this is a good place for used functions
+     * @param name the unique name of the declaration
+     * @param declaration the source code to declare
+     */
+    public addDeclaration(name: string, declaration: string): void {
+
+        this.declarationStack[name] = declaration;
+    }
+
+    /**
+     * put spaces before each statement in that string
+     * @param str the string
+     * @param spaces the number of spaces to add
+     */
+    public addSpacesToString(str: string, spaces: number): string {
+
+        return str.split("\n")
+            .map(line => new Array(spaces + 1).join(" ") + line)
+            .join("\n");
+    }
+
+    /**
      * add a node export
      * @param name the name of the exported variable
      * @param node the node that should be exported
@@ -74,34 +96,12 @@ export abstract class BaseTarget implements Partial<Target> {
     }
 
     /**
-     * adds a declaration source code to the top of the file. this is a good place for used functions
-     * @param name the unique name of the declaration
-     * @param declaration the source code to declare
-     */
-    protected addDeclaration(name: string, declaration: string): void {
-
-        this.declarationStack[name] = declaration;
-    }
-
-    /**
      * generate a unique variable that can be addressed locally
      * @param name the name of the variable
      */
     protected generateUniqueVariableName(name: string): string {
 
         return `__${name}_${this.uniqueVariableCounter++}`;
-    }
-
-    /**
-     * put spaces before each statement in that string
-     * @param str the string
-     * @param spaces the number of spaces to add
-     */
-    protected addSpacesToString(str: string, spaces: number): string {
-
-        return str.split("\n")
-            .map(line => new Array(spaces + 1).join(" ") + line)
-            .join("\n");
     }
 
     /**

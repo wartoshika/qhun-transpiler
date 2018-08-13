@@ -5,10 +5,13 @@ import { Transpiler } from "../src/transpiler/Transpiler";
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
+import { Target } from "../src/target/Target";
 
 const libSource = fs.readFileSync(path.join(path.dirname(require.resolve("typescript")), "lib.es6.d.ts")).toString();
 
 export abstract class Test {
+
+    protected lastTarget: Target;
 
     /**
      * get a test project object
@@ -78,6 +81,7 @@ export abstract class Test {
         // build target
         const targetFactory = new TargetFactory();
         const targetTranspiler = targetFactory.create(target, this.getProject(target), program.getTypeChecker());
+        this.lastTarget = targetTranspiler;
 
         // build transpiler
         const transpiler = new Transpiler(targetTranspiler);

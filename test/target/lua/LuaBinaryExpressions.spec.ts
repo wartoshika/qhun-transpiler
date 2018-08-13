@@ -60,4 +60,58 @@ import { UnitTest } from "../../UnitTest";
             }
         ]);
     }
+
+    @test "*, -, /, %, <=, <, >, >="() {
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `1*1`,
+                expected: [`1 * 1`]
+            }, {
+                code: `1-1`,
+                expected: [`1 - 1`]
+            }, {
+                code: `1/1`,
+                expected: [`1 / 1`]
+            }, {
+                code: `1%1`,
+                expected: [`1 % 1`]
+            }, {
+                code: `1<=1`,
+                expected: [`1 <= 1`]
+            }, {
+                code: `1< 1`,
+                expected: [`1 < 1`]
+            }, {
+                code: `1>1`,
+                expected: [`1 > 1`]
+            }, {
+                code: `1>=1`,
+                expected: [`1 >= 1`]
+            }
+        ]);
+    }
+
+    @test "bit operations ( &, |, ^ )"() {
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `1 & 2`,
+                expected: [`__bitop_and(1, 2)`],
+                expectedAditionalDeclaration: [
+                    `bitop.and`, `bitop.make`
+                ]
+            }, {
+                code: `1 | 2`,
+                expected: [`__bitop_or(1, 2)`],
+                expectedAditionalDeclaration: [
+                    `bitop.or`, `bitop.make`
+                ]
+            }, {
+                code: `1 ^ 2`,
+                expected: [`__bitop_xor(1, 2)`],
+                expectedAditionalDeclaration: [
+                    `bitop.xor`, `bitop.make`
+                ]
+            }
+        ]);
+    }
 }

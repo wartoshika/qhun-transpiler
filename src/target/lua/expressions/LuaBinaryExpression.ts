@@ -3,6 +3,7 @@ import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
 import { Types } from "../../../transpiler/Types";
+import { LuaBinaryOperations, LuaBinaryOperationsFunctions } from "../special/LuaBinaryOperations";
 
 export interface LuaBinaryExpression extends BaseTarget, Target { }
 export class LuaBinaryExpression implements Partial<Target> {
@@ -12,6 +13,18 @@ export class LuaBinaryExpression implements Partial<Target> {
         // get left and right nodes
         const left = this.transpileNode(node.left);
         const right = this.transpileNode(node.right);
+
+        // check for bit operations
+        if ([
+            ts.SyntaxKind.AmpersandToken,
+            ts.SyntaxKind.BarToken,
+            ts.SyntaxKind.CaretToken,
+            ts.SyntaxKind.LessThanLessThanToken,
+            ts.SyntaxKind.GreaterThanGreaterThanToken,
+            ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken
+        ].indexOf(node.operatorToken.kind) !== -1) {
+            return this.getBinaryBitOperations(node);
+        }
 
         // get the operator
         const operator = this.getOperatorForToken(node);
@@ -42,7 +55,7 @@ export class LuaBinaryExpression implements Partial<Target> {
             case ts.SyntaxKind.ExclamationEqualsToken:
             case ts.SyntaxKind.ExclamationEqualsEqualsToken:
                 return "~=";
-            case ts.SyntaxKind.AsteriskAsteriskToken:
+            case ts.SyntaxKind.AsteriskToken:
                 return "*";
             case ts.SyntaxKind.MinusToken:
                 return "-";
@@ -74,6 +87,35 @@ export class LuaBinaryExpression implements Partial<Target> {
                 }
             default:
                 throw new UnsupportedError(`The given Binary operator token ${ts.SyntaxKind[node.operatorToken.kind]} is not supported!`, node);
+        }
+    }
+
+    /**
+     * transpile binary bit operations
+     * @param node the node to transpile
+     */
+    private getBinaryBitOperations(node: ts.BinaryExpression): string {
+
+        // transpile left and right
+        const left = this.transpileNode(node.left);
+        const right = this.transpileNode(node.right);
+
+        // build dependencies
+        const bitop = new LuaBinaryOperations();
+
+        // get by case
+        switch (node.operatorToken.kind) {
+            case ts.SyntaxKind.AmpersandToken:
+                bitop.declareFunctionsFor(LuaBinaryOperationsFunctions.AND, this);
+                return `__bitop_and(${left}, ${right})`;
+            case ts.SyntaxKind.BarToken:
+                bitop.declareFunctionsFor(LuaBinaryOperationsFunctions.OR, this);
+                return `__bitop_or(${left}, ${right})`;
+            case ts.SyntaxKind.CaretToken:
+                bitop.declareFunctionsFor(LuaBinaryOperationsFunctions.XOR, this);
+                return `__bitop_xor(${left}, ${right})`;
+            default:
+                throw new UnsupportedError(`The given binary operation with operator ${ts.SyntaxKind[node.operatorToken.kind]} is unsupported!`, node);
         }
     }
 }

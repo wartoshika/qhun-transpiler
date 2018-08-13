@@ -6,6 +6,10 @@ import { UnsupportedError } from "../src/error/UnsupportedError";
 export declare type TestCodeAndResult = {
     code: string,
     expected: string[],
+    /**
+     * a stack of named declarations
+     */
+    expectedAditionalDeclaration?: string[],
     message?: string
 }[];
 
@@ -29,6 +33,19 @@ export abstract class UnitTest extends Test {
 
             expect(this.transpile(target, oneCase.code))
                 .to.deep.equal(oneCase.expected, oneCase.message);
+
+            if (oneCase.expectedAditionalDeclaration && oneCase.expectedAditionalDeclaration.length > 0) {
+                const declarations = Object.keys((this.lastTarget as any).declarationStack);
+                expect(declarations).to.satisfy((dec: string[]) => {
+                    return oneCase.expectedAditionalDeclaration.every(declaration => {
+                        const res = declarations.indexOf(declaration) !== -1;
+                        if (!res) {
+                            console.error("Cannot find", declaration, "in", declarations);
+                        }
+                        return res;
+                    });
+                }, oneCase.message);
+            }
         });
     }
 

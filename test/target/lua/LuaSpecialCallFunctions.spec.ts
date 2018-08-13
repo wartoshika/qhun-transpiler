@@ -11,12 +11,18 @@ import { UnitTest } from "../../UnitTest";
                 code: `"test".replace(a)`,
                 expected: [
                     `__string_replace("test", a)`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.replace'
                 ]
             }, {
                 code: `const a: string = "test"; a.replace("a", "b")`,
                 expected: [
                     `local a = "test"`,
                     `__string_replace(a, "a", "b")`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.replace'
                 ]
             }, {
                 code: `myObj.replace(1,2,3)`,
@@ -35,12 +41,18 @@ import { UnitTest } from "../../UnitTest";
                 code: `[1,2].join(",")`,
                 expected: [
                     `__array_join({1, 2}, ",")`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.join'
                 ]
             }, {
                 code: `const a: any[] = [1,2]; a.join("|")`,
                 expected: [
                     `local a = {1, 2}`,
                     `__array_join(a, "|")`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.join'
                 ]
             }, {
                 code: `myObj.join(",")`,
@@ -59,6 +71,9 @@ import { UnitTest } from "../../UnitTest";
                 expected: [
                     `local a = {}`,
                     `__array_push(a, 1, 2, 3, 4)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.push'
                 ]
             }
         ]);
@@ -76,6 +91,9 @@ import { UnitTest } from "../../UnitTest";
                     `__array_foreach({1, 2}, function (value, key)`,
                     `  run(test)`,
                     `end)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.foreach'
                 ]
             }
         ]);
@@ -93,6 +111,9 @@ import { UnitTest } from "../../UnitTest";
                     `__array_map({1, 2}, function (num)`,
                     `  return "test" .. num`,
                     `end)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.map'
                 ]
             }
         ]);
@@ -110,6 +131,9 @@ import { UnitTest } from "../../UnitTest";
                     `__array_filter({1, 2, 3}, function (obj)`,
                     `  return obj >= 2`,
                     `end)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.filter'
                 ]
             }, {
                 code: `
@@ -119,11 +143,17 @@ import { UnitTest } from "../../UnitTest";
                     `__array_filter({1, 2, 3}, function (obj)`,
                     `  return obj >= 2`,
                     `end)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.filter'
                 ]
             }, {
                 code: `[1,2].filter(myFilterFunc)`,
                 expected: [
                     `__array_filter({1, 2}, myFilterFunc)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.filter'
                 ]
             }, {
                 code: `[1,2].filter(obj => !!obj)`,
@@ -131,6 +161,9 @@ import { UnitTest } from "../../UnitTest";
                     `__array_filter({1, 2}, function (obj)`,
                     `  return (not (not obj))`,
                     `end)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.filter'
                 ]
             }
         ]);
@@ -143,6 +176,9 @@ import { UnitTest } from "../../UnitTest";
                 code: `const a = Object.keys(b)`,
                 expected: [
                     `local a = __object_keys(b)`
+                ],
+                expectedAditionalDeclaration: [
+                    'object.keys'
                 ]
             }, {
                 code: `myObj.keys()`,
