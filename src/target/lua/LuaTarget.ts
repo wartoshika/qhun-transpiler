@@ -87,6 +87,13 @@ export class LuaTarget extends BaseTarget implements Target {
     ) protected this: LuaTarget;
 
     /**
+     * get the file extension of the target language
+     */
+    public getFileExtension(): string {
+        return "lua";
+    }
+
+    /**
      * a function that is called before the transpiling process begins
      */
     public preTranspile(): string | void {

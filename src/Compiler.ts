@@ -5,6 +5,8 @@ import { Transpiler } from "./transpiler/Transpiler";
 
 import * as path from "path";
 import * as fs from "fs";
+import * as shelljs from "shelljs";
+import { Target } from "./target/Target";
 
 export class Compiler {
 
@@ -23,25 +25,59 @@ export class Compiler {
     public compile(files: string[]): boolean {
 
         // create a typescript program
-        const program = ts.createProgram(files, this.project.compilerOptions);
+        const program = ts.createProgram(files, this.project.parsedCommandLine.options);
         const typeChecker = program.getTypeChecker();
 
         // create the transpiling target
         const targetFactory = new TargetFactory();
         const target = targetFactory.create(this.project.target, this.project, typeChecker);
+        const extension = target.getFileExtension();
 
         // create the transpiler
         const transpiler = new Transpiler(target);
 
         // iterate over every source file
-        program.getSourceFiles().filter(file => !file.isDeclarationFile).forEach(sourceFile => {
+        try {
+            program.getSourceFiles().filter(file => !file.isDeclarationFile).forEach(sourceFile => {
 
-            // transpile this file
-            const transpiledCode = transpiler.transpile(sourceFile);
+                // transpile this file
+                const transpiledCode = transpiler.transpile(sourceFile);
 
-            console.log("transpiled: ", transpiledCode);
-        });
+                // output the transpiled code into the destination file
+                this.writeDestinationFile(sourceFile, transpiledCode, extension);
+            });
 
-        return true;
+            // everything was successfull!
+            return true;
+        } catch (e) {
+
+            console.error(e);
+            return false;
+        }
+    }
+
+    /**
+     * writes the destination file
+     * @param sourceFile the original source file
+     * @param transpiled the transpiled source code
+     * @param extension the target file extension
+     */
+    private writeDestinationFile(sourceFile: ts.SourceFile, transpiled: string, extension: string): void {
+
+        // get the root path
+        const rootPath = path.resolve(path.dirname(this.project.tsconfig));
+        const filePath = path.resolve(sourceFile.fileName);
+
+        // remove the cwd from the file path
+        const partOfFilePath = filePath.replace(rootPath, "");
+        const destinationDir = path.dirname(path.join(rootPath, this.project.outDir, partOfFilePath)).replace(this.project.stripOutDir, "");
+
+        // creat that dir
+        shelljs.mkdir("-p", destinationDir);
+
+        // write the file
+        const destinationFileName = path.join(destinationDir, path.basename(filePath, ".ts") + `.${extension}`);
+
+        fs.writeFileSync(destinationFileName, transpiled);
     }
 }

@@ -17,6 +17,11 @@ export interface Target {
     getNodeTranspiler(): (node: ts.Node) => string;
 
     /**
+     * get the file extension of the target language
+     */
+    getFileExtension(): string;
+
+    /**
      * get the declaration code that shoule be put to the head of the file
      */
     getDeclaration(): string[];

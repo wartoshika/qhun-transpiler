@@ -3,17 +3,17 @@ import * as commandLineUsage from "command-line-usage";
 import * as commandLineArgs from "command-line-args";
 import * as fs from "fs";
 import { TargetFactory, SupportedTargets } from "./target/TargetFactory";
-import { JsonReader } from "./config/JsonReader";
+import { JsonReader } from "./config/json/JsonReader";
 import { Project } from "./config/Project";
 import { Reader } from "./config/Reader";
-import { ArgumentReader } from "./config/ArgumentReader";
+import { ArgumentReader } from "./config/argument/ArgumentReader";
 import { Compiler } from "./Compiler";
 
 declare type ProgramArguments = {
     help: boolean,
     project: string,
     target: string,
-    entry: string
+    file: string
 };
 
 export class CommandLine {
@@ -39,11 +39,11 @@ export class CommandLine {
             type: String,
             description: "A target language. Can be: " + Object.keys(TargetFactory.supportedTargets).join(", ")
         }, {
-            name: "entry",
-            alias: "e",
+            name: "file",
+            alias: "f",
             type: String,
-            description: "The entry file",
-            typeLabel: "<entryFile.ts>"
+            description: "The file that shoule be transpiled",
+            typeLabel: "<file.ts>"
         }
     ];
 
@@ -88,7 +88,7 @@ export class CommandLine {
             // take the other arguments to build a project object
             reader = new ArgumentReader({
                 target: this.programArguments.target as keyof SupportedTargets,
-                entry: this.programArguments.entry
+                file: this.programArguments.file
             });
         }
 
@@ -99,7 +99,7 @@ export class CommandLine {
         const compiler = new Compiler(project);
 
         // start everything else
-        return compiler.compile([project.entry]);
+        return compiler.compile(project.parsedCommandLine.fileNames);
     }
 
     /**

@@ -6,6 +6,7 @@ import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
 import { Target } from "../src/target/Target";
+import { DefaultConfig } from "../src/config/DefaultConfig";
 
 const libSource = fs.readFileSync(path.join(path.dirname(require.resolve("typescript")), "lib.es6.d.ts")).toString();
 
@@ -18,19 +19,11 @@ export abstract class Test {
      */
     protected getProject<C extends Config>(target: keyof SupportedTargets, config?: C): Project<C> {
 
-        return {
-            author: "wartoshika <dev@qhun.de>",
-            name: "qhun-transpiler-test",
-            entry: "src/entry.ts",
-            description: "description",
-            licence: "MIT",
-            outDir: "dist",
-            target: target,
-            version: "1.0.0",
-            printFileHeader: false,
-            compilerOptions: this.getCompilerOptions(),
-            config: config || {} as C
-        };
+        // use default config constructor
+        return DefaultConfig.mergeDefaultProjectData({
+            config: config,
+            target: target
+        }) as Project<C>;
     }
 
     /**
