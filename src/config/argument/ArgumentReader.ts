@@ -1,6 +1,6 @@
 import { Reader } from "../Reader";
 import { Project } from "../Project";
-import * as ts from "typescript";
+import * as path from "path";
 import { ArgumentConfig } from "./ArgumentConfig";
 import { DefaultConfig } from "../DefaultConfig";
 
@@ -16,10 +16,13 @@ export class ArgumentReader implements Reader {
     public read(): Project {
         return DefaultConfig.mergeDefaultProjectData({
             target: this.args.target,
+            rootDir: path.dirname(path.resolve(this.args.file)),
+            outDir: ".",
             parsedCommandLine: {
                 fileNames: [
                     this.args.file
-                ]
+                ],
+                options: DefaultConfig.getDefaultCompilerOptions()
             }
         });
     }

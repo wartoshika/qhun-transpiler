@@ -53,7 +53,7 @@ export class LuaClassDeclaration implements Partial<Target> {
 
         // add the lua class initializer
         if (superClass) {
-            classHead.push(`local ${className} = ${superClass}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}()`);
+            classHead.push(`local ${className} = ${superClass}.${LuaKeywords.CLASS_NEW_FUNCTION_NAME}()`);
             classHead.push(`${className}.${LuaKeywords.CLASS_SUPER_REFERENCE_NAME} = ${superClass}`);
         } else {
             classHead.push(`local ${className} = {}`);

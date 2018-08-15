@@ -8,7 +8,7 @@ import { CommandLine } from "../src/CommandLine";
 
 @suite("[Integration] Complete transpile test", slow(500), timeout(3000)) class IntegrationTest {
 
-    @test "Transpile a declared project"() {
+    @test "Transpile using JsonReader"() {
 
         const transpileConfig: Partial<JsonConfig> = {
             tsconfig: "./iTsconfig.json",
@@ -98,5 +98,20 @@ import { CommandLine } from "../src/CommandLine";
 
         // restore filesystem
         mockfs.restore();
+    }
+
+    @test "Transpile using ArgumentReader"() {
+
+        mockfs({
+            "myFile.ts": `console.log(true);`
+        });
+
+        const cli = new CommandLine([
+            "-t", "lua", "-f", "myFile.ts"
+        ]);
+
+        cli.execute();
+
+        expect(fs.existsSync("myFile.lua")).to.be.true;
     }
 }

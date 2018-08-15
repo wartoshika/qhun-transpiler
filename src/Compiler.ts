@@ -97,7 +97,7 @@ export class Compiler {
 
         // remove the cwd from the file path
         const partOfFilePath = filePath.replace(this.project.rootDir, "");
-        const destinationDir = path.dirname(path.join(this.project.outDir, partOfFilePath)).replace(this.project.stripOutDir, "");
+        const destinationDir = path.dirname(path.join(this.project.rootDir, path.basename(this.project.outDir), partOfFilePath)).replace(this.project.stripOutDir, "");
 
         // creat that dir
         shelljs.mkdir("-p", destinationDir);
