@@ -70,14 +70,4 @@ import { UnitTest } from "../../UnitTest";
             }
         ]);
     }
-
-    @test "Export variables"() {
-
-        this.runCodeAndExpectResult("lua", [
-            {
-                code: `export const a = "b";`,
-                expected: [`local a = "b"`]
-            }
-        ]);
-    }
 }

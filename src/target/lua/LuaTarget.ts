@@ -105,7 +105,26 @@ export class LuaTarget extends BaseTarget implements Target {
      * a function that is called after the end of file token and directly after the transpiling process
      */
     public postTranspile(): string | void {
-        return "";
+        return this.addDeclaredExports();
+    }
+
+    /**
+     * add all declared exports to the transpiling context
+     */
+    private addDeclaredExports(): string {
+
+        // get all declared exports
+        const exports = this.getExports();
+
+        // check if there are no exports
+        if (exports.length === 0) {
+            return "";
+        }
+
+        // iterate over all exports and wrap it as object literal
+        return "return {\n" + exports.map(exportNode => {
+            return this.addSpacesToString(`${exportNode.name} = ${exportNode.name}`, 2);
+        }).join(",\n") + "\n}";
     }
 
 }

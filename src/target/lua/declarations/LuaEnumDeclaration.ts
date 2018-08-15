@@ -34,6 +34,6 @@ export class LuaEnumDeclaration implements Partial<Target> {
             `local ${name} = {`,
             memberStack.join(",\n"),
             `}`
-        ].join("\n");
+        ].join("\n") + "\n";
     }
 }

@@ -16,6 +16,11 @@ export class LuaFunctionDeclaration implements Partial<Target> {
         // get function name
         const name = this.transpileNode(node.name);
 
+        // check for exports
+        if (this.hasExportModifier(node)) {
+            this.addExport(name, node);
+        }
+
         // get all declared parameters
         let restArgumentName: string;
         const paramStack: string[] = node.parameters.map(param => {

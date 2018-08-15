@@ -1,6 +1,12 @@
 import { Target } from "./Target";
 import * as ts from "typescript";
 import { Project } from "../config/Project";
+import { Types } from "../transpiler/Types";
+
+declare type TypescriptExport = {
+    name: string,
+    node: ts.Node
+};
 
 /**
  * the base target class that implements cross language functionality
@@ -20,10 +26,7 @@ export abstract class BaseTarget implements Partial<Target> {
     /**
      * all declared exports of the file
      */
-    private exportStack: {
-        name: string,
-        node: ts.Node
-    }[] = [];
+    private exportStack: TypescriptExport[] = [];
 
     /**
      * a stack of declarations that will be put onto the top of the
@@ -96,6 +99,14 @@ export abstract class BaseTarget implements Partial<Target> {
     }
 
     /**
+     * get all declared exports
+     */
+    protected getExports(): TypescriptExport[] {
+
+        return this.exportStack;
+    }
+
+    /**
      * generate a unique variable that can be addressed locally
      * @param name the name of the variable
      */
@@ -133,7 +144,8 @@ export abstract class BaseTarget implements Partial<Target> {
      */
     protected hasExportModifier(node: ts.Node): boolean {
 
-        return node.modifiers && node.modifiers.some((x) => x.kind === ts.SyntaxKind.ExportKeyword);
+        // forward Types function
+        return Types.hasExportModifier(node, this.typeChecker);
     }
 
     /**

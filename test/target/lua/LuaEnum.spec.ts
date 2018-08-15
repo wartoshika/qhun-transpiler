@@ -52,21 +52,4 @@ import { UnitTest } from "../../UnitTest";
         ]);
 
     }
-
-    @test "Enum export"() {
-
-        this.runCodeAndExpectResult("lua", [{
-            code: `
-                export enum MyExportEnum {
-                    A, B
-                }
-            `,
-            expected: [
-                `local MyExportEnum = {`,
-                `  A = 1,`,
-                `  B = 2`,
-                `}`
-            ]
-        }])
-    }
 }
