@@ -7,6 +7,7 @@ export class LuaTypeAliasDeclaration implements Partial<Target> {
 
     public transpileTypeAliasDeclaration(node: ts.TypeAliasDeclaration): string {
 
-        return "TYPE_ALIAS";
+        // a type alias must be skipped in lua
+        return "";
     }
 }

@@ -34,6 +34,52 @@ import { UnitTest } from "../../UnitTest";
 
     }
 
+    @test "String.split(...)"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `"test".split(".")`,
+                expected: [
+                    `__string_split("test", ".")`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.split'
+                ]
+            }, {
+                code: `const a: string = "test"; a.split("|")`,
+                expected: [
+                    `local a = "test"`,
+                    `__string_split(a, "|")`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.split'
+                ]
+            }, {
+                code: `myObj.split(1,2,3)`,
+                expected: [
+                    `myObj:split(1, 2, 3)`
+                ]
+            }
+        ]);
+
+    }
+
+    @test "String.substr(...)"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `"test".substr(1,2)`,
+                expected: [
+                    `__string_substr("test", 1, 2)`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.substr'
+                ]
+            }
+        ]);
+
+    }
+
     @test "Array.join(...)"() {
 
         this.runCodeAndExpectResult("lua", [

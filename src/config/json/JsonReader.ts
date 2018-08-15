@@ -35,7 +35,12 @@ export class JsonReader implements Reader {
             const jsonData: JsonConfig = JSON.parse(jsonString);
 
             // get typescript data
-            const tsData = this.getTsConfigJsonContent(jsonData.tsconfig);
+            const rootDir = path.resolve(path.dirname(this.filePath));
+            const resolvedTsconfigPath = path.join(
+                rootDir,
+                jsonData.tsconfig
+            );
+            const tsData = this.getTsConfigJsonContent(resolvedTsconfigPath);
 
             // read into the project object
             project = DefaultConfig.mergeDefaultProjectData({
@@ -50,6 +55,7 @@ export class JsonReader implements Reader {
                 version: jsonData.version,
                 tsconfig: jsonData.tsconfig,
                 stripOutDir: jsonData.stripOutDir,
+                rootDir,
                 parsedCommandLine: tsData
             });
 

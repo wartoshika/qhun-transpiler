@@ -13,7 +13,11 @@ export class LuaImportDeclaration implements Partial<Target> {
 
         // check for default imports
         if (!node.importClause || !node.importClause.namedBindings) {
-            throw new UnsupportedError(`Default imports are not supported!`, node);
+
+            // just require the whole file
+            return `require(${path})`;
+
+            // throw new UnsupportedError(`Default imports are not supported!`, node);
         }
 
         // get the imports

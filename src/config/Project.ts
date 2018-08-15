@@ -16,4 +16,9 @@ export interface Project<C = Config> extends JsonConfig<C> {
      * the directory name where to put the transpiled files
      */
     outDir: string;
+
+    /**
+     * the root dir of the project. this must be absolute!
+     */
+    rootDir: string;
 }

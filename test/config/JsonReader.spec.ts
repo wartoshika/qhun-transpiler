@@ -7,6 +7,7 @@ import * as ts from "typescript";
 import { FileNotExistsError } from "../../src/error/FileNotExistsError";
 import { UnexpectedError } from "../../src/error/UnexpectedError";
 import { JsonConfig } from "../../src/config/json/JsonConfig";
+import * as path from "path";
 
 @suite("[Unit] JsonReader", slow(500), timeout(3000)) class JsonReaderTest {
 
@@ -67,7 +68,9 @@ import { JsonConfig } from "../../src/config/json/JsonConfig";
 
         // all files must be there
         expect(project.parsedCommandLine.fileNames).to.deep.equal([
-            "src/a.ts", "src/b.ts", "src/index.ts"
+            path.resolve("src/a.ts").replace(/\\/g, "/"),
+            path.resolve("src/b.ts").replace(/\\/g, "/"),
+            path.resolve("src/index.ts").replace(/\\/g, "/")
         ]);
     }
 

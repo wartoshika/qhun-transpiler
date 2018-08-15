@@ -1,5 +1,6 @@
 import * as ts from "typescript";
 import { Project } from "./Project";
+import * as path from "path";
 
 export class DefaultConfig {
 
@@ -31,6 +32,7 @@ export class DefaultConfig {
             printFileHeader: typeof givenProject.printFileHeader === "boolean" ? givenProject.printFileHeader : true,
             config: givenProject.config ? givenProject.config : {},
             stripOutDir: givenProject.stripOutDir ? givenProject.stripOutDir : "",
+            rootDir: givenProject.rootDir ? givenProject.rootDir : path.resolve("."),
             parsedCommandLine: givenProject.parsedCommandLine ? givenProject.parsedCommandLine : {
                 fileNames: [],
                 options: DefaultConfig.getDefaultCompilerOptions()

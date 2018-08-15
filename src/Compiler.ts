@@ -7,6 +7,12 @@ import * as path from "path";
 import * as fs from "fs";
 import * as shelljs from "shelljs";
 import { Target } from "./target/Target";
+import { UnsupportedError } from "./error/UnsupportedError";
+
+declare type TranspilerError = {
+    error: Error,
+    file: ts.SourceFile
+};
 
 export class Compiler {
 
@@ -30,15 +36,19 @@ export class Compiler {
 
         // create the transpiling target
         const targetFactory = new TargetFactory();
-        const target = targetFactory.create(this.project.target, this.project, typeChecker);
-        const extension = target.getFileExtension();
-
-        // create the transpiler
-        const transpiler = new Transpiler(target);
+        let lastSourceFile: ts.SourceFile;
 
         // iterate over every source file
         try {
             program.getSourceFiles().filter(file => !file.isDeclarationFile).forEach(sourceFile => {
+
+                // create the transpiler
+                const target = targetFactory.create(this.project.target, this.project, typeChecker);
+                const extension = target.getFileExtension();
+                const transpiler = new Transpiler(target);
+
+                // declare last soruce file
+                lastSourceFile = sourceFile;
 
                 // transpile this file
                 const transpiledCode = transpiler.transpile(sourceFile);
@@ -51,7 +61,26 @@ export class Compiler {
             return true;
         } catch (e) {
 
-            console.error(e);
+            // check for unsupported error
+            if (e instanceof UnsupportedError) {
+
+                // get position of error
+                if (e.node) {
+                    const position = ts.getLineAndCharacterOfPosition(lastSourceFile, e.node.pos);
+
+                    // print the error
+                    console.error(e.message);
+                    console.error(`${lastSourceFile.fileName}: Line: ${position.line + 1}, Column: ${position.character}\n${e.stack}`);
+                } else {
+
+                    console.error(e.message, e.stack);
+                }
+            } else {
+
+                // just log the error
+                console.error(e.message, e.stack);
+            }
+
             return false;
         }
     }
@@ -64,19 +93,19 @@ export class Compiler {
      */
     private writeDestinationFile(sourceFile: ts.SourceFile, transpiled: string, extension: string): void {
 
-        // get the root path
-        const rootPath = path.resolve(path.dirname(this.project.tsconfig));
         const filePath = path.resolve(sourceFile.fileName);
 
         // remove the cwd from the file path
-        const partOfFilePath = filePath.replace(rootPath, "");
-        const destinationDir = path.dirname(path.join(rootPath, this.project.outDir, partOfFilePath)).replace(this.project.stripOutDir, "");
+        const partOfFilePath = filePath.replace(this.project.rootDir, "");
+        const destinationDir = path.dirname(path.join(this.project.outDir, partOfFilePath)).replace(this.project.stripOutDir, "");
 
         // creat that dir
         shelljs.mkdir("-p", destinationDir);
 
         // write the file
         const destinationFileName = path.join(destinationDir, path.basename(filePath, ".ts") + `.${extension}`);
+
+        console.log("Write: ", destinationFileName);
 
         fs.writeFileSync(destinationFileName, transpiled);
     }

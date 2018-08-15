@@ -49,4 +49,16 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
             }
         ])
     }
+
+    @test "File imports"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `import "./myTestFile";`,
+                expected: [
+                    `require("./myTestFile")`
+                ]
+            }
+        ]);
+    }
 }
