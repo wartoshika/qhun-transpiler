@@ -4,6 +4,7 @@ import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
 import { Types } from "../../../transpiler/Types";
 import { LuaBinaryOperations, LuaBinaryOperationsFunctions } from "../special/LuaBinaryOperations";
+import { LuaKeywords } from "../LuaKeywords";
 
 export interface LuaBinaryExpression extends BaseTarget, Target { }
 export class LuaBinaryExpression implements Partial<Target> {
@@ -34,6 +35,13 @@ export class LuaBinaryExpression implements Partial<Target> {
             ts.SyntaxKind.SlashEqualsToken
         ].indexOf(node.operatorToken.kind) !== -1) {
             return this.getBinaryAssignmentOperation(node);
+        }
+
+        // check for other special operators
+        if ([
+            ts.SyntaxKind.InstanceOfKeyword
+        ].indexOf(node.operatorToken.kind) !== -1) {
+            return this.getBinaryExpressionSpecialOperator(node);
         }
 
         // get the operator
@@ -157,5 +165,47 @@ export class LuaBinaryExpression implements Partial<Target> {
             default:
                 throw new UnsupportedError(`The given binary assignment operation is unsupported!`, node);
         }
+    }
+
+    /**
+     * transpiles special operators in binary expressions
+     * @param node the node to transpile
+     */
+    private getBinaryExpressionSpecialOperator(node: ts.BinaryExpression): string {
+
+        switch (node.operatorToken.kind) {
+            case ts.SyntaxKind.InstanceOfKeyword:
+                return this.transpileInstanceOfKeyword(node);
+        }
+    }
+
+    /**
+     * transpiles the instanceof keyword in binary expressions
+     * @param node the node to transpile
+     */
+    private transpileInstanceOfKeyword(node: ts.BinaryExpression): string {
+
+        // transline left and right
+        const left = this.transpileNode(node.left);
+        const right = this.transpileNode(node.right);
+
+        // declare the function
+        this.addDeclaration(
+            "global.instanceof",
+            [
+                `local function __global_instanceof(a,b)`,
+                this.addSpacesToString(`while a do`, 2),
+                this.addSpacesToString(`if a.__index === b then`, 4),
+                this.addSpacesToString(`return true`, 6),
+                this.addSpacesToString(`end`, 4),
+                this.addSpacesToString(`a = a.${LuaKeywords.CLASS_SUPER_REFERENCE_NAME}`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return false`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        // use the declared function
+        return `__global_instanceof(${left}, ${right})`;
     }
 }

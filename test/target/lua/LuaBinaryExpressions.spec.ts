@@ -146,4 +146,19 @@ import { UnitTest } from "../../UnitTest";
             }
         ])
     }
+
+    @test "Instanceof keyword"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `a instanceof b`,
+                expected: [
+                    `__global_instanceof(a, b)`
+                ],
+                expectedAditionalDeclaration: [
+                    'global.instanceof'
+                ]
+            }
+        ])
+    }
 }
