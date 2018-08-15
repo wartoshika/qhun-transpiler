@@ -87,7 +87,7 @@ export class LuaStringSpecial {
             [
                 `local function __string_split(a,b)`,
                 this.addSpacesToString(`result = {}`, 2),
-                this.addSpacesToString(`for match in (str..delimiter):gmatch("(.-)"..delimiter) do`, 2),
+                this.addSpacesToString(`for match in (a..b):gmatch("(.-)"..b) do`, 2),
                 this.addSpacesToString(`table.insert(result, match)`, 4),
                 this.addSpacesToString(`end`, 2),
                 this.addSpacesToString(`return result`, 2),
