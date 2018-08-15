@@ -26,6 +26,16 @@ export class LuaBinaryExpression implements Partial<Target> {
             return this.getBinaryBitOperations(node);
         }
 
+        // check for assignments
+        if ([
+            ts.SyntaxKind.PlusEqualsToken,
+            ts.SyntaxKind.MinusEqualsToken,
+            ts.SyntaxKind.AsteriskEqualsToken,
+            ts.SyntaxKind.SlashEqualsToken
+        ].indexOf(node.operatorToken.kind) !== -1) {
+            return this.getBinaryAssignmentOperation(node);
+        }
+
         // get the operator
         const operator = this.getOperatorForToken(node);
 
@@ -116,6 +126,36 @@ export class LuaBinaryExpression implements Partial<Target> {
                 return `__bitop_xor(${left}, ${right})`;
             default:
                 throw new UnsupportedError(`The given binary operation with operator ${ts.SyntaxKind[node.operatorToken.kind]} is unsupported!`, node);
+        }
+    }
+
+    /**
+     * transpiles a binary assignment
+     * @param node the node to transpile
+     */
+    private getBinaryAssignmentOperation(node: ts.BinaryExpression): string {
+
+        // transpile left and right
+        const left = this.transpileNode(node.left);
+
+        // now check for the operator
+        switch (node.operatorToken.kind) {
+
+            case ts.SyntaxKind.FirstCompoundAssignment:
+            case ts.SyntaxKind.PlusEqualsToken:
+                node.operatorToken.kind = ts.SyntaxKind.PlusToken;
+                return `${left} = ${this.transpileBinaryExpression(node)}`;
+            case ts.SyntaxKind.MinusEqualsToken:
+                node.operatorToken.kind = ts.SyntaxKind.MinusToken;
+                return `${left} = ${this.transpileBinaryExpression(node)}`;
+            case ts.SyntaxKind.AsteriskEqualsToken:
+                node.operatorToken.kind = ts.SyntaxKind.AsteriskToken;
+                return `${left} = ${this.transpileBinaryExpression(node)}`;
+            case ts.SyntaxKind.SlashEqualsToken:
+                node.operatorToken.kind = ts.SyntaxKind.SlashToken;
+                return `${left} = ${this.transpileBinaryExpression(node)}`;
+            default:
+                throw new UnsupportedError(`The given binary assignment operation is unsupported!`, node);
         }
     }
 }

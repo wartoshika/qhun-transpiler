@@ -114,4 +114,36 @@ import { UnitTest } from "../../UnitTest";
             }
         ]);
     }
+
+    @test "Binary assignments (+=, -=, *=, /=)"() {
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `a += 2`,
+                expected: [
+                    `a = a + 2`
+                ]
+            }, {
+                code: `const a: string = "test"; a += "test2";`,
+                expected: [
+                    `local a = "test"`,
+                    `a = a .. "test2"`
+                ]
+            }, {
+                code: `a -= 2`,
+                expected: [
+                    `a = a - 2`
+                ]
+            }, {
+                code: `a *= 2`,
+                expected: [
+                    `a = a * 2`
+                ]
+            }, {
+                code: `a /= 2`,
+                expected: [
+                    `a = a / 2`
+                ]
+            }
+        ])
+    }
 }
