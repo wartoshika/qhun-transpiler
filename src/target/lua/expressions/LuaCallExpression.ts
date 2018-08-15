@@ -2,10 +2,10 @@ import { Target } from "../../Target";
 import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
-import { LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial } from "../special";
+import { LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial } from "../special";
 import { Types } from "../../../transpiler/Types";
 
-export interface LuaCallExpression extends BaseTarget, Target, LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial { }
+export interface LuaCallExpression extends BaseTarget, Target, LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial { }
 export class LuaCallExpression implements Partial<Target> {
 
     public transpileCallExpression(node: ts.CallExpression): string {
@@ -54,7 +54,7 @@ export class LuaCallExpression implements Partial<Target> {
             case "Array":
                 return this.transpileSpecialArrayFunction(functionName, ownerName, node.arguments);
             case "Math":
-                throw new UnsupportedError("The Math object is currently unsupported!", node);
+                return this.transpileSpecialMathFunction(functionName, ownerName, node.arguments);
         }
 
         // use the default access pattern

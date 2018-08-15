@@ -79,6 +79,7 @@ export class LuaTarget extends BaseTarget implements Target {
         luaTrait.LuaStringSpecial,
         luaTrait.LuaObjectSpecial,
         luaTrait.LuaArraySpecial,
+        luaTrait.LuaMathSpecial,
         // decorator
         luaTrait.LuaClassDecorator,
         luaTrait.LuaFunctionDecorator,

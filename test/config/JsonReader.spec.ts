@@ -2,8 +2,6 @@ import { suite, test, slow, timeout } from "mocha-typescript";
 import { expect } from "chai";
 import { JsonReader } from "../../src/config/json/JsonReader";
 import * as mockfs from "mock-fs";
-import { Project } from "../../src/config/Project";
-import * as ts from "typescript";
 import { FileNotExistsError } from "../../src/error/FileNotExistsError";
 import { UnexpectedError } from "../../src/error/UnexpectedError";
 import { JsonConfig } from "../../src/config/json/JsonConfig";

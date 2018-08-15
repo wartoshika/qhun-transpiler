@@ -1,5 +1,6 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
+import { UnsupportedError } from "../../../src/error/UnsupportedError";
 
 @suite("[Unit] Target: Lua | Special call functions", slow(1000), timeout(10000)) class LuaSpecialCallFunctions extends UnitTest {
 
@@ -233,6 +234,25 @@ import { UnitTest } from "../../UnitTest";
                 ]
             }
         ]);
+    }
+
+    @test "Math functions"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `console.log(Math.atan(2));`,
+                expected: [
+                    `console:log(math.atan(2))`
+                ]
+            }
+        ]);
+
+        this.runCodeAndExpectThrow("lua", [
+            {
+                code: `console.log(Math.atan2(1,2))`,
+                throw: UnsupportedError
+            }
+        ])
     }
 
 }
