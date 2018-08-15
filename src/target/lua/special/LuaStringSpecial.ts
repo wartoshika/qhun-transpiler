@@ -110,7 +110,7 @@ export class LuaStringSpecial {
             "string.substr",
             [
                 `local function __string_substr(a,b,c)`,
-                this.addSpacesToString(`return String.sub(a, b, c)`, 2),
+                this.addSpacesToString(`return string.sub(a, b, c)`, 2),
                 `end`
             ].join("\n")
         );
