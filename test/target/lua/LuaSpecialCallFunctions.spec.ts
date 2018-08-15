@@ -81,6 +81,22 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
 
     }
 
+    @test "String.trim(...)"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `"test".trim()`,
+                expected: [
+                    `__string_trim("test")`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.trim'
+                ]
+            }
+        ]);
+
+    }
+
     @test "Array.join(...)"() {
 
         this.runCodeAndExpectResult("lua", [

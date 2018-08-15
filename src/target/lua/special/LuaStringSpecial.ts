@@ -38,6 +38,8 @@ export class LuaStringSpecial {
                 return this.transpileSpecialStringFunctionSplit(owner, argumentStack);
             case "substr":
                 return this.transpileSpecialStringFunctionSubstr(owner, argumentStack);
+            case "trim":
+                return this.transpileSpecialStringFunctionTrim(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given string function ${name} is unsupported!`, null);
         }
@@ -114,5 +116,25 @@ export class LuaStringSpecial {
         );
 
         return `__string_substr(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
+    }
+
+    /**
+     * an impl. for the string.trim function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialStringFunctionTrim(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // add declaration
+        this.addDeclaration(
+            "string.trim",
+            [
+                `local function __string_trim(a)`,
+                this.addSpacesToString(`return string.gsub(a, "^%s*(.-)%s*$", "%1")`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__string_trim(${owner})`;
     }
 }

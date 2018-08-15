@@ -195,7 +195,7 @@ export class LuaBinaryExpression implements Partial<Target> {
             [
                 `local function __global_instanceof(a,b)`,
                 this.addSpacesToString(`while a do`, 2),
-                this.addSpacesToString(`if a.__index === b then`, 4),
+                this.addSpacesToString(`if a.__index == b then`, 4),
                 this.addSpacesToString(`return true`, 6),
                 this.addSpacesToString(`end`, 4),
                 this.addSpacesToString(`a = a.${LuaKeywords.CLASS_SUPER_REFERENCE_NAME}`, 4),
