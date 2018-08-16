@@ -1,6 +1,6 @@
 {
   "name": "@wartoshika/qhun-transpiler",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A command line tool to transpiles a Typescript project into supported other languages.",
   "main": "dist/index.js",
   "repository": {
