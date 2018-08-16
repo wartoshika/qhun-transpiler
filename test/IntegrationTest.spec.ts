@@ -8,6 +8,10 @@ import { CommandLine } from "../src/CommandLine";
 
 @suite("[Integration] Complete transpile test", slow(500), timeout(3000)) class IntegrationTest {
 
+    public after() {
+        mockfs.restore();
+    }
+
     @test "Transpile using JsonReader"() {
 
         const transpileConfig: Partial<JsonConfig> = {
@@ -95,9 +99,6 @@ import { CommandLine } from "../src/CommandLine";
         expect(fs.existsSync("dist/a.lua")).to.be.true;
         expect(fs.existsSync("dist/b.lua")).to.be.true;
         expect(fs.existsSync("dist/c.lua")).to.be.true
-
-        // restore filesystem
-        mockfs.restore();
     }
 
     @test "Transpile using ArgumentReader"() {
