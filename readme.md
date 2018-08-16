@@ -1,4 +1,4 @@
-# QhunCli
+# Qhun Transpiler
 
 This command line tool helps to transpile [Typescript](https://github.com/Microsoft/TypeScript) into other languages. The main goal was to support every aspect of Typescript. 
 
@@ -9,124 +9,50 @@ This command line tool helps to transpile [Typescript](https://github.com/Micros
 ## **Installation & Help**
 
 ```console
-$ npm install -g --save-dev @wartoshika/qhun-cli
-$ qhun-cli -h
+$ npm install -g --save-dev @wartoshika/qhun-transpiler
+$ qhun-transpiler -h
 ```
 
-After the installation you need to create a `qhun-cli.json` file at project root level.
+There are two possible ways of transpiling your sourcecode into other languages.
+1. Creating a JSON file containing project relevant information (recommended).
+2. Passing required data via command line arguments.
 
-## **Requirements**
+## **Requirements and usage when using the JSON based setup**
 
-- Your project need to have a valid `tsconfig.json` at project root level.
-    - The module resolution shoule be `node`
+- You need to create a JSON file next to a `tsconfig.json` file.
+- Call the executable file of qhun-transpiler using the `-p` argument.
+    - *Example*: `$ qhun-transpiler -p ./qhun-transpiler.json`
 
-## **Usage**
-
-Here are some examples for the usage:
-- `qhun-cli -p .` *(Transpiles everything in your current project)*
-- `qhun-cli -p ../../path/to/your/project` *(Will try to locate your project)*
-- `qhun-cli -h` *(prints the help page)*
-
-## **Supported Typescript -> LUA features**
-
-- Variable declaration
-- Binary expressions (including Unary prefix and postfix)
-- Class declaration and heritage, class usage, interfaces
-    - Private, protected and public declaration of constructor properties
-    - Static and non static property declaration
-    - Abstract and non abstract methods
-    - Decorators (Currently property decorators only)
-- Function and Arrowfunction declaration
-- If, switch and for statements
-- Special functions (*Array.forEach(), Array.join(), Array.push(), Object.keys(), String.length, String.trim(), String.split(), String.replace(), String.substr()*)
-- Named module import / export
-- Typeof and instanceof checks
-- Enums
-- String, numeric, object and array literals
-- Computed properties
-
-# `qhun-cli.json` file structure
-
-This is the definition of the structure:
-
-```ts
-declare type QhunCliData = {
-    name: string,           // The name of your project
-    version: string,        // the version of your project
-    author: string,         // The author(s)
-    description: string,    // A longer description
-    licence: string,        // The licence of your project
-    entry: string,          // The entry file including the file extension
-    outDir: string,         // The destination directory where to put the transpiled files
-    copy: {                 // All files that shoule be copied to the destination folder
-        from: string,
-        to: string,
-        relative: string
-    }[],
-    config: {}              // A target depenting config (see each section for a declaration and description)
-}
-```
-
-<details><summary>Structure with examples for <b>LUA</b> target</summary>
-<p>
+The `qhun-transpiler.json` file must have the following structure:
 
 ```json
 {
-    "name": "YourProgramName",
-    "version": "1.0.0",
+    "name": "The name of your program/project",
+    "version": "The version number as string of your program/project",
     "author": "Your name",
-    "description": "A long description!",
     "licence": "Your licence",
-    "entry": "./src/index.ts",
-    "target": "lua",
-    "outDir": "./dist",
-    "copy": [
-        {
-            "from": "./lib/lua/Library.lua",
-            "to": "./lib/Library.lua",
-            "relative": "lib/Library.lua"
-        }
-    ],
-    "config": {}
-}
-```
-
-</p>
-</details>
-
-<details><summary>Structure with examples for <b>WoW</b> target</summary>
-<p>
-
-```json
-{
-    "name": "QhunCoreTS",
-    "version": "1.0.0",
-    "author": "wartoshika <dev@qhun.de>",
-    "description": "A long description!",
-    "licence": "MIT",
-    "entry": "./src/core.ts",
-    "target": "wow",
-    "outDir": "./dist",
-    "copy": [
-        {
-            "from": "./lib/lua/Library.lua",
-            "to": "./lib/Library.lua",
-            "relative": "lib/Library.lua"
-        }
-    ],
+    "description": "A longer description of your program/project",
+    "printFileHeader": true, // a boolean value that indicates that a text will be added to each file.
+    "stripOutDir": "src",  // the name of the folder where you put your sourcecode in. Eg. src. Leave this empty if your code is not stored in one source folder
+    "target": "The target name. Eg. lua",
+    "tsconfig": "the relative path to the tsconfig.json file including its name",
     "config": {
-        "visibleName": "QhunCore|c00ff0000TS |c0000ff00[Lib]",
-        "interface": 80000,
-        "optionalDependencies": [
-            "QhunDebug",
-            "QhunUnitTest"
-        ],
-        "dependencies": [],
-        "savedVariables": [],
-        "savedVariablesPerCharacter": []
+        // A config block that varies between each target. See the target documentation for details
     }
 }
 ```
 
-</p>
-</details>
+The `tsconfig.json` file will tell the transpiler wich files shoule be transpiled. Please refer to the [tsconfig.json Documentation](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html).
+
+Every file will be translated into the given target language. The directory where to put those files is stored in the `tsconfig.json` file. Please refer to its [documentation](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html).
+
+## **Requirements and usage when using arguments**
+
+- There are no requirements.
+- Call the executale and pass the following arguments:
+    - `-t` The target language. Eg. lua
+    - `-f` The path to the file that should be transpiled
+
+An example executable path could be `$ qhun-transpiler -t lua -f ./myTypescriptFile.ts`
+
+The transpiles file will be placed next to the original file. The file extension will be changed to the target language's file extension.

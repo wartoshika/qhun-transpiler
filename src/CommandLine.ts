@@ -56,7 +56,7 @@ export class CommandLine {
      * @param args the arguments
      */
     constructor(
-        args: string[]
+        private args: string[]
     ) {
 
         // parse arguments
@@ -71,7 +71,7 @@ export class CommandLine {
     public execute(): boolean {
 
         // evaluate help page
-        if (this.programArguments.help) {
+        if (this.programArguments.help || this.args.length === 0) {
             this.printHelp();
             return true;
         }

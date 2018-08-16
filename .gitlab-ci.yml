@@ -34,6 +34,19 @@ test:node10:
         - npm run coverage
     coverage: '/\d+\.\d+\%\ \(/'
 
+###################
+# DEPLOY TO GITHUB
+###################
+deploy:GitHub:
+    stage: deploy
+    image: ilyasemenov/gitlab-ci-git-push
+    when: on_success
+    script:
+        - git-push git@github.com:wartoshika/qhun-transpiler.git
+    only:
+        - master
+        - dev
+
 ################
 # DEPLOY
 ################
