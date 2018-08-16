@@ -42,7 +42,7 @@ deploy:GitHub:
     image: ilyasemenov/gitlab-ci-git-push
     when: on_success
     script:
-        - git-push git@github.com:wartoshika/qhun-transpiler.git
+        - git-push git@github.com:wartoshika/qhun-transpiler.git refs/heads/$CI_COMMIT_REF_NAME
     only:
         - master
         - dev
