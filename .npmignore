@@ -3,6 +3,7 @@ test/
 .nyc_output/
 .vscode/
 coverage/
+dist/**/*.js.map
 .gitignore
 .gitlab-ci.yml
 tsconfig.json

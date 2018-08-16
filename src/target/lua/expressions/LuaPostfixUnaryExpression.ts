@@ -27,8 +27,6 @@ export class LuaPostfixUnaryExpression implements Partial<Target> {
                         )
                     )
                 );
-            default:
-                throw new UnsupportedError(`Unsupported postfix unary operator ${ts.SyntaxKind[node.operator]}`, node);
         }
     }
 }

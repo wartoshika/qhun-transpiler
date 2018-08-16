@@ -8,6 +8,9 @@ export class LuaFunctionDecorator implements Partial<Target> {
 
     public transpileFunctionDecorator(node: ts.FunctionDeclaration): string {
 
+        // this decorator is not fully supported, write a warning
+        console.warn("MethodDecorators are not fully supported. The typed property descriptor is currently empty!");
+
         // get the function name
         let functionName = this.transpileNode(node.name);
 
