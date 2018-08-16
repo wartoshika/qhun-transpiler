@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "es2015",
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
@@ -8,7 +8,7 @@
         "emitDecoratorMetadata": true,
         "outDir": "dist",
         "moduleResolution": "node",
-        "target": "es5",
+        "target": "es2015",
         "sourceMap": true
     },
     "include": [
