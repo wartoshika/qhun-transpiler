@@ -46,6 +46,7 @@ deploy:GitHub:
     only:
         - master
         - dev
+        - tags
 
 ######################
 # DEPLOY TO NPMJS.ORG
@@ -56,7 +57,7 @@ deploy:NPM:
     dependencies:
       - build:node10
     script:
-        - echo '//registry.npmjs.org/:_authToken=${NPM_NPMJS_TOKEN}'>.npmrc
+        - echo '//registry.npmjs.org/:_authToken=$NPM_NPMJS_TOKEN'>.npmrc
         - npm publish
     only:
         - tags
@@ -64,13 +65,13 @@ deploy:NPM:
 ##############################
 # DEPLOY TO INTERNAL REGISTRY
 ##############################
-deploy:NPM:
+deploy:NPM_INTERNAL:
     stage: deploy
     image: node:10
     dependencies:
       - build:node10
     script:
-        - echo '//npm-registry.qhun.de/:_authToken=${NPM_INTERNAL_TOKEN}'>.npmrc
+        - echo '//npm-registry.qhun.de/:_authToken=$NPM_INTERNAL_TOKEN'>.npmrc
         - npm publish --registry http://npm-registry.qhun.de
     only:
         - tags
