@@ -3,14 +3,15 @@
   "version": "0.0.1",
   "description": "A command line tool to transpiles a Typescript project into supported other languages.",
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wartoshika/qhun-transpiler"
+  },
   "scripts": {
     "test": "./node_modules/.bin/mocha -r ts-node/register test/**/*.spec.ts",
     "coverage": "./node_modules/.bin/nyc ./node_modules/.bin/mocha -r ts-node/register test/**/*.spec.ts",
     "build": "./node_modules/.bin/tsc",
     "run-ts": "./node_modules/.bin/ts-node src/index.ts"
-  },
-  "publishConfig": {
-    "registry": "http://npm-registry.qhun.de"
   },
   "nyc": {
     "include": [

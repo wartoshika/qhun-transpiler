@@ -34,9 +34,9 @@ test:node10:
         - npm run coverage
     coverage: '/\d+\.\d+\%\ \(/'
 
-###################
-# DEPLOY TO GITHUB
-###################
+#########################
+# DEPLOY TO GITHUB.COM
+#########################
 deploy:GitHub:
     stage: deploy
     image: ilyasemenov/gitlab-ci-git-push
@@ -47,14 +47,30 @@ deploy:GitHub:
         - master
         - dev
 
-################
-# DEPLOY
-################
+######################
+# DEPLOY TO NPMJS.ORG
+######################
 deploy:NPM:
     stage: deploy
+    image: node:10
     dependencies:
       - build:node10
     script:
-        - ls -la
+        - echo '//registry.npmjs.org/:_authToken=${NPM_NPMJS_TOKEN}'>.npmrc
+        - npm publish
     only:
-        - master
+        - tags
+
+##############################
+# DEPLOY TO INTERNAL REGISTRY
+##############################
+deploy:NPM:
+    stage: deploy
+    image: node:10
+    dependencies:
+      - build:node10
+    script:
+        - echo '//npm-registry.qhun.de/:_authToken=${NPM_INTERNAL_TOKEN}'>.npmrc
+        - npm publish --registry http://npm-registry.qhun.de
+    only:
+        - tags
