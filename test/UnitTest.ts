@@ -1,11 +1,11 @@
 import { Test } from "./Test";
 import { expect } from "chai";
-import { SupportedTargets } from "../src/target/TargetFactory";
+import { SupportedTargets, SupportedTargetConfig } from "../src/target/TargetFactory";
 import { UnsupportedError } from "../src/error/UnsupportedError";
 
 export declare type TestCodeAndResult = {
     code: string,
-    expected: string[],
+    expected: string[] | ((context: UnitTest) => string[]),
     /**
      * a stack of named declarations
      */
@@ -27,12 +27,19 @@ export declare type TestCodeAndThrow = {
 
 export abstract class UnitTest extends Test {
 
-    protected runCodeAndExpectResult(target: keyof SupportedTargets, test: TestCodeAndResult): void {
+    protected runCodeAndExpectResult<K extends keyof SupportedTargets>(target: K, test: TestCodeAndResult, config?: SupportedTargetConfig[K]): void {
 
         test.forEach(oneCase => {
 
-            expect(this.transpile(target, oneCase.code))
-                .to.deep.equal(oneCase.expected, oneCase.message);
+            let expected: string[];
+            if (typeof oneCase.expected === "function") {
+                expected = oneCase.expected(this);
+            } else {
+                expected = oneCase.expected;
+            }
+
+            expect(this.transpile(target, oneCase.code, config))
+                .to.deep.equal(expected, oneCase.message);
 
             if (oneCase.expectedAditionalDeclaration && oneCase.expectedAditionalDeclaration.length > 0) {
                 const declarations = Object.keys((this.lastTarget as any).declarationStack);
@@ -49,16 +56,23 @@ export abstract class UnitTest extends Test {
         });
     }
 
-    protected runCodeAndExpectResultContains(target: keyof SupportedTargets, test: TestCodeAndResult): void {
+    protected runCodeAndExpectResultContains<K extends keyof SupportedTargets>(target: K, test: TestCodeAndResult, config?: SupportedTargetConfig[K]): void {
 
         test.forEach(oneCase => {
 
-            expect(this.transpile(target, oneCase.code))
+            expect(this.transpile(target, oneCase.code, config))
                 .to.satisfy((arr: string[]) => {
+
+                    let expected: string[];
+                    if (typeof oneCase.expected === "function") {
+                        expected = oneCase.expected(this);
+                    } else {
+                        expected = oneCase.expected;
+                    }
 
                     // trim
                     arr = arr.map(line => line.trim());
-                    return oneCase.expected.every(line => {
+                    return expected.every(line => {
                         const res = arr.indexOf(line) !== -1;
                         if (!res) {
                             console.error("Cannot find", line, "in", arr);
@@ -69,12 +83,12 @@ export abstract class UnitTest extends Test {
         });
     }
 
-    protected runCodeAndExpectThrow(target: keyof SupportedTargets, test: TestCodeAndThrow): void {
+    protected runCodeAndExpectThrow<K extends keyof SupportedTargets>(target: K, test: TestCodeAndThrow, config?: SupportedTargetConfig[K]): void {
 
         test.forEach(oneCase => {
 
             try {
-                expect(this.transpile(target, oneCase.code));
+                expect(this.transpile(target, oneCase.code, config));
                 expect(false).to.equal(true, "no throw statement occured");
             } catch (e) {
                 expect(e).to.be.an.instanceof(oneCase.throw, oneCase.message);

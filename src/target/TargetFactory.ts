@@ -3,10 +3,17 @@ import { TargetConstructor } from "./TargetConstructor";
 import { WowTarget } from "./wow/WowTarget";
 import { Project } from "../config/Project";
 import * as ts from "typescript";
+import { LuaConfig } from "./lua/LuaConfig";
+import { WowConfig } from "./wow/WowConfig";
 
 export declare type SupportedTargets = {
     lua: LuaTarget,
     wow: WowTarget
+};
+
+export declare type SupportedTargetConfig = {
+    lua: LuaConfig,
+    wow: WowConfig
 };
 
 declare type SupportedTargetConstructors = {
@@ -32,8 +39,8 @@ export class TargetFactory {
      * @param project the project object
      * @param typeChecker the current typer checker
      */
-    public create<T extends keyof SupportedTargetConstructors>(target: T, project: Project, typeChecker: ts.TypeChecker): SupportedTargets[T] {
+    public create<T extends keyof SupportedTargetConstructors>(target: T, project: Project, typeChecker: ts.TypeChecker, sourceFile: ts.SourceFile): SupportedTargets[T] {
 
-        return new TargetFactory.supportedTargets[target](project, typeChecker);
+        return new TargetFactory.supportedTargets[target](project, typeChecker, sourceFile);
     }
 }

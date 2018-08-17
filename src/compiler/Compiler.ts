@@ -1,20 +1,21 @@
-import { Project } from "./config/Project";
+import { Project } from "../config/Project";
 import * as ts from "typescript";
-import { TargetFactory } from "./target/TargetFactory";
-import { Transpiler } from "./transpiler/Transpiler";
+import { TargetFactory } from "../target/TargetFactory";
+import { Transpiler } from "../transpiler/Transpiler";
+import { UnsupportedError } from "../error/UnsupportedError";
+import { CompilerWrittenFile } from "./CompilerWrittenFile";
 
 import * as path from "path";
 import * as fs from "fs";
 import * as shelljs from "shelljs";
-import { Target } from "./target/Target";
-import { UnsupportedError } from "./error/UnsupportedError";
-
-declare type TranspilerError = {
-    error: Error,
-    file: ts.SourceFile
-};
+import { Target } from "../target/Target";
 
 export class Compiler {
+
+    /**
+     * a stack of all written files
+     */
+    private writtenFileStack: CompilerWrittenFile[] = [];
 
     /**
      * @param project the project configuration
@@ -37,18 +38,20 @@ export class Compiler {
         // create the transpiling target
         const targetFactory = new TargetFactory();
         let lastSourceFile: ts.SourceFile;
+        let lastTarget: Target;
 
         // iterate over every source file
         try {
             program.getSourceFiles().filter(file => !file.isDeclarationFile).forEach(sourceFile => {
 
                 // create the transpiler
-                const target = targetFactory.create(this.project.target, this.project, typeChecker);
+                const target = targetFactory.create(this.project.target, this.project, typeChecker, sourceFile);
                 const extension = target.getFileExtension();
                 const transpiler = new Transpiler(target);
 
-                // declare last soruce file
+                // declare last instances
                 lastSourceFile = sourceFile;
+                lastTarget = target;
 
                 // transpile this file
                 const transpiledCode = transpiler.transpile(sourceFile);
@@ -57,8 +60,8 @@ export class Compiler {
                 this.writeDestinationFile(sourceFile, transpiledCode, extension);
             });
 
-            // everything was successfull!
-            return true;
+            // run post project transpile
+            return lastTarget.postProjectTranspile(this.writtenFileStack);
         } catch (e) {
 
             // check for unsupported error
@@ -87,13 +90,13 @@ export class Compiler {
 
     /**
      * writes the destination file
-     * @param sourceFile the original source file
+     * @param sourcefile the original source file
      * @param transpiled the transpiled source code
      * @param extension the target file extension
      */
-    private writeDestinationFile(sourceFile: ts.SourceFile, transpiled: string, extension: string): void {
+    private writeDestinationFile(sourcefile: ts.SourceFile, transpiled: string, extension: string): void {
 
-        const filePath = path.resolve(sourceFile.fileName);
+        const filePath = path.resolve(sourcefile.fileName);
 
         // remove the cwd from the file path
         const partOfFilePath = filePath.replace(this.project.rootDir, "");
@@ -105,8 +108,13 @@ export class Compiler {
         // write the file
         const destinationFileName = path.join(destinationDir, path.basename(filePath, ".ts") + `.${extension}`);
 
-        console.log("Write: ", destinationFileName);
-
+        // write the file!
         fs.writeFileSync(destinationFileName, transpiled);
+
+        // add the file to the written file stack
+        this.writtenFileStack.push({
+            sourcefile,
+            generatedFileName: destinationFileName
+        });
     }
 }

@@ -1,5 +1,5 @@
 import { Config } from "../src/config/Config";
-import { SupportedTargets, TargetFactory } from "../src/target/TargetFactory";
+import { SupportedTargets, TargetFactory, SupportedTargetConfig } from "../src/target/TargetFactory";
 import { Project } from "../src/config/Project";
 import { Transpiler } from "../src/transpiler/Transpiler";
 import * as ts from "typescript";
@@ -13,17 +13,18 @@ const libSource = fs.readFileSync(path.join(path.dirname(require.resolve("typesc
 export abstract class Test {
 
     protected lastTarget: Target;
+    protected lastProject: Project;
 
     /**
      * get a test project object
      */
-    protected getProject<C extends Config>(target: keyof SupportedTargets, config?: C): Project<C> {
+    protected getProject<K extends keyof SupportedTargets>(target: K, config?: SupportedTargetConfig[K]): Project<SupportedTargetConfig[K]> {
 
         // use default config constructor
         return DefaultConfig.mergeDefaultProjectData({
             config: config,
             target: target
-        }) as Project<C>;
+        }) as Project<SupportedTargetConfig[K]>;
     }
 
     /**
@@ -43,7 +44,7 @@ export abstract class Test {
      * @param target the target 
      * @param code the code to transpile into the target language
      */
-    protected transpile(target: keyof SupportedTargets, code: string): string[] {
+    protected transpile<K extends keyof SupportedTargets>(target: K, code: string, config?: SupportedTargetConfig[K]): string[] {
 
         // build compiler host
         const compilerHost = {
@@ -70,10 +71,11 @@ export abstract class Test {
 
         // build program
         const program = ts.createProgram(["test.ts"], this.getCompilerOptions(), compilerHost);
+        this.lastProject = this.lastProject || this.getProject(target, config);
 
         // build target
         const targetFactory = new TargetFactory();
-        const targetTranspiler = targetFactory.create(target, this.getProject(target), program.getTypeChecker());
+        const targetTranspiler = targetFactory.create(target, this.lastProject, program.getTypeChecker(), program.getSourceFile("test.ts"));
         this.lastTarget = targetTranspiler;
 
         // build transpiler

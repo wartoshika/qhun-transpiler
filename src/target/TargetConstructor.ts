@@ -7,5 +7,5 @@ import * as ts from "typescript";
  */
 export interface TargetConstructor<T extends Target = Target> {
 
-    new(project: Project, typeChecker: ts.TypeChecker): T;
+    new(project: Project, typeChecker: ts.TypeChecker, sourceFile: ts.SourceFile): T;
 }

@@ -2,11 +2,12 @@ import { suite, test, slow, timeout } from "mocha-typescript";
 import { expect } from "chai";
 
 import * as mockfs from "mock-fs";
-import { JsonConfig } from "../src/config/json/JsonConfig";
+import { JsonConfig } from "../../src/config/json/JsonConfig";
 import * as fs from "fs";
-import { CommandLine } from "../src/CommandLine";
+import { CommandLine } from "../../src/CommandLine";
+import { Test } from "../Test";
 
-@suite("[Integration] Complete transpile test", slow(500), timeout(3000)) class IntegrationTest {
+@suite("[Integration] Complete transpile test for target wow", slow(500), timeout(3000)) class LuaIntegrationTest extends Test {
 
     public after() {
         mockfs.restore();
@@ -16,7 +17,7 @@ import { CommandLine } from "../src/CommandLine";
 
         const transpileConfig: Partial<JsonConfig> = {
             tsconfig: "./iTsconfig.json",
-            target: "lua",
+            target: "wow",
             stripOutDir: "src"
         };
         const tsconfig = {
@@ -98,21 +99,7 @@ import { CommandLine } from "../src/CommandLine";
         expect(fs.existsSync("dist/index.lua")).to.be.true;
         expect(fs.existsSync("dist/a.lua")).to.be.true;
         expect(fs.existsSync("dist/b.lua")).to.be.true;
-        expect(fs.existsSync("dist/c.lua")).to.be.true
-    }
-
-    @test "Transpile using ArgumentReader"() {
-
-        mockfs({
-            "myFile.ts": `console.log(true);`
-        });
-
-        const cli = new CommandLine([
-            "-t", "lua", "-f", "myFile.ts"
-        ]);
-
-        cli.execute();
-
-        expect(fs.existsSync("myFile.lua")).to.be.true;
+        expect(fs.existsSync("dist/c.lua")).to.be.true;
+        expect(fs.existsSync(`dist/${this.getProject("lua").name}.toc`)).to.equal(true, "TOC file has not been generated");
     }
 }

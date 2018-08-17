@@ -1,4 +1,5 @@
 import * as ts from "typescript";
+import { CompilerWrittenFile } from "../compiler/CompilerWrittenFile";
 
 /**
  * a transpiler target
@@ -25,6 +26,13 @@ export interface Target {
      * get the declaration code that shoule be put to the head of the file
      */
     getDeclaration(): string[];
+
+    /**
+     * a function that is called after every source file as been transpiled.
+     * @param files all files that has passed the transpiler
+     * @returns a flag if the post project transpile has been run successfully
+     */
+    postProjectTranspile(files: CompilerWrittenFile[]): boolean;
 
     /**
      * a function that is called before the transpiling process begins

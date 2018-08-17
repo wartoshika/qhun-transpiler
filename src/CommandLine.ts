@@ -7,7 +7,7 @@ import { JsonReader } from "./config/json/JsonReader";
 import { Project } from "./config/Project";
 import { Reader } from "./config/Reader";
 import { ArgumentReader } from "./config/argument/ArgumentReader";
-import { Compiler } from "./Compiler";
+import { Compiler } from "./compiler/Compiler";
 
 // tslint:disable-next-line
 const packageJson = require("../package.json");

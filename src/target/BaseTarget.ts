@@ -2,6 +2,8 @@ import { Target } from "./Target";
 import * as ts from "typescript";
 import { Project } from "../config/Project";
 import { Types } from "../transpiler/Types";
+import { CompilerWrittenFile } from "../compiler/CompilerWrittenFile";
+import { Config } from "../config/Config";
 
 declare type TypescriptExport = {
     name: string,
@@ -12,7 +14,7 @@ declare type TypescriptExport = {
 /**
  * the base target class that implements cross language functionality
  */
-export abstract class BaseTarget implements Partial<Target> {
+export abstract class BaseTarget<C extends Config = Config> implements Partial<Target> {
 
     /**
      * the node transpiler
@@ -37,8 +39,9 @@ export abstract class BaseTarget implements Partial<Target> {
     } = {};
 
     constructor(
-        protected project: Project,
-        protected typeChecker: ts.TypeChecker
+        protected project: Project<C>,
+        protected typeChecker: ts.TypeChecker,
+        protected sourceFile: ts.SourceFile
     ) { }
 
     /**
@@ -63,6 +66,17 @@ export abstract class BaseTarget implements Partial<Target> {
 
         return Object.keys(this.declarationStack)
             .map(key => this.declarationStack[key]);
+    }
+
+    /**
+     * a function that is called after every source file as been transpiled.
+     * @param files all files that has passed the transpiler
+     * @returns a flag if the post project transpile has been run successfully
+     */
+    public postProjectTranspile(files: CompilerWrittenFile[]): boolean {
+
+        // defaults to true for language targets that does not need post project transpile
+        return true;
     }
 
     /**
@@ -135,7 +149,7 @@ export abstract class BaseTarget implements Partial<Target> {
      */
     protected removeQuotes(str: string): string {
         if (str[0] === `"` || str[0] === `'`) {
-            return str.substr(1, str.length - 1);
+            return str.substr(1, str.length - 2);
         }
         return str;
     }

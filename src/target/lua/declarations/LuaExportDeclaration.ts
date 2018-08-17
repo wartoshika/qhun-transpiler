@@ -21,19 +21,4 @@ export class LuaExportDeclaration implements Partial<Target> {
             throw new UnsupportedError(`An export declaration must have a module specifier!`, node);
         }
     }
-
-    /**
-     * adds the declaration for require all function
-     */
-    private declareExportDeclarationRequireAll(): void {
-
-        this.addDeclaration(
-            "global.requireall",
-            [
-                `local function __global_requireall(path)`,
-                this.addSpacesToString(`local mods = require(path)`, 2),
-                this.addSpacesToString(``, 2)
-            ].join("\n")
-        );
-    }
 }
