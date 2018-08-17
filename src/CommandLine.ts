@@ -9,6 +9,9 @@ import { Reader } from "./config/Reader";
 import { ArgumentReader } from "./config/argument/ArgumentReader";
 import { Compiler } from "./Compiler";
 
+// tslint:disable-next-line
+const packageJson = require("../package.json");
+
 declare type ProgramArguments = {
     help: boolean,
     project: string,
@@ -108,8 +111,7 @@ export class CommandLine {
     private printHelp(): void {
 
         // read package.json file
-        const packageFile = fs.readFileSync(__dirname + "/../package.json").toString();
-        const packageObject = JSON.parse(packageFile);
+        const packageObject = packageJson;
 
         console.log(commandLineUsage([
             {
