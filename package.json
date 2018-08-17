@@ -3,7 +3,9 @@
   "version": "0.0.3",
   "description": "A command line tool to transpiles a Typescript project into supported other languages.",
   "main": "dist/index.js",
-  "bin": {},
+  "bin": {
+    "qhun-transpiler": "./dist/bin/qhun-transpiler.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/wartoshika/qhun-transpiler"
@@ -11,28 +13,11 @@
   "scripts": {
     "test": "./node_modules/.bin/mocha -r ts-node/register test/**/*.spec.ts",
     "coverage": "./node_modules/.bin/nyc ./node_modules/.bin/mocha -r ts-node/register test/**/*.spec.ts",
-    "build": "./node_modules/.bin/tsc",
+    "build-ts": "./node_modules/.bin/tsc",
+    "build-bundle": "./node_modules/.bin/webpack --config ./webpack.config.js",
+    "build": "./node_modules/.bin/npm-run-all build-ts build-bundle",
     "run-ts": "./node_modules/.bin/ts-node src/index.ts",
-    "bundle": "./node_modules/.bin/webpack --config ./webpack.config.js",
     "postversion": "git push --follow-tags"
-  },
-  "nyc": {
-    "include": [
-      "src/**/*.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text-summary",
-      "html",
-      "lcov"
-    ],
-    "sourceMap": true,
-    "instrument": true
   },
   "author": "wartoshika <dev@qhun.de>",
   "license": "MIT",
