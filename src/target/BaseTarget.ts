@@ -5,7 +5,8 @@ import { Types } from "../transpiler/Types";
 
 declare type TypescriptExport = {
     name: string,
-    node: ts.Node
+    node: ts.Node,
+    isNamespaceExport?: boolean
 };
 
 /**
@@ -90,11 +91,12 @@ export abstract class BaseTarget implements Partial<Target> {
      * add a node export
      * @param name the name of the exported variable
      * @param node the node that should be exported
+     * @param isNamespaceExport should be true for exports like export * from
      */
-    protected addExport(name: string, node: ts.Node): void {
+    protected addExport(name: string, node: ts.Node, isNamespaceExport: boolean = false): void {
 
         this.exportStack.push({
-            name, node
+            name, node, isNamespaceExport
         });
     }
 

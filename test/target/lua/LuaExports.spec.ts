@@ -13,9 +13,10 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                 expected: [
                     `local function abc()`,
                     `end`,
-                    `return {`,
+                    `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
                     `  abc = abc`,
-                    `}`
+                    `}`,
+                    `return ${LuaKeywords.EXPORT_LOCAL_NAME}`
                 ]
             }
         ]);
@@ -30,10 +31,11 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                     `local a = "test"`,
                     `local b = "test2"`,
                     `local c = "test3"`,
-                    `return {`,
+                    `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
                     `  a = a,`,
                     `  b = b`,
-                    `}`
+                    `}`,
+                    `return ${LuaKeywords.EXPORT_LOCAL_NAME}`
                 ]
             }
         ]);
@@ -56,9 +58,10 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                     `end`,
                     `function A.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}(self)`,
                     `end`,
-                    `return {`,
+                    `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
                     `  A = A`,
-                    `}`
+                    `}`,
+                    `return ${LuaKeywords.EXPORT_LOCAL_NAME}`
                 ]
             }
         ])
@@ -73,9 +76,10 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                 `  A = 1,`,
                 `  B = 2`,
                 `}`,
-                `return {`,
+                `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
                 `  Test = Test`,
-                `}`
+                `}`,
+                `return ${LuaKeywords.EXPORT_LOCAL_NAME}`
             ]
         }]);
     }

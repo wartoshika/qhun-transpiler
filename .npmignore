@@ -6,5 +6,7 @@ coverage/
 dist/**/*.js.map
 .gitignore
 .gitlab-ci.yml
+.nycrc
+webpack.config.js
 tsconfig.json
 tslint.json

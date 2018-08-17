@@ -4,6 +4,7 @@ import * as luaTrait from "./traits";
 
 import * as ts from "typescript";
 import { use } from "typescript-mix";
+import { LuaKeywords } from "./LuaKeywords";
 
 export interface LuaTarget extends BaseTarget, Target,
     luaTrait.LuaDeclarations, luaTrait.LuaDeclarations, luaTrait.LuaExpressions, luaTrait.LuaMisc,
@@ -114,17 +115,54 @@ export class LuaTarget extends BaseTarget implements Target {
     private addDeclaredExports(): string {
 
         // get all declared exports
-        const exports = this.getExports();
+        const allExports = this.getExports();
 
         // check if there are no exports
-        if (exports.length === 0) {
+        if (allExports.length === 0) {
             return "";
         }
 
+        // divide between namespace exports and normal exports
+        const normalExports = allExports.filter(exp => !exp.isNamespaceExport).map(exportNode => {
+            return `${exportNode.name} = ${exportNode.name}`;
+        });
+
+        // now the namespace exports
+        const namespaceExports = allExports.filter(exp => !!exp.isNamespaceExport).map(exportNode => {
+            return `${LuaKeywords.EXPORT_LOCAL_NAME} = __global_requireall(${exportNode.name}, ${LuaKeywords.EXPORT_LOCAL_NAME})`;
+        });
+
+        // declare requireall when a namespace export is there
+        if (namespaceExports.length > 0) {
+            this.addDeclaration(
+                "global.requireall",
+                [
+                    `local function __global_requireall(a,b)`,
+                    this.addSpacesToString(`local mods = require(a)`, 2),
+                    this.addSpacesToString(`for k, v in pairs(mods) do`, 2),
+                    this.addSpacesToString(`b[k] = v`, 4),
+                    this.addSpacesToString(`end`, 2),
+                    this.addSpacesToString(`return b`, 2),
+                    `end`
+                ].join("\n")
+            );
+        }
+
         // iterate over all exports and wrap it as object literal
-        return "return {\n" + exports.map(exportNode => {
-            return this.addSpacesToString(`${exportNode.name} = ${exportNode.name}`, 2);
-        }).join(",\n") + "\n}";
+        const exportStatements: string[] = [
+            `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`
+        ];
+        if (normalExports.length > 0) {
+            exportStatements.push(this.addSpacesToString(normalExports.join(",\n"), 2));
+        }
+        exportStatements.push(`}`);
+        if (namespaceExports.length > 0) {
+            exportStatements.push(...namespaceExports);
+        }
+        exportStatements.push(`return ${LuaKeywords.EXPORT_LOCAL_NAME}`);
+
+        // return the final result
+        return exportStatements.join("\n");
     }
 
 }
