@@ -45,7 +45,7 @@ deploy:GitHub:
         - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
         - chmod 600 ~/.ssh/id_rsa
         - ssh-keyscan -H 22 "github.com" >> ~/.ssh/known_hosts
-        - git remote add github git@github.com:wartoshika/qhun-transpiler.git
+        - git remote add github git@github.com:wartoshika/qhun-transpiler.git || true
         - git push github -u $CI_COMMIT_REF_NAME --follow-tags --force
     only:
         - master
