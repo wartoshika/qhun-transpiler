@@ -20,6 +20,18 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
                     `end`,
                     `local myString, myNumber = abc()`
                 ]
+            }, {
+                code: `function abc(): [string, number[], any[][]] {
+                    return ["test", [1,2,3], [["a",2],3]]
+                }
+                const [myString, myNumberArray, myObj] = abc();
+                `,
+                expected: [
+                    `local function abc()`,
+                    `  return "test", {1, 2, 3}, {{"a", 2}, 3}`,
+                    `end`,
+                    `local myString, myNumberArray, myObj = abc()`
+                ]
             }
         ]);
 
