@@ -8,12 +8,12 @@ cache:
   - node_modules/
 
 ################
-# node 10
+# node latest
 ################
     
-build:node10:
+build_node:latest:
     stage: build
-    image: node:10
+    image: node:latest
     script:
         - npm install
         - npm run build
@@ -26,9 +26,9 @@ build:node10:
             - package.json
             - LICENSE
 
-test:node10:
+test_node:latest:
     stage: test
-    image: node:10
+    image: node:latest
     script:
         - npm install
         - npm run coverage
@@ -52,12 +52,15 @@ deploy:GitHub:
 ######################
 deploy:NPM:
     stage: deploy
-    image: node:10
+    image: node:latest
+    when: on_success
     dependencies:
-      - build:node10
+      - build_node:latest
     script:
-        - export NPM_NPMJS_TOKEN=$NPM_NPMJS_TOKEN
-        - echo '//registry.npmjs.org/:_authToken=${NPM_NPMJS_TOKEN}'>.npmrc
+        - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        - cat ~/.npmrc
+        - npm whoami
         - npm publish
     only:
         - tags
+        - triggers
