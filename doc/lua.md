@@ -16,7 +16,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
 - [Variable declarations](https://www.typescriptlang.org/docs/handbook/variable-declarations.html)
 - [Literal expressions](https://www.typescriptlang.org/docs/handbook/advanced-types.html)
 - [Prefix and suffix unary expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators#Inkrement_())
-- Binary expressions including [bitops](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operatoren)
+- Binary expressions including [bitops](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators)
 - Template strings
 - Typeof and instanceof statements
 - For, ForIn, ~~ForOf~~, Do and While statements
@@ -56,7 +56,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
 ## What you should keep in mind when writing typescript code:
 
 1. Lua does not know about the difference between the `let` and `const` statement. Same as javascript `ES5`. These are just hints at compilertime and will be lost at runtime.
-2. You shoule use array destructing only for getting values from a multireturn function. See this example:
+2. You should use array destructing only for getting values from a multireturn function. See this example:
 ```typescript
 // myTypescriptFile.ts
 const [a, b, c, , e] = myMultiReturnFunction()
