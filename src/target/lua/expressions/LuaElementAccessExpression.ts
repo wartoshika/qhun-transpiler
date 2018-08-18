@@ -2,6 +2,7 @@ import { Target } from "../../Target";
 import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { Types } from "../../../transpiler/Types";
+import { UnsupportedError } from "../../../error/UnsupportedError";
 
 export interface LuaElementAccessExpression extends BaseTarget, Target { }
 export class LuaElementAccessExpression implements Partial<Target> {
@@ -19,11 +20,18 @@ export class LuaElementAccessExpression implements Partial<Target> {
         // - array index access
         // - object access
         // handle them by case
+        try {
+            if (Types.isString(node.expression, this.typeChecker)) {
+                return this.getElementAccessStringCase(element, accessor);
+            } else if (Types.isArray(node.expression, this.typeChecker)) {
+                return this.getElementAccessArrayCase(element, accessor);
+            }
+        } catch (e) {
 
-        if (Types.isString(node.expression, this.typeChecker)) {
-            return this.getElementAccessStringCase(element, accessor);
-        } else if (Types.isArray(node.expression, this.typeChecker)) {
-            return this.getElementAccessArrayCase(element, accessor);
+            // type could not be evaluated, use normal access pattern
+            if (e instanceof UnsupportedError) {
+                throw e;
+            }
         }
 
         // use the normal object like access case

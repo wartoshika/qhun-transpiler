@@ -36,7 +36,7 @@ export class Transpiler {
         });
 
         // add post transpile
-        result += this.target.postTranspile() || "";
+        result += this.target.postTranspile(result) || "";
 
         // check the declaration flag
         if (addDeclarations) {

@@ -41,8 +41,10 @@ export interface Target {
 
     /**
      * a function that is called after the end of file token and directly after the transpiling process
+     * @param currentTranspiledContent the currently transpiled file content
+     * @returns a string that will be appended to the currently transpiled content
      */
-    postTranspile(): string | void;
+    postTranspile(currentTranspiledContent: string): string | void;
 
     /**
      * transpiles an import declaration

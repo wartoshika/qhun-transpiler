@@ -6,6 +6,7 @@ import { JsonConfig } from "../../src/config/json/JsonConfig";
 import * as fs from "fs";
 import { CommandLine } from "../../src/CommandLine";
 import { Test } from "../Test";
+import { WowKeywords } from "../../src/target/wow/WowKeywords";
 
 @suite("[Integration] Complete transpile test for target wow", slow(500), timeout(3000)) class LuaIntegrationTest extends Test {
 
@@ -101,5 +102,6 @@ import { Test } from "../Test";
         expect(fs.existsSync("dist/b.lua")).to.be.true;
         expect(fs.existsSync("dist/c.lua")).to.be.true;
         expect(fs.existsSync(`dist/${this.getProject("lua").name}.toc`)).to.equal(true, "TOC file has not been generated");
+        expect(fs.existsSync(`dist/${WowKeywords.IMPORT_LIB_NAME}.lua`)).to.equal(true, "Library file has not been created");
     }
 }

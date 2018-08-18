@@ -5,6 +5,7 @@ import { WowPathBuilder } from "./WowPathBuilder";
 import { WowConfig } from "../WowConfig";
 import * as path from "path";
 import * as fs from "fs";
+import { WowKeywords } from "../WowKeywords";
 
 export interface WowPostTranspile extends BaseTarget<WowConfig>, Target, WowPathBuilder { }
 
@@ -24,6 +25,11 @@ export class WowPostTranspile implements Partial<Target> {
 
         // get the destination root path for the toc file
         const destinationRootPath = path.join(this.project.rootDir, path.basename(this.project.outDir));
+
+        // create library file for imports and exports and add the created
+        // file to the top of the name stack. library needs to be the first loaded file!
+        this.createWowLibraryFile(destinationRootPath);
+        tocFileNames.unshift(`${WowKeywords.IMPORT_LIB_NAME}.lua`);
 
         // generate toc content
         const tocFileContent: string[] = [
@@ -45,6 +51,34 @@ export class WowPostTranspile implements Partial<Target> {
         }
 
         return true;
+    }
+
+    /**
+     * creates a library file for wow import and exports
+     * @param destinationRootPath the directory name where to store the library file
+     * @return the path of the created file
+     */
+    private createWowLibraryFile(destinationRootPath: string): string {
+
+        // declare the lib content
+        const libContent: string = [
+            `local ${WowKeywords.IMPORT_LIB_NAME} = {}`,
+            `local declareStack = {}`,
+            `function ${WowKeywords.IMPORT_LIB_NAME}.declare(name, content)`,
+            this.addSpacesToString(`declareStack[name] = content`, 2),
+            `end`,
+            `function ${WowKeywords.IMPORT_LIB_NAME}.get(name)`,
+            this.addSpacesToString(`return declareStack[name] or {}`, 2),
+            `end`,
+            `_G.${WowKeywords.IMPORT_LIB_NAME} = ${WowKeywords.IMPORT_LIB_NAME}`
+        ].join("\n");
+
+        // build the target file path and write it
+        const targetPath = path.join(destinationRootPath, `${WowKeywords.IMPORT_LIB_NAME}.lua`);
+        fs.writeFileSync(targetPath, libContent);
+
+        // return the created file name
+        return targetPath;
     }
 
     /**

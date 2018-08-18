@@ -31,9 +31,22 @@ export class WowTarget extends LuaTarget implements Target {
     /**
      * @override LuaTarget.postTranspile()
      */
-    public postTranspile(): string | void {
+    public postTranspile(currentTranspiledContent: string): string | void {
 
-        return this.addDeclaredWowExports();
+        const postTranspileStack: string[] = [];
+
+        const exportStack = this.addDeclaredWowExports();
+        if (exportStack) {
+            postTranspileStack.push(exportStack);
+        }
+
+        // wow does not like empty files. when no transpiled content is available
+        // add a comment to prevent wow from failing to load this file
+        if (currentTranspiledContent.length === 0 && exportStack.length === 0) {
+            postTranspileStack.push(`-- File is empty. This comment prevents wow from failing to load this file.`);
+        }
+
+        return postTranspileStack.join("\n");
     }
 
     /**

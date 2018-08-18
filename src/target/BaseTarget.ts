@@ -4,6 +4,8 @@ import { Project } from "../config/Project";
 import { Types } from "../transpiler/Types";
 import { CompilerWrittenFile } from "../compiler/CompilerWrittenFile";
 import { Config } from "../config/Config";
+import * as path from "path";
+import * as fs from "fs";
 
 declare type TypescriptExport = {
     name: string,
