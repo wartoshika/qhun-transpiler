@@ -9,6 +9,7 @@ import * as path from "path";
 import * as fs from "fs";
 import * as shelljs from "shelljs";
 import { Target } from "../target/Target";
+import { TranspilerFunctions } from "../transpiler/TranspilerFunctions";
 
 export class Compiler {
 
@@ -54,7 +55,10 @@ export class Compiler {
                 lastTarget = target;
 
                 // transpile this file
-                const transpiledCode = transpiler.transpile(sourceFile);
+                let transpiledCode = transpiler.transpile(sourceFile);
+
+                // restore replacements
+                transpiledCode = TranspilerFunctions.restoreReservedChars(transpiledCode);
 
                 // output the transpiled code into the destination file
                 this.writeDestinationFile(sourceFile, transpiledCode, extension);
