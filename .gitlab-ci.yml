@@ -39,10 +39,14 @@ test_node:latest:
 #########################
 deploy:GitHub:
     stage: deploy
-    image: ilyasemenov/gitlab-ci-git-push
     when: on_success
     script:
-        - git-push git@github.com:wartoshika/qhun-transpiler.git refs/heads/$CI_COMMIT_REF_NAME
+        - mkdir -p ~/.ssh
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+        - chmod 600 ~/.ssh/id_rsa
+        - ssh-keyscan -H 22 "github.com" >> ~/.ssh/known_hosts
+        - git remote add github git@github.com:wartoshika/qhun-transpiler.git
+        - git-push github -u $CI_COMMIT_REF_NAME --follow-tags
     only:
         - master
         - dev
@@ -57,9 +61,7 @@ deploy:NPM:
     dependencies:
       - build_node:latest
     script:
-        - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-        - cat ~/.npmrc
-        - npm whoami
+        - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
         - npm publish
     only:
         - tags
