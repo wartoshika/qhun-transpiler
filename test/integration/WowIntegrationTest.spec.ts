@@ -4,7 +4,7 @@ import { expect } from "chai";
 import * as mockfs from "mock-fs";
 import { JsonConfig } from "../../src/config/json/JsonConfig";
 import * as fs from "fs";
-import { CommandLine } from "../../src/CommandLine";
+import { CommandLine } from "../../src/cli/CommandLine";
 import { Test } from "../Test";
 import { WowKeywords } from "../../src/target/wow/WowKeywords";
 
