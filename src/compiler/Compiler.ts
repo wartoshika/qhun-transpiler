@@ -2,14 +2,14 @@ import { Project } from "../config/Project";
 import * as ts from "typescript";
 import { TargetFactory } from "../target/TargetFactory";
 import { Transpiler } from "../transpiler/Transpiler";
-import { UnsupportedError } from "../error/UnsupportedError";
 import { CompilerWrittenFile } from "./CompilerWrittenFile";
+import { Target } from "../target/Target";
+import { TranspilerFunctions } from "../transpiler/TranspilerFunctions";
+import { ErrorWithNode } from "../error/ErrorWithNode";
 
 import * as path from "path";
 import * as fs from "fs";
 import * as shelljs from "shelljs";
-import { Target } from "../target/Target";
-import { TranspilerFunctions } from "../transpiler/TranspilerFunctions";
 
 export class Compiler {
 
@@ -69,7 +69,7 @@ export class Compiler {
         } catch (e) {
 
             // check for unsupported error
-            if (e instanceof UnsupportedError) {
+            if (e instanceof ErrorWithNode) {
 
                 // get position of error
                 if (e.node) {
