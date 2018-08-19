@@ -2,14 +2,14 @@ import { Project } from "../config/Project";
 import * as ts from "typescript";
 import { TargetFactory } from "../target/TargetFactory";
 import { Transpiler } from "../transpiler/Transpiler";
-import { UnsupportedError } from "../error/UnsupportedError";
 import { CompilerWrittenFile } from "./CompilerWrittenFile";
+import { Target } from "../target/Target";
+import { TranspilerFunctions } from "../transpiler/TranspilerFunctions";
+import { ErrorWithNode } from "../error/ErrorWithNode";
 
 import * as path from "path";
 import * as fs from "fs";
 import * as shelljs from "shelljs";
-import { Target } from "../target/Target";
-import { TranspilerFunctions } from "../transpiler/TranspilerFunctions";
 
 export class Compiler {
 
@@ -28,9 +28,9 @@ export class Compiler {
     /**
      * compiles the given files and transpiles them into the target language
      * @param files the files to compile and transpile
-     * @returns true if the compiling and transpiling was successfull
+     * @returns the amount of successfully transpiled and written files. false on error
      */
-    public compile(files: string[]): boolean {
+    public compile(files: string[]): number | boolean {
 
         // create a typescript program
         const program = ts.createProgram(files, this.project.parsedCommandLine.options);
@@ -65,11 +65,17 @@ export class Compiler {
             });
 
             // run post project transpile
-            return lastTarget.postProjectTranspile(this.writtenFileStack);
+            if (lastTarget.postProjectTranspile(this.writtenFileStack)) {
+
+                return this.writtenFileStack.length;
+            } else {
+
+                return false;
+            }
         } catch (e) {
 
             // check for unsupported error
-            if (e instanceof UnsupportedError) {
+            if (e instanceof ErrorWithNode) {
 
                 // get position of error
                 if (e.node) {

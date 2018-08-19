@@ -64,19 +64,55 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
         ]);
     }
 
-    @test "Unsupported switch cases"() {
+    @test "Switch statements with return in case block"() {
 
-        this.runCodeAndExpectThrow("lua", [
+        this.runCodeAndExpectResult("lua", [
             {
                 code: `
                     switch(1) {
                         case 1:
                             run(1);
                             return true;
-                        case 2: break;
+                        case 2: 
+                            run(2);
+                            break;
+                        case 3:
+                            run(3);
+                            break;
+                        case 4: break;
                     }
                 `,
-                throw: UnsupportedError
+                expected: [
+                    `if 1 == 1 then`,
+                    `  run(1)`,
+                    `  return true`,
+                    `elseif 1 == 2 then`,
+                    `  run(2)`,
+                    `elseif 1 == 3 then`,
+                    `  run(3)`,
+                    `elseif 1 == 4 then`,
+                    `  `,
+                    `end`
+                ]
+            }, {
+                code: `
+                    switch(a) {
+                        case "test": return hello("test"); break;
+                        case "test2": return hello("test2"); break;
+                        default:
+                            return hello("default");
+                            break;
+                    }
+                `,
+                expected: [
+                    `if a == "test" then`,
+                    `  return hello("test")`,
+                    `elseif a == "test2" then`,
+                    `  return hello("test2")`,
+                    `else`,
+                    `  return hello("default")`,
+                    `end`
+                ]
             }
         ])
     }

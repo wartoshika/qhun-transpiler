@@ -55,4 +55,14 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
         }])
     }
 
+    @test "Array destruction assigned to array"() {
+
+        this.runCodeAndExpectResult("lua", [{
+            code: `const [a,b,c] = [c,b,a]`,
+            expected: [
+                `local a, b, c = c, b, a`
+            ]
+        }])
+    }
+
 }

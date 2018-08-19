@@ -1,14 +1,14 @@
 import * as ts from "typescript";
+import { ErrorWithNode } from "./ErrorWithNode";
 
-export class UnsupportedError extends Error {
+export class UnsupportedError extends ErrorWithNode {
 
     constructor(
         message: string,
-        public node: ts.Node
+        node: ts.Node,
+        public bubble: boolean = false
     ) {
-        super(message);
-        this.node = node;
-
+        super(message, node);
         (this as any).__proto__ = UnsupportedError.prototype;
     }
 }

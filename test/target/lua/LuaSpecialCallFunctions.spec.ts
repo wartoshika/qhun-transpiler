@@ -252,6 +252,59 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
         ]);
     }
 
+    @test "Object.values()"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `const a = Object.values(b)`,
+                expected: [
+                    `local a = __object_values(b)`
+                ],
+                expectedAditionalDeclaration: [
+                    'object.values'
+                ]
+            }, {
+                code: `myObj.values()`,
+                expected: [
+                    `myObj:values()`
+                ]
+            }
+        ]);
+    }
+
+    @test "Object.hasOwnProperty()"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `const a: {} = {}; a.hasOwnProperty("b")`,
+                expected: [
+                    `local a = {}`,
+                    `__object_hasownproperty(a, "b")`
+                ],
+                expectedAditionalDeclaration: [
+                    'object.hasownproperty'
+                ]
+            }, {
+                code: `myUntypedObject.hasOwnProperty("b")`,
+                expected: [
+                    `myUntypedObject:hasOwnProperty("b")`
+                ]
+            }
+        ]);
+
+        this.runCodeAndExpectThrow("lua", [{
+            code: `Object.hasOwnProperty("b")`,
+            throw: UnsupportedError
+        }])
+    }
+
+    @test "Unsupported Object.* test"() {
+        this.runCodeAndExpectThrow("lua", [{
+            code: `Object.unsupported()`,
+            throw: UnsupportedError
+        }])
+    }
+
     @test "Math functions"() {
 
         this.runCodeAndExpectResult("lua", [

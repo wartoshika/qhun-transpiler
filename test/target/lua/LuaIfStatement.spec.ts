@@ -51,6 +51,8 @@ import { UnitTest } from "../../UnitTest";
                             print(false);
                         }else if(true) {
                             print("3");
+                        }else if (4) {
+                            print(4)
                         }else{
                             print("yay");
                         }
@@ -64,6 +66,8 @@ import { UnitTest } from "../../UnitTest";
                     `    print(false)`,
                     `  elseif true then`,
                     `    print("3")`,
+                    `  elseif 4 then`,
+                    `    print(4)`,
                     `  else`,
                     `    print("yay")`,
                     `  end`,

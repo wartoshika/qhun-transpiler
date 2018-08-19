@@ -4,6 +4,7 @@ import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
 import { LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial } from "../special";
 import { Types } from "../../../transpiler/Types";
+import { LuaKeywords } from "../LuaKeywords";
 
 export interface LuaCallExpression extends BaseTarget, Target, LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial { }
 export class LuaCallExpression implements Partial<Target> {
@@ -15,8 +16,20 @@ export class LuaCallExpression implements Partial<Target> {
             return this.transpileCallExpressionOnProperty(node);
         }
 
-        // get base expression
-        const base = this.transpileNode(node.expression);
+        // check for super function calls
+        let base: string;
+        if (node.expression.kind === ts.SyntaxKind.SuperKeyword) {
+
+            // use the constructor of the super class
+            base = `self.${LuaKeywords.CLASS_SUPER_REFERENCE_NAME}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}`;
+
+            // add the self reference to the arguments
+            node.arguments = ts.createNodeArray([ts.createNode(ts.SyntaxKind.ThisKeyword) as ts.Expression, ...node.arguments]);
+        } else {
+
+            // normal funcion call.
+            base = this.transpileNode(node.expression);
+        }
 
         // put everything together
         return `${base}(${node.arguments.map(this.transpileNode).join(", ")})`;
@@ -43,12 +56,32 @@ export class LuaCallExpression implements Partial<Target> {
             ownerNameCheck = "String";
         } else if (Types.isArray(owner, this.typeChecker)) {
             ownerNameCheck = "Array";
+        } else if (Types.isObject(owner, this.typeChecker)) {
+
+            // be sure to exclude object type special implementations
+            if ([
+                "Math"
+            ].indexOf(ownerName) === -1) {
+                ownerNameCheck = "Object";
+            }
         }
 
         // check if there are some special objects
         switch (ownerNameCheck) {
             case "Object":
-                return this.transpileSpecialObjectFunction(functionName, ownerName, node.arguments);
+                try {
+                    return this.transpileSpecialObjectFunction(functionName, ownerName, node.arguments);
+                } catch (e) {
+
+                    // if this method does not exists on object, use the normal object call pattern
+                    // because in most cases the function is declared on the object so dont
+                    // throw an exception here. check the bubble boolean to devide if this exception must
+                    // be forwarded
+                    if (e instanceof UnsupportedError && e.bubble) {
+                        throw e;
+                    }
+                }
+                break;
             case "String":
                 return this.transpileSpecialStringFunction(functionName, ownerName, node.arguments);
             case "Array":

@@ -70,4 +70,13 @@ import { UnitTest } from "../../UnitTest";
             }
         ]);
     }
+
+    @test "Declare variables"() {
+        this.runCodeAndExpectResult("lua", [{
+            code: `declare const declaredVariable = "test";`,
+            expected: [
+                // declare vars should not emit any output
+            ]
+        }])
+    }
 }

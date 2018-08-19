@@ -1,6 +1,6 @@
 # Qhun Transpiler
 
-This command line tool helps to transpile [Typescript](https://github.com/Microsoft/TypeScript) into other languages. The main goal was to support every aspect of Typescript. 
+This command line tool helps to transpile [Typescript](https://github.com/Microsoft/TypeScript) into other languages. The main goal was to support every aspect of Typescript. Every Typescript version >= 2 & < 3 is supported. Typescript 3 will be supported when my dependencies can handle Typescript 3.
 
 **The following languages are currently supported:**
 - [LUA](https://www.lua.org/)
@@ -57,8 +57,13 @@ An example executable path could be `$ qhun-transpiler -t lua -f ./myTypescriptF
 
 The transpiles file will be placed next to the original file. The file extension will be changed to the target language's file extension.
 
-## Documentation
+## **Documentation**
 
 You can find a documentation file for the desired target in the `doc` folder.
   
 - [Lua documentation](./doc/lua.md)
+- [WoW documentation](./doc/wow.md)
+
+## **License**
+
+MIT license. See [LICENSE](./LICENSE) for more details.

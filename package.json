@@ -12,6 +12,7 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha -r ts-node/register test/**/*.spec.ts",
+    "test-async": "./node_modules/.bin/mocha-parallel-tests -r ts-node/register test/**/*.spec.ts",
     "coverage": "./node_modules/.bin/nyc ./node_modules/.bin/mocha -r ts-node/register test/**/*.spec.ts",
     "build-ts": "./node_modules/.bin/tsc",
     "build-bundle": "./node_modules/.bin/webpack --config ./webpack.config.js",
@@ -33,6 +34,7 @@
     "file-loader": "^1.1.11",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
+    "mocha-parallel-tests": "^2.0.4",
     "mocha-typescript": "^1.1.17",
     "mock-fs": "^4.6.0",
     "npm-run-all": "^4.1.3",

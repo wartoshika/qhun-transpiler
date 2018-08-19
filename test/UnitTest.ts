@@ -2,6 +2,7 @@ import { Test } from "./Test";
 import { expect } from "chai";
 import { SupportedTargets, SupportedTargetConfig } from "../src/target/TargetFactory";
 import { UnsupportedError } from "../src/error/UnsupportedError";
+import { LuaReservedKeywordError } from "../src/error/lua/LuaReservedKeywordError";
 
 export declare type TestCodeAndResult = {
     code: string,
@@ -21,7 +22,7 @@ export declare type TestCodeAndContainResult = {
 
 export declare type TestCodeAndThrow = {
     code: string,
-    throw: typeof UnsupportedError | typeof Error,
+    throw: typeof LuaReservedKeywordError | typeof UnsupportedError | typeof Error,
     message?: string
 }[];
 

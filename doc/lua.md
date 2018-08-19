@@ -19,7 +19,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
 - Binary expressions including [bitops](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators)
 - Template strings
 - Typeof and instanceof statements
-- For, ForIn, ~~ForOf~~, Do and While statements
+- For, ForIn, ForOf, Do and While statements
 - [Spread element](https://basarat.gitbooks.io/typescript/docs/spread-operator.html) in every context
 - Computed properties
 - Builtin Array functions
@@ -35,6 +35,8 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
     - [String.trim()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim)
 - Builtin Object functions
     - [Object.keys()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys)
+    - [Object.values()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values)
+    - [Object.hasOwnProperty()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasownproperty)
 - Builtin Math functions
     - The lua equivalent will be used. [See the lua documentation for more help](http://lua-users.org/wiki/MathLibraryTutorial).
 - [Switch statements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/switch)
@@ -52,11 +54,13 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
     - Method level decorator *(Not fully supported)*
     - ~~Parameter level decorator~~
     - Decorator factories
+- [Array and ~~object~~ destructing](https://basarat.gitbooks.io/typescript/docs/destructuring.html)
 
 ## What you should keep in mind when writing typescript code:
 
 1. Lua does not know about the difference between the `let` and `const` statement. Same as javascript `ES5`. These are just hints at compilertime and will be lost at runtime.
-2. You should use array destructing only for getting values from a multireturn function. See this example:
+2. The keywords `null` and `undefined` will both be transpiled to `nil`. So a test `null === undefined` will transpiled into a truethy expression: `nil == nil`!
+3. Use the array destructing pattern for achiving multireturn like results. See this example:
 ```typescript
 // myTypescriptFile.ts
 const [a, b, c, , e] = myMultiReturnFunction()
@@ -66,8 +70,8 @@ Will be transpiled to:
 -- theGeneratedLuaFile.lua
 local a, b, c, _, e = myMultiReturnFunction()
 ```
-3. To support multireturn the tuple or array literal is used to achive this. When returning an array literal, the transpiler will use a multireturn. If a variable is returned, no matter the type, it will not be a multireturn. Example:
-```ts
+4. To support multireturn the tuple or array literal is used to achive this. When returning an array literal, the transpiler will use a multireturn. If a variable is returned, no matter the type, it will not be a multireturn. Example:
+```typescript
 // this function will return multiple values
 function myFunc(): [number, string] {
     return [1, "test"]
@@ -90,3 +94,11 @@ local function myOtherFunc()
     return a
 end
 ```
+5. Lua does not know about `Arrays`. But there are object wich can have a number based index. An array is transpiled into object without any key. See some examples:
+```ts
+const myArray = [1,2,3];
+```
+
+## Config block
+
+Each target has a config block section in the `qhun-transpiler.json` file. So LUA does does. This block is currently empty and is reversed for future releases to configure the transpiling process.

@@ -1,16 +1,16 @@
 import { OptionDefinition } from "command-line-usage";
 import * as commandLineUsage from "command-line-usage";
 import * as commandLineArgs from "command-line-args";
-import * as fs from "fs";
-import { TargetFactory, SupportedTargets } from "./target/TargetFactory";
-import { JsonReader } from "./config/json/JsonReader";
-import { Project } from "./config/Project";
-import { Reader } from "./config/Reader";
-import { ArgumentReader } from "./config/argument/ArgumentReader";
-import { Compiler } from "./compiler/Compiler";
+import { TargetFactory, SupportedTargets } from "../target/TargetFactory";
+import { JsonReader } from "../config/json/JsonReader";
+import { Project } from "../config/Project";
+import { Reader } from "../config/Reader";
+import { ArgumentReader } from "../config/argument/ArgumentReader";
+import { Compiler } from "../compiler/Compiler";
+import { CommandLineColors } from "./CommandLineColors";
 
 // tslint:disable-next-line
-const packageJson = require("../package.json");
+const packageJson = require("../../package.json");
 
 declare type ProgramArguments = {
     help: boolean,
@@ -102,7 +102,12 @@ export class CommandLine {
         const compiler = new Compiler(project);
 
         // start everything else
-        return compiler.compile(project.parsedCommandLine.fileNames);
+        const result = compiler.compile(project.parsedCommandLine.fileNames);
+
+        // print the final result
+        this.printResult(result);
+
+        return result !== false;
     }
 
     /**
@@ -125,6 +130,19 @@ export class CommandLine {
                 content: `{underline Licence}: ${packageObject.license}\n{underline Author}: ${packageObject.author}`
             }
         ]));
+    }
+
+    /**
+     * prints the final result
+     * @param result the result of the transpiling process
+     */
+    private printResult(result: number | boolean): void {
+
+        if (typeof result === "number") {
+            console.log(`${CommandLineColors.GREEN}%s${CommandLineColors.RESET}`, `Successfully transpiled ${result} files.`);
+        } else {
+            console.log(`${CommandLineColors.RED}%s${CommandLineColors.RESET}`, `An error occured while transpiling your files.`);
+        }
     }
 
 }
