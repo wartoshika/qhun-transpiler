@@ -19,7 +19,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
 - Binary expressions including [bitops](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators)
 - Template strings
 - Typeof and instanceof statements
-- For, ForIn, ~~ForOf~~, Do and While statements
+- For, ForIn, ForOf, Do and While statements
 - [Spread element](https://basarat.gitbooks.io/typescript/docs/spread-operator.html) in every context
 - Computed properties
 - Builtin Array functions
