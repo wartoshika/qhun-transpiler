@@ -56,12 +56,32 @@ export class LuaCallExpression implements Partial<Target> {
             ownerNameCheck = "String";
         } else if (Types.isArray(owner, this.typeChecker)) {
             ownerNameCheck = "Array";
+        } else if (Types.isObject(owner, this.typeChecker)) {
+
+            // be sure to exclude object type special implementations
+            if ([
+                "Math"
+            ].indexOf(ownerName) === -1) {
+                ownerNameCheck = "Object";
+            }
         }
 
         // check if there are some special objects
         switch (ownerNameCheck) {
             case "Object":
-                return this.transpileSpecialObjectFunction(functionName, ownerName, node.arguments);
+                try {
+                    return this.transpileSpecialObjectFunction(functionName, ownerName, node.arguments);
+                } catch (e) {
+
+                    // if this method does not exists on object, use the normal object call pattern
+                    // because in most cases the function is declared on the object so dont
+                    // throw an exception here. check the bubble boolean to devide if this exception must
+                    // be forwarded
+                    if (e instanceof UnsupportedError && e.bubble) {
+                        throw e;
+                    }
+                }
+                break;
             case "String":
                 return this.transpileSpecialStringFunction(functionName, ownerName, node.arguments);
             case "Array":

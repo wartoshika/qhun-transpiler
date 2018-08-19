@@ -26,13 +26,26 @@ export class LuaObjectSpecial {
      * @param argumentStack the argument stack
      */
     public transpileSpecialObjectFunction(name: string, owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
-        switch (name) {
-            case "keys":
-                return this.transpileSpecialObjectFunctionKeys(owner, argumentStack);
-            case "values":
-                return this.transpileSpecialObjectFunctionValues(owner, argumentStack);
-            default:
-                throw new UnsupportedError(`The given object function ${name} is unsupported!`, null);
+
+        // static Object.* test
+        if (owner === "Object") {
+            switch (name) {
+                case "keys":
+                    return this.transpileSpecialObjectFunctionKeys(owner, argumentStack);
+                case "values":
+                    return this.transpileSpecialObjectFunctionValues(owner, argumentStack);
+                default:
+                    throw new UnsupportedError(`The given object function ${name} is unsupported!`, null, true);
+            }
+        } else {
+
+            // non static test
+            switch (name) {
+                case "hasOwnProperty":
+                    return this.transpileSpecialObjectFunctionHasOwnProperty(owner, argumentStack);
+                default:
+                    throw new UnsupportedError(`The given object function ${name} is unsupported!`, null);
+            }
         }
     }
 
@@ -82,5 +95,30 @@ export class LuaObjectSpecial {
         );
 
         return `__object_values(${argumentStack.map(this.transpileNode).join(", ")})`;
+    }
+
+    /**
+     * an impl. for the Object.hasOwnProperty() function in lua
+     * @param owner the owner
+     * @param argumentStack the arguments
+     */
+    private transpileSpecialObjectFunctionHasOwnProperty(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // declare object.keys
+        this.addDeclaration(
+            "object.hasownproperty",
+            [
+                `local function __object_hasownproperty(a,b)`,
+                this.addSpacesToString(`for k, _ in pairs(a) do`, 2),
+                this.addSpacesToString(`if k == b then`, 4),
+                this.addSpacesToString(`return true`, 6),
+                this.addSpacesToString(`end`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return false`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__object_hasownproperty(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
     }
 }

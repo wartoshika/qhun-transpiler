@@ -99,7 +99,9 @@ export class Types {
         const type = typeChecker.getTypeAtLocation(node);
         const nodeType = typeChecker.typeToTypeNode(type);
 
+        return node && !!(type.flags & ts.TypeFlags.Object) || ts.isObjectLiteralElement(node);
+
         // make the test
-        return nodeType && (nodeType.kind === ts.SyntaxKind.ObjectLiteralExpression);
+        // return nodeType && (nodeType.kind === ts.SyntaxKind.ObjectLiteralExpression);
     }
 }
