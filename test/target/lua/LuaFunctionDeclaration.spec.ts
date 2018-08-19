@@ -84,4 +84,22 @@ import { UnitTest } from "../../UnitTest";
         ]);
     }
 
+    @test "Function signature overload"() {
+
+        this.runCodeAndExpectResult("lua", [{
+            code: `
+                function test(a: string): void;
+                function test(a: number): void;
+                function test(a: any): void {
+                    run(a);
+                }
+            `,
+            expected: [
+                `local function test(a)`,
+                `  run(a)`,
+                `end`
+            ]
+        }])
+    }
+
 }
