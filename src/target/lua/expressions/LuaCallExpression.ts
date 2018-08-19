@@ -4,6 +4,7 @@ import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
 import { LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial } from "../special";
 import { Types } from "../../../transpiler/Types";
+import { LuaKeywords } from "../LuaKeywords";
 
 export interface LuaCallExpression extends BaseTarget, Target, LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial { }
 export class LuaCallExpression implements Partial<Target> {
@@ -15,8 +16,20 @@ export class LuaCallExpression implements Partial<Target> {
             return this.transpileCallExpressionOnProperty(node);
         }
 
-        // get base expression
-        const base = this.transpileNode(node.expression);
+        // check for super function calls
+        let base: string;
+        if (node.expression.kind === ts.SyntaxKind.SuperKeyword) {
+
+            // use the constructor of the super class
+            base = `self.${LuaKeywords.CLASS_SUPER_REFERENCE_NAME}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}`;
+
+            // add the self reference to the arguments
+            node.arguments = ts.createNodeArray([ts.createNode(ts.SyntaxKind.ThisKeyword) as ts.Expression, ...node.arguments]);
+        } else {
+
+            // normal funcion call.
+            base = this.transpileNode(node.expression);
+        }
 
         // put everything together
         return `${base}(${node.arguments.map(this.transpileNode).join(", ")})`;

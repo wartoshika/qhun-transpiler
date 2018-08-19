@@ -57,9 +57,13 @@ An example executable path could be `$ qhun-transpiler -t lua -f ./myTypescriptF
 
 The transpiles file will be placed next to the original file. The file extension will be changed to the target language's file extension.
 
-## Documentation
+## **Documentation**
 
 You can find a documentation file for the desired target in the `doc` folder.
   
 - [Lua documentation](./doc/lua.md)
 - [WoW documentation](./doc/wow.md)
+
+## **License**
+
+MIT license. See [LICENSE](./LICENSE) for more details.

@@ -5,3 +5,4 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 ## Unreleased
 
 - Added changelog file for future feature change tracking.
+- Added documentation for currently supported targets.
