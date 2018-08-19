@@ -28,9 +28,9 @@ export class Compiler {
     /**
      * compiles the given files and transpiles them into the target language
      * @param files the files to compile and transpile
-     * @returns true if the compiling and transpiling was successfull
+     * @returns the amount of successfully transpiled and written files. false on error
      */
-    public compile(files: string[]): boolean {
+    public compile(files: string[]): number | boolean {
 
         // create a typescript program
         const program = ts.createProgram(files, this.project.parsedCommandLine.options);
@@ -65,7 +65,13 @@ export class Compiler {
             });
 
             // run post project transpile
-            return lastTarget.postProjectTranspile(this.writtenFileStack);
+            if (lastTarget.postProjectTranspile(this.writtenFileStack)) {
+
+                return this.writtenFileStack.length;
+            } else {
+
+                return false;
+            }
         } catch (e) {
 
             // check for unsupported error
