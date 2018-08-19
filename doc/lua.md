@@ -90,3 +90,7 @@ local function myOtherFunc()
     return a
 end
 ```
+
+## Config block
+
+Each target has a config block section in the `qhun-transpiler.json` file. So LUA does does. This block is currently empty and is reversed for future releases to configure the transpiling process.

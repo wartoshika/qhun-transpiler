@@ -38,6 +38,12 @@ export class LuaPropertyAccessExpression implements Partial<Target> {
 
         // use normal lua property access
         const expression = this.transpileNode(node.expression);
-        return `${expression}.${name}`;
+
+        // append the name if the name is truethy
+        if (name) {
+            return `${expression}.${name}`;
+        } else {
+            return expression;
+        }
     }
 }

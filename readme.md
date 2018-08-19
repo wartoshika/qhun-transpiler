@@ -62,3 +62,4 @@ The transpiles file will be placed next to the original file. The file extension
 You can find a documentation file for the desired target in the `doc` folder.
   
 - [Lua documentation](./doc/lua.md)
+- [WoW documentation](./doc/wow.md)
