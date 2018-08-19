@@ -29,6 +29,8 @@ export class LuaObjectSpecial {
         switch (name) {
             case "keys":
                 return this.transpileSpecialObjectFunctionKeys(owner, argumentStack);
+            case "values":
+                return this.transpileSpecialObjectFunctionValues(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given object function ${name} is unsupported!`, null);
         }
@@ -56,5 +58,29 @@ export class LuaObjectSpecial {
         );
 
         return `__object_keys(${argumentStack.map(this.transpileNode).join(", ")})`;
+    }
+
+    /**
+     * an impl. for the Object.values() function in lua
+     * @param owner the owner
+     * @param argumentStack the arguments
+     */
+    private transpileSpecialObjectFunctionValues(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // declare object.keys
+        this.addDeclaration(
+            "object.values",
+            [
+                `local function __object_values(a)`,
+                this.addSpacesToString(`local vals = {}`, 2),
+                this.addSpacesToString(`for _, v in pairs(a) do`, 2),
+                this.addSpacesToString(`table.insert(vals, v)`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return vals`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__object_values(${argumentStack.map(this.transpileNode).join(", ")})`;
     }
 }

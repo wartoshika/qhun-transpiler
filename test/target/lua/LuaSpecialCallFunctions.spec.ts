@@ -252,6 +252,26 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
         ]);
     }
 
+    @test "Object.values()"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `const a = Object.values(b)`,
+                expected: [
+                    `local a = __object_values(b)`
+                ],
+                expectedAditionalDeclaration: [
+                    'object.values'
+                ]
+            }, {
+                code: `myObj.values()`,
+                expected: [
+                    `myObj:values()`
+                ]
+            }
+        ]);
+    }
+
     @test "Math functions"() {
 
         this.runCodeAndExpectResult("lua", [
