@@ -15,8 +15,21 @@ export class LuaVariableDeclaration implements Partial<Target> {
             this.addExport(name, node);
         }
 
-        // get the possible initializer
-        const initializer = this.transpileNode(node.initializer);
+        // get the initializer
+        let initializer: string;
+
+        // test for array destructing assignment
+        if (ts.isArrayBindingPattern(node.name) && node.initializer && ts.isArrayLiteralExpression(node.initializer)) {
+
+            // use destructing assignment via lua multireturn
+            initializer = node.initializer.elements
+                .map(element => this.transpileNode(element))
+                .join(", ");
+        } else {
+
+            // use the normal node transpiling for getting the identifier
+            initializer = this.transpileNode(node.initializer);
+        }
 
         // write the code
         return `local ${name} = ${initializer || "nil"}\n`;

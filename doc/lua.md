@@ -52,11 +52,12 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
     - Method level decorator *(Not fully supported)*
     - ~~Parameter level decorator~~
     - Decorator factories
+- [Array and ~~object~~ destructing](https://basarat.gitbooks.io/typescript/docs/destructuring.html)
 
 ## What you should keep in mind when writing typescript code:
 
 1. Lua does not know about the difference between the `let` and `const` statement. Same as javascript `ES5`. These are just hints at compilertime and will be lost at runtime.
-2. You should use array destructing only for getting values from a multireturn function. See this example:
+2. Use the array destructing pattern for achiving multireturn like results. See this example:
 ```typescript
 // myTypescriptFile.ts
 const [a, b, c, , e] = myMultiReturnFunction()
@@ -67,7 +68,7 @@ Will be transpiled to:
 local a, b, c, _, e = myMultiReturnFunction()
 ```
 3. To support multireturn the tuple or array literal is used to achive this. When returning an array literal, the transpiler will use a multireturn. If a variable is returned, no matter the type, it will not be a multireturn. Example:
-```ts
+```typescript
 // this function will return multiple values
 function myFunc(): [number, string] {
     return [1, "test"]
@@ -89,6 +90,10 @@ local function myOtherFunc()
     local a = {1, "test"}
     return a
 end
+```
+4. Lua does not know about `Arrays`. But there are object wich can have a number based index. An array is transpiled into object without any key. See some examples:
+```ts
+const myArray = [1,2,3];
 ```
 
 ## Config block

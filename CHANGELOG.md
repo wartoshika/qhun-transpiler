@@ -6,3 +6,4 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 
 - Added changelog file for future feature change tracking.
 - Added documentation for currently supported targets.
+- Added most of the typescript feature to `lua` and `wow` target
