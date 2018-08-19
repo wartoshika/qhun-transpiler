@@ -7,6 +7,7 @@ export class LuaEmptyStatement implements Partial<Target> {
 
     public transpileEmptyStatement(node: ts.EmptyStatement): string {
 
-        return "EMPTY";
+        // an empty statement will result in an empty string
+        return "";
     }
 }

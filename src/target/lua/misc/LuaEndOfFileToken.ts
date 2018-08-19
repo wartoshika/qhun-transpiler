@@ -7,6 +7,7 @@ export class LuaEndOfFileToken implements Partial<Target> {
 
     public transpileEndOfFileToken(node: ts.EndOfFileToken): string {
 
-        return "EOF_TOKEN";
+        // when transpiling an EOF token, new a new line character
+        return "\n";
     }
 }
