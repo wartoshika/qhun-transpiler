@@ -59,7 +59,8 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
 ## What you should keep in mind when writing typescript code:
 
 1. Lua does not know about the difference between the `let` and `const` statement. Same as javascript `ES5`. These are just hints at compilertime and will be lost at runtime.
-2. Use the array destructing pattern for achiving multireturn like results. See this example:
+2. The keywords `null` and `undefined` will both be transpiled to `nil`. So a test `null === undefined` will transpiled into a truethy expression: `nil == nil`!
+3. Use the array destructing pattern for achiving multireturn like results. See this example:
 ```typescript
 // myTypescriptFile.ts
 const [a, b, c, , e] = myMultiReturnFunction()
@@ -69,7 +70,7 @@ Will be transpiled to:
 -- theGeneratedLuaFile.lua
 local a, b, c, _, e = myMultiReturnFunction()
 ```
-3. To support multireturn the tuple or array literal is used to achive this. When returning an array literal, the transpiler will use a multireturn. If a variable is returned, no matter the type, it will not be a multireturn. Example:
+4. To support multireturn the tuple or array literal is used to achive this. When returning an array literal, the transpiler will use a multireturn. If a variable is returned, no matter the type, it will not be a multireturn. Example:
 ```typescript
 // this function will return multiple values
 function myFunc(): [number, string] {
@@ -93,7 +94,7 @@ local function myOtherFunc()
     return a
 end
 ```
-4. Lua does not know about `Arrays`. But there are object wich can have a number based index. An array is transpiled into object without any key. See some examples:
+5. Lua does not know about `Arrays`. But there are object wich can have a number based index. An array is transpiled into object without any key. See some examples:
 ```ts
 const myArray = [1,2,3];
 ```
