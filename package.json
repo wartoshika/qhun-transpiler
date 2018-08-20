@@ -29,6 +29,7 @@
     "@types/mocha": "^5.2.4",
     "@types/mock-fs": "^3.6.30",
     "@types/node": "^10.5.2",
+    "@types/object-assign": "^4.0.30",
     "@types/shelljs": "^0.8.0",
     "chai": "^4.1.2",
     "file-loader": "^1.1.11",
@@ -49,6 +50,7 @@
   "dependencies": {
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
+    "object-assign": "^4.1.1",
     "shelljs": "^0.8.2",
     "typescript": "^2.9.2",
     "typescript-mix": "^3.1.3"

@@ -7,6 +7,14 @@ import * as fs from "fs";
 import * as ts from "typescript";
 import * as path from "path";
 import { DefaultConfig } from "../DefaultConfig";
+import { ValidationError } from "../../error/ValidationError";
+import { Validator } from "../validator/Validator";
+import { ValidatorRules, ValidatorRule } from "../validator/ValidatorRules";
+import { TargetFactory, SupportedTargets } from "../../target/TargetFactory";
+import { LuaConfigValidator } from "../../target/lua/LuaConfigValidator";
+import { ValidatorObject } from "../validator/ValidatorObject";
+import { WowConfigValidator } from "../../target/wow/WowConfigValidator";
+import { TargetConfigValidator } from "../validator/TargetConfigValidator";
 
 export class JsonReader implements Reader {
 
@@ -33,6 +41,12 @@ export class JsonReader implements Reader {
 
             // parse json
             const jsonData: JsonConfig = JSON.parse(jsonString);
+
+            // validate json data
+            const validationResult = this.validateJsonConfig(jsonData);
+            if (validationResult !== true) {
+                throw new ValidationError(validationResult as string[]);
+            }
 
             // get typescript data
             const rootDir = path.resolve(path.dirname(this.filePath));
@@ -61,7 +75,7 @@ export class JsonReader implements Reader {
 
         } catch (e) {
 
-            if (e instanceof FileNotExistsError) {
+            if (e instanceof FileNotExistsError || e instanceof ValidationError) {
                 throw e;
             } else {
                 throw new UnexpectedError(`Error while parsing the qhun-cli.json file. Error was: ${e}`);
@@ -101,5 +115,59 @@ export class JsonReader implements Reader {
         } catch (e) {
             throw new UnexpectedError(`Unexpected error while trying to parse the given ${filePath}. Error was: ${e.toString()}`);
         }
+    }
+
+    /**
+     * validates the given json data
+     * @param jsonData the json data to validate
+     */
+    private validateJsonConfig(jsonData: JsonConfig): boolean | string[] {
+
+        // construct the validator
+        const validator = new Validator<JsonConfig>({
+            rules: {
+                // mandatory rules
+                author: ValidatorRules.isString(1),
+                licence: ValidatorRules.isString(1),
+                version: ValidatorRules.isString(1),
+                target: ValidatorRules.isInArray(Object.keys(TargetFactory.supportedTargets)),
+                name: ValidatorRules.isString(1),
+                tsconfig: ValidatorRules.pathExists(),
+                // now the optional rules
+                printFileHeader: ValidatorRules.optional(ValidatorRules.isBoolean()),
+                description: ValidatorRules.optional(ValidatorRules.isString()),
+                stripOutDir: ValidatorRules.optional(ValidatorRules.isString()),
+                config: this.getConfigBlockValidationRules(jsonData.target)
+            }
+        });
+
+        // validate against the given data
+        if (!validator.validate(jsonData)) {
+            return validator.getValidationErrors();
+        }
+
+        return true;
+    }
+
+    /**
+     * get all validation rules for the given target
+     * @param target the target to get the validation rules for
+     */
+    private getConfigBlockValidationRules(target: keyof SupportedTargets): ValidatorObject | ValidatorRule | ValidatorRule[] {
+
+        // get the validator
+        let validator: TargetConfigValidator;
+
+        switch (target) {
+            case "lua":
+                validator = new LuaConfigValidator();
+                break;
+            case "wow":
+                validator = new WowConfigValidator();
+                break;
+        }
+
+        // get the rules from the target config validator
+        return validator.getRules();
     }
 }
