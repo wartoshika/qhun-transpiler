@@ -8,6 +8,7 @@ import { Reader } from "../config/Reader";
 import { ArgumentReader } from "../config/argument/ArgumentReader";
 import { Compiler } from "../compiler/Compiler";
 import { CommandLineColors } from "./CommandLineColors";
+import { ValidationError } from "../error/ValidationError";
 
 // tslint:disable-next-line
 const packageJson = require("../../package.json");
@@ -81,22 +82,37 @@ export class CommandLine {
 
         // build a project reader
         let reader: Reader;
+        let project: Project;
 
         // evaluate if a qhun-transpiler.json file is available
-        if (this.programArguments.project) {
+        try {
+            if (this.programArguments.project) {
 
-            reader = new JsonReader(this.programArguments.project);
-        } else {
+                reader = new JsonReader(this.programArguments.project);
+            } else {
 
-            // take the other arguments to build a project object
-            reader = new ArgumentReader({
-                target: this.programArguments.target as keyof SupportedTargets,
-                file: this.programArguments.file
-            });
+                // take the other arguments to build a project object
+                reader = new ArgumentReader({
+                    target: this.programArguments.target as keyof SupportedTargets,
+                    file: this.programArguments.file
+                });
+            }
+
+            // construct the project object
+            project = reader.read();
+
+        } catch (e) {
+
+            // catch validation errors
+            if (e instanceof ValidationError) {
+
+                // write the error
+                console.error(`${CommandLineColors.RED}${e.message}${CommandLineColors.RESET}`);
+
+                // no transpiling!
+                return false;
+            }
         }
-
-        // construct the project object
-        const project: Project = reader.read();
 
         // construct the compiler
         const compiler = new Compiler(project);
