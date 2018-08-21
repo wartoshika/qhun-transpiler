@@ -8,8 +8,15 @@ declare type ValidatorRuleExecutor = (input: any) => boolean;
  */
 export class ValidatorRule {
 
+    /**
+     * @param runTest the test function to run
+     * @param errorMessage a message that shoule be visible on error. $0, $1 ... $n can be used to acess constraints
+     * @param constraints the contraints that had been used to build aditional boundary checks
+     */
     constructor(
-        private runTest: ValidatorRuleExecutor
+        private runTest: ValidatorRuleExecutor,
+        private errorMessage: string = "Validation error",
+        private constraints: any[] = []
     ) { }
 
     /**
@@ -19,6 +26,17 @@ export class ValidatorRule {
     public runValidationTest(input: any): boolean {
 
         return this.runTest(input);
+    }
+
+    /**
+     * get a readable validator error message
+     */
+    public getErrorMessage(): string[] {
+
+        // replace all constraint accesses
+        return this.errorMessage.replace(/(\$([a-z0-9]+))/ig, (match, p1, p2) => {
+            return this.constraints[parseInt(p2)];
+        }).split("\n");
     }
 
     /**
@@ -34,7 +52,7 @@ export class ValidatorRule {
                 (typeof minLength === "number" ? input.length >= minLength : true) &&
                 // max length check
                 (typeof maxLength === "number" ? input.length <= maxLength : true);
-        });
+        }, "Value must be a string and between $0 and $1 characters long.", [minLength || 0, maxLength || Infinity]);
     }
 
     /**
@@ -50,7 +68,7 @@ export class ValidatorRule {
                 (typeof minimal === "number" ? input >= minimal : true) &&
                 // max check
                 (typeof maximal === "number" ? input <= maximal : true);
-        });
+        }, "Value must be a number and between $0 and $1.", [minimal || -Infinity, maximal || Infinity]);
     }
 
     /**
@@ -66,14 +84,17 @@ export class ValidatorRule {
                 (typeof minLength === "number" ? input.length >= minLength : true) &&
                 // max length check
                 (typeof maxLength === "number" ? input.length <= maxLength : true);
-        });
+        }, "Value must be an array with a length between $0 and $1", [minLength || 0, maxLength || Infinity]);
     }
 
     /**
      * tests if the given input is of type boolean
      */
     public static isBoolean(): ValidatorRule {
-        return new ValidatorRule((input: any) => typeof input === "boolean");
+        return new ValidatorRule(
+            (input: any) => typeof input === "boolean",
+            "Value must be a boolean type"
+        );
     }
 
     /**
@@ -81,7 +102,10 @@ export class ValidatorRule {
      * @param data the data to test against
      */
     public static isInArray(data: any[]): ValidatorRule {
-        return new ValidatorRule((input: any) => data.some(val => input === val));
+        return new ValidatorRule(
+            (input: any) => data.some(val => input === val),
+            "Value must be a part of $0", [data.join(", ")]
+        );
     }
 
     /**
@@ -104,7 +128,10 @@ export class ValidatorRule {
                     // matches every given rule
                     (rules as ValidatorRule[]).every(givenRule => givenRule.runValidationTest(elm))
                 );
-        });
+        }, "Every element in the array must be: $0", [
+                // just all error messages
+                this.flattenErrorMessages(rules)
+            ]);
     }
 
     /**
@@ -114,7 +141,8 @@ export class ValidatorRule {
         return new ValidatorRule((input: any) =>
 
             // must be a string and must exists on fs
-            typeof input === "string" && fs.existsSync(input)
+            typeof input === "string" && fs.existsSync(input),
+            "The given path does not exists!"
         );
     }
 
@@ -137,7 +165,16 @@ export class ValidatorRule {
 
             // when input is given, every rule must be resolved
             return (rules as ValidatorRule[]).every(givenRule => givenRule.runValidationTest(input));
-        });
+        }, "$0", [
+                // just all error messages
+                this.flattenErrorMessages(rules)
+            ]);
 
+    }
+
+    private static flattenErrorMessages(rules: ValidatorRule[]): string {
+
+        const errors = rules.map(rule => rule.getErrorMessage());
+        return errors.reduce((acc, val) => acc.concat(val), []).join("\n");
     }
 }

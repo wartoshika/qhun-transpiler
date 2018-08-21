@@ -1,6 +1,5 @@
 import { ValidatorObject, ObjectAccessor } from "./ValidatorObject";
 import { ValidatorRule } from "./ValidatorRule";
-import * as objectAssign from "object-assign";
 
 export type ValidatorErrors = { [index: string]: string[] };
 
@@ -111,7 +110,7 @@ export class Validator<O extends ObjectAccessor = ObjectAccessor> {
             this.validationErrors[joinedError] = [];
         }
 
-        this.validationErrors[joinedError].push(`Does not met the validation rules.`);
+        this.validationErrors[joinedError].push(...rule.getErrorMessage());
     }
 
     /**

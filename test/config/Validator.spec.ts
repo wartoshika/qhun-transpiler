@@ -81,11 +81,12 @@ declare type myComplexObject = {
                     rules: {
                         num: ValidatorRule.isNumber(),
                         str: ValidatorRule.isString(10),
-                        strArr: ValidatorRule.optional(
+                        strArr: ValidatorRule.optional([
+                            ValidatorRule.isArray(1),
                             ValidatorRule.everyElementInArray(
                                 ValidatorRule.isString(3)
                             )
-                        )
+                        ])
                     }
                 }
             }
