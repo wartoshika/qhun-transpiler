@@ -6,6 +6,7 @@ import { FileNotExistsError } from "../../src/error/FileNotExistsError";
 import { UnexpectedError } from "../../src/error/UnexpectedError";
 import { JsonConfig } from "../../src/config/json/JsonConfig";
 import * as path from "path";
+import { ValidationError } from "../../src/error/ValidationError";
 
 @suite("[Unit] JsonReader", slow(500), timeout(3000)) class JsonReaderTest {
 
@@ -111,6 +112,16 @@ import * as path from "path";
     @test "Throws tsconfig.json file errors"() {
 
         let projectObject: JsonConfig = {
+            author: "wartoshika",
+            config: {},
+            entry: "./my/entry.ts",
+            description: "description test",
+            licence: "MIT",
+            name: "my Cool Name",
+            outDir: "dist",
+            target: "lua",
+            version: "1.0.0",
+            printFileHeader: false,
             tsconfig: "./myothertsconfig.json"
         } as any;
 
@@ -124,12 +135,12 @@ import * as path from "path";
         try {
             new JsonReader("./qhun-transpiler.json").read();
         } catch (e) {
-            expect(e).to.be.an.instanceof(FileNotExistsError);
+            expect(e).to.be.an.instanceof(ValidationError);
             thrown = true;
         }
 
         if (!thrown) {
-            expect(false).to.equal(true, "Expection FileNotExistsError has not been thrown!");
+            expect(false).to.equal(true, "Expection ValidationError has not been thrown!");
         }
 
         // ------------------------
