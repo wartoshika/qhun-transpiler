@@ -8,8 +8,8 @@ import * as ts from "typescript";
 import * as path from "path";
 import { DefaultConfig } from "../DefaultConfig";
 import { ValidationError } from "../../error/ValidationError";
-import { Validator } from "../validator/Validator";
-import { ValidatorRules, ValidatorRule } from "../validator/ValidatorRules";
+import { Validator, ValidatorErrors } from "../validator/Validator";
+import { ValidatorRule } from "../validator/ValidatorRule";
 import { TargetFactory, SupportedTargets } from "../../target/TargetFactory";
 import { LuaConfigValidator } from "../../target/lua/LuaConfigValidator";
 import { ValidatorObject } from "../validator/ValidatorObject";
@@ -45,7 +45,7 @@ export class JsonReader implements Reader {
             // validate json data
             const validationResult = this.validateJsonConfig(jsonData);
             if (validationResult !== true) {
-                throw new ValidationError(validationResult as string[]);
+                throw new ValidationError(validationResult as ValidatorErrors);
             }
 
             // get typescript data
@@ -121,22 +121,22 @@ export class JsonReader implements Reader {
      * validates the given json data
      * @param jsonData the json data to validate
      */
-    private validateJsonConfig(jsonData: JsonConfig): boolean | string[] {
+    private validateJsonConfig(jsonData: JsonConfig): boolean | ValidatorErrors {
 
         // construct the validator
         const validator = new Validator<JsonConfig>({
             rules: {
                 // mandatory rules
-                author: ValidatorRules.isString(1),
-                licence: ValidatorRules.isString(1),
-                version: ValidatorRules.isString(1),
-                target: ValidatorRules.isInArray(Object.keys(TargetFactory.supportedTargets)),
-                name: ValidatorRules.isString(1),
-                tsconfig: ValidatorRules.pathExists(),
+                author: ValidatorRule.isString(1),
+                licence: ValidatorRule.isString(1),
+                version: ValidatorRule.isString(1),
+                target: ValidatorRule.isInArray(Object.keys(TargetFactory.supportedTargets)),
+                name: ValidatorRule.isString(1),
+                tsconfig: ValidatorRule.pathExists(),
                 // now the optional rules
-                printFileHeader: ValidatorRules.optional(ValidatorRules.isBoolean()),
-                description: ValidatorRules.optional(ValidatorRules.isString()),
-                stripOutDir: ValidatorRules.optional(ValidatorRules.isString()),
+                printFileHeader: ValidatorRule.optional(ValidatorRule.isBoolean()),
+                description: ValidatorRule.optional(ValidatorRule.isString()),
+                stripOutDir: ValidatorRule.optional(ValidatorRule.isString()),
                 config: this.getConfigBlockValidationRules(jsonData.target)
             }
         });
@@ -165,6 +165,9 @@ export class JsonReader implements Reader {
             case "wow":
                 validator = new WowConfigValidator();
                 break;
+            default:
+                // validation not nessesary
+                return [];
         }
 
         // get the rules from the target config validator

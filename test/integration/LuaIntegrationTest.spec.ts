@@ -5,6 +5,7 @@ import * as mockfs from "mock-fs";
 import { JsonConfig } from "../../src/config/json/JsonConfig";
 import * as fs from "fs";
 import { CommandLine } from "../../src/cli/CommandLine";
+import { DefaultConfig } from "../../src/config/DefaultConfig";
 
 @suite("[Integration] Complete transpile test for target lua", slow(500), timeout(3000)) class LuaIntegrationTest {
 
@@ -14,11 +15,11 @@ import { CommandLine } from "../../src/cli/CommandLine";
 
     @test "Transpile using JsonReader"() {
 
-        const transpileConfig: Partial<JsonConfig> = {
+        const transpileConfig: JsonConfig = DefaultConfig.mergeDefaultProjectData({
             tsconfig: "./iTsconfig.json",
             target: "lua",
             stripOutDir: "src"
-        };
+        });
         const tsconfig = {
             "compilerOptions": {
                 "module": "commonjs",

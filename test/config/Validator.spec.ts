@@ -1,7 +1,7 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { expect } from "chai";
 import { Validator } from "../../src/config/validator/Validator";
-import { ValidatorRules } from "../../src/config/validator/ValidatorRules";
+import { ValidatorRule } from "../../src/config/validator/ValidatorRule";
 
 declare type myObject = {
     num: number,
@@ -33,15 +33,15 @@ declare type myComplexObject = {
 
         const validator = new Validator<myObject>({
             rules: {
-                num: ValidatorRules.isNumber(),
-                str: ValidatorRules.isString(),
-                numArr: ValidatorRules.everyElementInArray(
-                    ValidatorRules.isNumber()
+                num: ValidatorRule.isNumber(),
+                str: ValidatorRule.isString(),
+                numArr: ValidatorRule.everyElementInArray(
+                    ValidatorRule.isNumber()
                 )
             }
         });
 
-        // expect(validator.validate(myGoodObject)).to.be.true;
+        expect(validator.validate(myGoodObject)).to.be.true;
 
         const myBadObject = {
             num: "test",
@@ -49,10 +49,10 @@ declare type myComplexObject = {
             numArr: [1, "bad string in num arr", 3]
         };
 
-        //const result = validator.validate(myBadObject as any);
-        //expect(result).to.be.false;
+        const result = validator.validate(myBadObject as any);
+        expect(result).to.be.false;
 
-        // expect(validator.getValidationErrors().length).to.equal(3, "Validation error length is invalid");
+        expect(Object.keys(validator.getValidationErrors()).length).to.equal(3, "Validation error length is invalid");
 
     }
 
@@ -72,18 +72,18 @@ declare type myComplexObject = {
         // build the validator
         const validator = new Validator<myComplexObject>({
             rules: {
-                num: ValidatorRules.isNumber(),
+                num: ValidatorRule.isNumber(),
                 // we wont validating str.
-                anyArr: ValidatorRules.optional(
-                    ValidatorRules.isArray()
+                anyArr: ValidatorRule.optional(
+                    ValidatorRule.isArray()
                 ),
                 neasted: {
                     rules: {
-                        num: ValidatorRules.isNumber(),
-                        str: ValidatorRules.isString(10),
-                        strArr: ValidatorRules.optional(
-                            ValidatorRules.everyElementInArray(
-                                ValidatorRules.isString(3)
+                        num: ValidatorRule.isNumber(),
+                        str: ValidatorRule.isString(10),
+                        strArr: ValidatorRule.optional(
+                            ValidatorRule.everyElementInArray(
+                                ValidatorRule.isString(3)
                             )
                         )
                     }
@@ -91,7 +91,7 @@ declare type myComplexObject = {
             }
         });
 
-        //expect(validator.validate(myGoodObject)).to.be.true;
+        expect(validator.validate(myGoodObject)).to.be.true;
 
         const myBadObject = {
             num: {},
@@ -100,7 +100,7 @@ declare type myComplexObject = {
             neasted: {
                 num: 5,
                 str: "to short",
-                strArr: ["optional not when given it must be a string[]", 1337, "three"]
+                strArr: ["optional but when given it must be a string[]", 1337, "three"]
             }
         }
 
@@ -108,22 +108,10 @@ declare type myComplexObject = {
 
         // get the errors
         const validationErrors = validator.getValidationErrors();
-        expect(validationErrors.length).to.equal(4, "Validator error stack length invalid!");
+        expect(Object.keys(validationErrors).length).to.equal(4, "Validator error stack length invalid!");
 
         // take a deeper look into the errors
-        expect(validationErrors).to.satisfy(() => {
-            const expectedErrPrefix: string[] = [
-                "num", "anyArr", "neasted.str", "neasted.strArr"
-            ];
-            return validationErrors.every((err, index) => {
-                if (err.indexOf(expectedErrPrefix[index]) === -1) {
-
-                    console.error(expectedErrPrefix[index], "was not found in ", validationErrors);
-                    return false;
-                }
-                return true;
-            });
-        });
+        expect(Object.keys(validationErrors)).to.deep.equal(["num", "anyArr", "neasted.str", "neasted.strArr"]);
 
     }
 }

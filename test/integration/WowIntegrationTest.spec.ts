@@ -7,6 +7,8 @@ import * as fs from "fs";
 import { CommandLine } from "../../src/cli/CommandLine";
 import { Test } from "../Test";
 import { WowKeywords } from "../../src/target/wow/WowKeywords";
+import { DefaultConfig } from "../../src/config/DefaultConfig";
+import { WowConfig } from "../../src/target/wow/WowConfig";
 
 @suite("[Integration] Complete transpile test for target wow", slow(500), timeout(3000)) class LuaIntegrationTest extends Test {
 
@@ -16,11 +18,15 @@ import { WowKeywords } from "../../src/target/wow/WowKeywords";
 
     @test "Transpile using JsonReader"() {
 
-        const transpileConfig: Partial<JsonConfig> = {
+        const transpileConfig = DefaultConfig.mergeDefaultProjectData<Partial<WowConfig>>({
             tsconfig: "./iTsconfig.json",
             target: "wow",
-            stripOutDir: "src"
-        };
+            stripOutDir: "src",
+            config: {
+                visibleName: "name",
+                interface: 12343
+            }
+        });
         const tsconfig = {
             "compilerOptions": {
                 "module": "commonjs",

@@ -1,4 +1,4 @@
-import { ValidatorRule } from "./ValidatorRules";
+import { ValidatorRule } from "./ValidatorRule";
 
 export type ObjectAccessor = { [index: string]: any };
 

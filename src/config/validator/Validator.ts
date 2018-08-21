@@ -1,6 +1,8 @@
 import { ValidatorObject, ObjectAccessor } from "./ValidatorObject";
-import { ValidatorRule } from "./ValidatorRules";
+import { ValidatorRule } from "./ValidatorRule";
 import * as objectAssign from "object-assign";
+
+export type ValidatorErrors = { [index: string]: string[] };
 
 /**
  * A validator class that allow to validate existing config settings and check if
@@ -11,7 +13,7 @@ export class Validator<O extends ObjectAccessor = ObjectAccessor> {
     /**
      * all errors that occured when validating given data
      */
-    private validationErrors: string[];
+    private validationErrors: ValidatorErrors;
 
     constructor(
         private ruleObject: ValidatorObject<O>
@@ -24,7 +26,7 @@ export class Validator<O extends ObjectAccessor = ObjectAccessor> {
     public validate(data: O): boolean {
 
         // reset validation errors
-        this.validationErrors = [];
+        this.validationErrors = {};
 
         return this.validateInternal(data);
     }
@@ -32,7 +34,7 @@ export class Validator<O extends ObjectAccessor = ObjectAccessor> {
     /**
      * get all validation errors
      */
-    public getValidationErrors(): string[] {
+    public getValidationErrors(): ValidatorErrors {
 
         return this.validationErrors;
     }
@@ -75,10 +77,10 @@ export class Validator<O extends ObjectAccessor = ObjectAccessor> {
                 // try to apply every rule
                 ruleStack.forEach(givenRule => {
 
-                    if (!givenRule(data[key])) {
+                    if (!givenRule.runValidationTest(data[key])) {
 
                         // rule failed, store the error
-                        this.validationErrors.push(this.buildError(currentPath, key));
+                        this.addValidationError(currentPath, key, givenRule);
                     }
                 });
             } else {
@@ -89,21 +91,27 @@ export class Validator<O extends ObjectAccessor = ObjectAccessor> {
 
         });
 
-        return this.validationErrors.length === 0;
+        return Object.keys(this.validationErrors).length === 0;
     }
 
     /**
-     * builds an human understandable error text
+     * adds a validation error
      * @param path the current neasted path
      * @param currentKey the current object key
      */
-    private buildError(path: string[], currentKey: string): string {
+    private addValidationError(path: string[], currentKey: string, rule: ValidatorRule): void {
 
         // add current key to the path (clone the array first)
-        const errorPath = path.splice(0);
+        const errorPath = path.slice(0);
         errorPath.push(currentKey);
+        const joinedError = errorPath.join(".");
 
-        return `${errorPath.join(".")}: Does not met the validation rules.`;
+        // check if the validation stack exists of the object
+        if (!Array.isArray(this.validationErrors[joinedError])) {
+            this.validationErrors[joinedError] = [];
+        }
+
+        this.validationErrors[joinedError].push(`Does not met the validation rules.`);
     }
 
     /**
@@ -113,12 +121,12 @@ export class Validator<O extends ObjectAccessor = ObjectAccessor> {
     private objectIsARule(data: any): data is ValidatorRule | ValidatorRule[] {
 
         // simple function type check
-        if (typeof data === "function") {
+        if (data instanceof ValidatorRule) {
             return true;
         }
 
         // every array content must be a function
-        if (Array.isArray(data) && data.every(t => typeof t === "function")) {
+        if (Array.isArray(data) && data.every(t => t instanceof ValidatorRule)) {
             return true;
         }
 

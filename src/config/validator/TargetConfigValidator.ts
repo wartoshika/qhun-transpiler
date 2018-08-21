@@ -1,4 +1,4 @@
-import { ValidatorRule } from "./ValidatorRules";
+import { ValidatorRule } from "./ValidatorRule";
 import { ValidatorObject } from "./ValidatorObject";
 import { Config } from "../Config";
 

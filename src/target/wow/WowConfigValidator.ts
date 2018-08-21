@@ -1,18 +1,18 @@
 import { TargetConfigValidator } from "../../config/validator/TargetConfigValidator";
 import { ValidatorObject } from "../../config/validator/ValidatorObject";
 import { WowConfig } from "./WowConfig";
-import { ValidatorRules } from "../../config/validator/ValidatorRules";
+import { ValidatorRule } from "../../config/validator/ValidatorRule";
 
 export class WowConfigValidator implements TargetConfigValidator<WowConfig> {
 
     public getRules(): ValidatorObject<WowConfig> {
 
         // a generic validation rule for optional array values
-        const optionalArrayValues = ValidatorRules.optional(
+        const optionalArrayValues = ValidatorRule.optional(
             // every element in the array
-            ValidatorRules.everyElementInArray(
+            ValidatorRule.everyElementInArray(
                 // must be a string
-                ValidatorRules.isString(1)
+                ValidatorRule.isString(1)
             )
         );
 
@@ -20,8 +20,8 @@ export class WowConfigValidator implements TargetConfigValidator<WowConfig> {
         return {
             rules: {
                 // mandatory values
-                visibleName: ValidatorRules.isString(1),
-                interface: ValidatorRules.isNumber(),
+                visibleName: ValidatorRule.isString(1),
+                interface: ValidatorRule.isNumber(),
                 // optional values
                 dependencies: optionalArrayValues,
                 optionalDependencies: optionalArrayValues,

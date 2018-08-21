@@ -1,6 +1,7 @@
 import * as ts from "typescript";
 import { Project } from "./Project";
 import * as path from "path";
+import { Config } from "./Config";
 
 export class DefaultConfig {
 
@@ -18,7 +19,7 @@ export class DefaultConfig {
      * merge an existing or get the default project data
      * @param givenProject the given project data
      */
-    public static mergeDefaultProjectData(givenProject: Partial<Project> = {}): Project {
+    public static mergeDefaultProjectData<C extends Config = Config>(givenProject: Partial<Project<C>> = {}): Project {
 
         return {
             author: givenProject.author ? givenProject.author : "Unknown",
