@@ -9,7 +9,11 @@
         "outDir": "dist",
         "moduleResolution": "node",
         "target": "es5",
-        "sourceMap": true
+        "sourceMap": true,
+        "typeRoots": [
+            "declarations",
+            "node_modules/@types"
+        ]
     },
     "include": [
         "./src/**/*.ts"

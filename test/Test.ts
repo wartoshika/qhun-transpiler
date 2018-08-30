@@ -43,8 +43,10 @@ export abstract class Test {
      * an inline transpiler function
      * @param target the target 
      * @param code the code to transpile into the target language
+     * @param config the optional config used while transpiling
+     * @param addDeclarations add declaration code into transpiling result
      */
-    protected transpile<K extends keyof SupportedTargets>(target: K, code: string, config?: SupportedTargetConfig[K]): string[] {
+    protected transpile<K extends keyof SupportedTargets>(target: K, code: string, config?: SupportedTargetConfig[K], addDeclarations: boolean = false): string[] {
 
         // build compiler host
         const compilerHost = {
@@ -83,7 +85,7 @@ export abstract class Test {
 
         // return the transpiled code
         return transpiler
-            .transpile(program.getSourceFile("test.ts"), false)
+            .transpile(program.getSourceFile("test.ts"), addDeclarations)
             .split("\n")
             .filter(line => !!line);
     }

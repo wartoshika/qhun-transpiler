@@ -34,7 +34,7 @@ import { LuaBinaryOperationsFunctions } from "../../../src/target/lua/special/Lu
                     `${LuaBinaryOperationsFunctions.NOT}(a)`
                 ],
                 expectedAditionalDeclaration: [
-                    "bitop.make", "bitop.not"
+                    "bitop.makeop", "bitop.not"
                 ]
             }
         ]);

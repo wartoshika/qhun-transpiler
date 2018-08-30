@@ -2,9 +2,9 @@ import { Target } from "../../Target";
 import { BaseTarget } from "../../BaseTarget";
 
 enum LuaBinaryOperationsFunctionsInternal {
-    MEMOIZE = "__bitop_memoize",
-    MAKE_UNCACHED = "__bitop_makeuncached",
-    MAKE = "__bitop_make"
+    TO_BITTABLE_R = "__bitop_to_bittable_r",
+    TO_BITTABLE = "__bitop_to_bittable",
+    MAKEOP = "__bitop_make_op"
 }
 
 export enum LuaBinaryOperationsFunctions {
@@ -14,7 +14,7 @@ export enum LuaBinaryOperationsFunctions {
     NOT = "__bitop_not"
 }
 
-// special thanks to: https://github.com/AlberTajuelo/bitop-lua
+// special thanks to: https://gist.github.com/kaeza/8ee7e921c98951b4686d
 export class LuaBinaryOperations {
 
     private mod: number = 2 ^ 32;
@@ -28,26 +28,24 @@ export class LuaBinaryOperations {
 
         // get dependencies
         const dependencyStack: ((t: BaseTarget) => void)[] = [
-            this.declareMemoize,
-            this.declareMakeUncached,
-            this.declareMake
+            this.declareToBittableR,
+            this.declareToBittable,
+            this.declareMakeOp
         ];
         switch (binaryFunction) {
             case LuaBinaryOperationsFunctions.AND:
                 dependencyStack.push(...[
-                    this.declareXor,
                     this.declareAnd
                 ]);
                 break;
             case LuaBinaryOperationsFunctions.NOT:
                 dependencyStack.push(...[
+                    this.declareXor,
                     this.declareNot
                 ]);
                 break;
             case LuaBinaryOperationsFunctions.OR:
                 dependencyStack.push(...[
-                    this.declareXor,
-                    this.declareAnd,
                     this.declareOr
                 ]);
                 break;
@@ -63,73 +61,62 @@ export class LuaBinaryOperations {
     }
 
     /**
-     * declare the bitop memoize function
+     * declare the bitop to bittable r function
      * @param target the target to declare the function on
      */
-    private declareMemoize(target: BaseTarget): void {
+    private declareToBittableR(target: BaseTarget): void {
 
         target.addDeclaration(
-            "bitop.memoize",
+            "bitop.tobittabler",
             [
-                `local function ${LuaBinaryOperationsFunctionsInternal.MEMOIZE}(f)`,
-                target.addSpacesToString(`local mt = {}`, 2),
-                target.addSpacesToString(`local t = setmetatable({}, mt)`, 2),
-                target.addSpacesToString(`function mt:__index(k)`, 2),
-                target.addSpacesToString(`local v = f(k)`, 4),
-                target.addSpacesToString(`t[k] = v`, 4),
-                target.addSpacesToString(`return v`, 4),
-                target.addSpacesToString(`end`, 2),
-                target.addSpacesToString(`return t`, 2),
+                `local function ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE_R}(x, ...)`,
+                target.addSpacesToString(`if (x or 0) == 0 then return ... end`, 2),
+                target.addSpacesToString(`return ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE_R}(math.floor(x/2), x%2, ...)`, 2),
                 `end`
             ].join("\n")
         );
     }
 
     /**
-     * declare the bitop make uncached function
+     * declare the to bittable function
      * @param target the target to declare the function on
      */
-    private declareMakeUncached(target: BaseTarget): void {
+    private declareToBittable(target: BaseTarget): void {
 
         target.addDeclaration(
-            "bitop.makeuncached",
+            "bitop.tobittable",
             [
-                `local function ${LuaBinaryOperationsFunctionsInternal.MAKE_UNCACHED}(t, m)`,
-                target.addSpacesToString(`local function bitop(a, b)`, 2),
-                target.addSpacesToString(`local res,p = 0,1`, 4),
-                target.addSpacesToString(`while a ~= 0 and b ~= 0 do`, 4),
-                target.addSpacesToString(`local am, bm = a%m, b%m`, 6),
-                target.addSpacesToString(`res = res + t[am][bm]*p`, 6),
-                target.addSpacesToString(`a = (a - am) / m`, 6),
-                target.addSpacesToString(`b = (b - bm) / m`, 6),
-                target.addSpacesToString(`p = p*m`, 6),
+                `local function ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(x)`,
+                target.addSpacesToString(`if x == 0 then return { 0 } end`, 2),
+                target.addSpacesToString(`return { ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE_R}(x) }`, 2),
+                `end`
+            ].join("\n")
+        );
+    }
+
+    /**
+     * declare the make op function
+     * @param target the target to declare the function on
+     */
+    private declareMakeOp(target: BaseTarget): void {
+
+        target.addDeclaration(
+            "bitop.makeop",
+            [
+                `local function ${LuaBinaryOperationsFunctionsInternal.MAKEOP}(cond)`,
+                target.addSpacesToString(`local function oper(x, y, ...)`, 2),
+                target.addSpacesToString(`if not y then return x end`, 4),
+                target.addSpacesToString(`x, y = ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(x), ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(y)`, 4),
+                target.addSpacesToString(`local xl, yl = #x, #y`, 4),
+                target.addSpacesToString(`local t, tl = { }, math.max(xl, yl)`, 4),
+                target.addSpacesToString(`for i = 0, tl-1 do`, 4),
+                target.addSpacesToString(`local b1, b2 = x[xl-i], y[yl-i]`, 6),
+                target.addSpacesToString(`if not (b1 or b2) then break end`, 6),
+                target.addSpacesToString(`t[tl-i] = (cond((b1 or 0) ~= 0, (b2 or 0) ~= 0) and 1 or 0)`, 6),
                 target.addSpacesToString(`end`, 4),
-                target.addSpacesToString(`res = res + (a+b) * p`, 4),
-                target.addSpacesToString(`return res`, 4),
+                target.addSpacesToString(`return oper(tonumber(table.concat(t), 2), ...)`, 4),
                 target.addSpacesToString(`end`, 2),
-                target.addSpacesToString(`return bitop`, 2),
-                `end`
-            ].join("\n")
-        );
-    }
-
-    /**
-     * declare the bitop make function
-     * @param target the target to declare the function on
-     */
-    private declareMake(target: BaseTarget): void {
-
-        target.addDeclaration(
-            "bitop.make",
-            [
-                `local function ${LuaBinaryOperationsFunctionsInternal.MAKE}(t)`,
-                target.addSpacesToString(`local op1 = ${LuaBinaryOperationsFunctionsInternal.MAKE_UNCACHED}(t, 2^1)`, 2),
-                target.addSpacesToString(`local op2 = ${LuaBinaryOperationsFunctionsInternal.MEMOIZE}(function(a)`, 2),
-                target.addSpacesToString(`return ${LuaBinaryOperationsFunctionsInternal.MEMOIZE}(function(b)`, 4),
-                target.addSpacesToString(`return op1(a, b)`, 6),
-                target.addSpacesToString(`end)`, 4),
-                target.addSpacesToString(`end)`, 2),
-                target.addSpacesToString(`return ${LuaBinaryOperationsFunctionsInternal.MAKE_UNCACHED}(op2, 2^(t.n or 1))`, 2),
+                target.addSpacesToString(`return oper`, 2),
                 `end`
             ].join("\n")
         );
@@ -143,7 +130,7 @@ export class LuaBinaryOperations {
 
         target.addDeclaration(
             "bitop.xor",
-            `local ${LuaBinaryOperationsFunctions.XOR} = ${LuaBinaryOperationsFunctionsInternal.MAKE} {[0]={[0]=0,[1]=1},[1]={[0]=1,[1]=0}, n=4}`
+            `local ${LuaBinaryOperationsFunctions.XOR} = ${LuaBinaryOperationsFunctionsInternal.MAKEOP}(function(a, b) return a ~= b end)`
         );
     }
 
@@ -155,11 +142,7 @@ export class LuaBinaryOperations {
 
         target.addDeclaration(
             "bitop.and",
-            [
-                `function ${LuaBinaryOperationsFunctions.AND}(a, b)`,
-                target.addSpacesToString(`return ((a+b)-${LuaBinaryOperationsFunctions.XOR}(a,b))/2`, 2),
-                `end`
-            ].join("\n")
+            `local ${LuaBinaryOperationsFunctions.AND} = ${LuaBinaryOperationsFunctionsInternal.MAKEOP}(function(a, b) return a and b end)`
         );
     }
 
@@ -171,11 +154,7 @@ export class LuaBinaryOperations {
 
         target.addDeclaration(
             "bitop.or",
-            [
-                `function ${LuaBinaryOperationsFunctions.OR}(a, b)`,
-                target.addSpacesToString(`return ${this.modm}-${LuaBinaryOperationsFunctions.AND}(${this.modm}-a, ${this.modm}-b)`, 2),
-                `end`
-            ].join("\n")
+            `local ${LuaBinaryOperationsFunctions.OR} = ${LuaBinaryOperationsFunctionsInternal.MAKEOP}(function(a, b) return a or b end)`
         );
     }
 
@@ -189,7 +168,7 @@ export class LuaBinaryOperations {
             "bitop.not",
             [
                 `function ${LuaBinaryOperationsFunctions.NOT}(a)`,
-                target.addSpacesToString(`return ${this.modm}-a)`, 2),
+                target.addSpacesToString(`return ${LuaBinaryOperationsFunctions.XOR}(a, #${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(a)-1)`, 2),
                 `end`
             ].join("\n")
         );

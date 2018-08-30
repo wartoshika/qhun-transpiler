@@ -2,41 +2,17 @@ import { suite, test, slow, timeout } from "mocha-typescript";
 import { expect } from "chai";
 
 import * as mockfs from "mock-fs";
-import { JsonConfig } from "../../src/config/json/JsonConfig";
 import * as fs from "fs";
 import { CommandLine } from "../../src/cli/CommandLine";
-import { DefaultConfig } from "../../src/config/DefaultConfig";
+import { IntegrationTestBase } from "./IntegrationTestBase";
 
-@suite("[Integration] Complete transpile test for target lua", slow(500), timeout(3000)) class LuaIntegrationTest {
+@suite("[Integration] Complete transpile test for target lua", slow(500), timeout(3000)) class LuaIntegrationTest extends IntegrationTestBase {
 
     public after() {
         mockfs.restore();
     }
 
     @test "Transpile using JsonReader"() {
-
-        const transpileConfig: JsonConfig = DefaultConfig.mergeDefaultProjectData({
-            tsconfig: "./iTsconfig.json",
-            target: "lua",
-            stripOutDir: "src"
-        });
-        const tsconfig = {
-            "compilerOptions": {
-                "module": "commonjs",
-                "noImplicitAny": true,
-                "removeComments": true,
-                "preserveConstEnums": true,
-                "experimentalDecorators": true,
-                "emitDecoratorMetadata": true,
-                "outDir": "dist",
-                "moduleResolution": "node",
-                "target": "es5",
-                "sourceMap": true
-            },
-            "include": [
-                "./src/**/*.ts"
-            ]
-        };
 
         // declare files
         const indexTs = `
@@ -49,51 +25,19 @@ import { DefaultConfig } from "../../src/config/DefaultConfig";
         const bTs = `export const b = function(a,b) { return a + b; }`;
         const cTs = `export const test: string = "test";`;
 
-        // create filesystem
-        mockfs({
-            "iTranspileConfig.json": JSON.stringify(transpileConfig),
-            "iTsconfig.json": JSON.stringify(tsconfig),
-            "src": {
-                "index.ts": indexTs,
-                "a.ts": aTs,
-                "b.ts": bTs,
-                "c.ts": cTs
-            },
-            "node_modules": {
-                "command-line-args": {
-                    "lib": {
-                        "argv-parser.js": fs.readFileSync("node_modules/command-line-args/lib/argv-parser.js"),
-                        "option.js": fs.readFileSync("node_modules/command-line-args/lib/option.js"),
-                        "option-definition.js": fs.readFileSync("node_modules/command-line-args/lib/option-definition.js"),
-                        "option-definitions.js": fs.readFileSync("node_modules/command-line-args/lib/option-definitions.js"),
-                        "option-flag.js": fs.readFileSync("node_modules/command-line-args/lib/option-flag.js"),
-                        "output.js": fs.readFileSync("node_modules/command-line-args/lib/output.js"),
-                        "output-grouped.js": fs.readFileSync("node_modules/command-line-args/lib/output-grouped.js")
-                    }
-                },
-                "array-back": {
-                    "index.js": fs.readFileSync("node_modules/array-back/index.js")
-                },
-                "argv-tools": {
-                    "index.js": fs.readFileSync("node_modules/argv-tools/index.js")
-                },
-                "typical": {
-                    "lib": {
-                        "typical.js": fs.readFileSync("node_modules/typical/lib/typical.js")
-                    }
-                },
-                "lodash.camelcase": {
-                    "index.js": fs.readFileSync("node_modules/lodash.camelcase/index.js")
+        expect(
+            this.integrationTranspile(
+                {
+                    target: "lua"
+                }, {
+                    "index.ts": indexTs,
+                    "a.ts": aTs,
+                    "b.ts": bTs,
+                    "c.ts": cTs
                 }
-            }
-        });
+            )
+        ).to.equal(true);
 
-        // run the program
-        const cli = new CommandLine([
-            "-p", "iTranspileConfig.json"
-        ]);
-
-        cli.execute();
 
         // dist files must exists
         expect(fs.existsSync("dist/index.lua")).to.be.true;

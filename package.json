@@ -33,6 +33,7 @@
     "chai": "^4.1.2",
     "file-loader": "^1.1.11",
     "istanbul": "^0.4.5",
+    "lua.vm.js": "0.0.1",
     "mocha": "^5.2.0",
     "mocha-parallel-tests": "^2.0.4",
     "mocha-typescript": "^1.1.17",

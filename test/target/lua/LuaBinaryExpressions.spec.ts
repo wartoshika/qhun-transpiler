@@ -97,19 +97,19 @@ import { UnitTest } from "../../UnitTest";
                 code: `1 & 2`,
                 expected: [`__bitop_and(1, 2)`],
                 expectedAditionalDeclaration: [
-                    `bitop.and`, `bitop.make`
+                    `bitop.and`, `bitop.makeop`
                 ]
             }, {
                 code: `1 | 2`,
                 expected: [`__bitop_or(1, 2)`],
                 expectedAditionalDeclaration: [
-                    `bitop.or`, `bitop.make`
+                    `bitop.or`, `bitop.makeop`
                 ]
             }, {
                 code: `1 ^ 2`,
                 expected: [`__bitop_xor(1, 2)`],
                 expectedAditionalDeclaration: [
-                    `bitop.xor`, `bitop.make`
+                    `bitop.xor`, `bitop.makeop`
                 ]
             }
         ]);

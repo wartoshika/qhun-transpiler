@@ -125,13 +125,13 @@ export class LuaBinaryExpression implements Partial<Target> {
         switch (node.operatorToken.kind) {
             case ts.SyntaxKind.AmpersandToken:
                 bitop.declareFunctionsFor(LuaBinaryOperationsFunctions.AND, this);
-                return `__bitop_and(${left}, ${right})`;
+                return `${LuaBinaryOperationsFunctions.AND}(${left}, ${right})`;
             case ts.SyntaxKind.BarToken:
                 bitop.declareFunctionsFor(LuaBinaryOperationsFunctions.OR, this);
-                return `__bitop_or(${left}, ${right})`;
+                return `${LuaBinaryOperationsFunctions.OR}(${left}, ${right})`;
             case ts.SyntaxKind.CaretToken:
                 bitop.declareFunctionsFor(LuaBinaryOperationsFunctions.XOR, this);
-                return `__bitop_xor(${left}, ${right})`;
+                return `${LuaBinaryOperationsFunctions.XOR}(${left}, ${right})`;
             default:
                 throw new UnsupportedError(`The given binary operation with operator ${ts.SyntaxKind[node.operatorToken.kind]} is unsupported!`, node);
         }
