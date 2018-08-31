@@ -68,33 +68,43 @@ export class Compiler {
             if (lastTarget.postProjectTranspile(this.writtenFileStack)) {
 
                 return this.writtenFileStack.length;
-            } else {
-
-                return false;
             }
+
         } catch (e) {
 
-            // check for unsupported error
-            if (e instanceof ErrorWithNode) {
+            // handle this error
+            this.handleCompileError(e, lastSourceFile);
+        }
 
-                // get position of error
-                if (e.node) {
-                    const position = ts.getLineAndCharacterOfPosition(lastSourceFile, e.node.pos);
+        // compiling not successfill
+        return false;
+    }
 
-                    // print the error
-                    console.error(e.message);
-                    console.error(`${lastSourceFile.fileName}: Line: ${position.line + 1}, Column: ${position.character}\n${e.stack}`);
-                } else {
+    /**
+     * handle compiler errors
+     * @param error the error to handle
+     * @param lastSourceFile the sourcefile where the error happens
+     */
+    private handleCompileError(error: Error, lastSourceFile: ts.SourceFile): void {
 
-                    console.error(e.message, e.stack);
-                }
+        // check for unsupported error
+        if (error instanceof ErrorWithNode) {
+
+            // get position of error
+            if (error.node) {
+                const position = ts.getLineAndCharacterOfPosition(lastSourceFile, error.node.pos);
+
+                // print the error
+                console.error(error.message);
+                console.error(`${lastSourceFile.fileName}: Line: ${position.line + 1}, Column: ${position.character}\n${error.stack}`);
             } else {
 
-                // just log the error
-                console.error(e.message, e.stack);
+                console.error(error.message, error.stack);
             }
+        } else {
 
-            return false;
+            // just log the error
+            console.error(error.message, error.stack);
         }
     }
 
@@ -110,7 +120,9 @@ export class Compiler {
 
         // remove the cwd from the file path
         const partOfFilePath = filePath.replace(this.project.rootDir, "");
-        const destinationDir = path.dirname(path.join(this.project.rootDir, path.basename(this.project.outDir), partOfFilePath)).replace(this.project.stripOutDir, "");
+        const destinationDir = path.dirname(
+            path.join(this.project.rootDir, path.basename(this.project.outDir), partOfFilePath)
+        ).replace(this.project.stripOutDir, "");
 
         // creat that dir
         shelljs.mkdir("-p", destinationDir);

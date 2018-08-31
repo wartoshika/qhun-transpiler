@@ -39,7 +39,12 @@ export class TargetFactory {
      * @param project the project object
      * @param typeChecker the current typer checker
      */
-    public create<T extends keyof SupportedTargetConstructors>(target: T, project: Project, typeChecker: ts.TypeChecker, sourceFile: ts.SourceFile): SupportedTargets[T] {
+    public create<T extends keyof SupportedTargetConstructors>(
+        target: T,
+        project: Project,
+        typeChecker: ts.TypeChecker,
+        sourceFile: ts.SourceFile
+    ): SupportedTargets[T] {
 
         return new TargetFactory.supportedTargets[target](project, typeChecker, sourceFile);
     }

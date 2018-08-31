@@ -104,7 +104,9 @@ export class LuaBinaryOperations {
                 `local function ${LuaBinaryOperationsFunctionsInternal.MAKEOP}(cond)`,
                 target.addSpacesToString(`local function oper(x, y, ...)`, 2),
                 target.addSpacesToString(`if not y then return x end`, 4),
-                target.addSpacesToString(`x, y = ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(x), ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(y)`, 4),
+                target.addSpacesToString(
+                    `x, y = ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(x), ${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(y)`,
+                    4),
                 target.addSpacesToString(`local xl, yl = #x, #y`, 4),
                 target.addSpacesToString(`local t, tl = { }, math.max(xl, yl)`, 4),
                 target.addSpacesToString(`for i = 0, tl-1 do`, 4),
