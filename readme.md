@@ -1,7 +1,7 @@
 # Qhun Transpiler
 
 [![npm version](https://badge.fury.io/js/%40wartoshika%2Fqhun-transpiler.svg)](https://www.npmjs.com/package/@wartoshika/qhun-transpiler)
-![Dependencies](https://david-dm.org/wartoshika/qhun-transpiler.svg)
+[![Dependencies](https://david-dm.org/wartoshika/qhun-transpiler.svg)](https://david-dm.org/wartoshika/qhun-transpiler)
 [![Known Vulnerabilities](https://snyk.io/test/npm/@wartoshika/qhun-transpiler/badge.svg)](https://snyk.io/test/npm/@wartoshika/qhun-transpiler)
 
 Service | Master | Dev  |
