@@ -9,7 +9,7 @@ import { ErrorWithNode } from "../error/ErrorWithNode";
 
 import * as path from "path";
 import * as fs from "fs";
-import * as shelljs from "shelljs";
+import * as mkdirp from "mkdirp";
 
 export class Compiler {
 
@@ -124,8 +124,8 @@ export class Compiler {
             path.join(this.project.rootDir, path.basename(this.project.outDir), partOfFilePath)
         ).replace(this.project.stripOutDir, "");
 
-        // creat that dir
-        shelljs.mkdir("-p", destinationDir);
+        // create that dir
+        mkdirp.sync(destinationDir);
 
         // write the file
         const destinationFileName = path.join(destinationDir, path.basename(filePath, ".ts") + `.${extension}`);

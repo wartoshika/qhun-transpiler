@@ -1,5 +1,16 @@
 # Qhun Transpiler
 
+[![npm version](https://badge.fury.io/js/%40wartoshika%2Fqhun-transpiler.svg)](https://www.npmjs.com/package/@wartoshika/qhun-transpiler)
+![Dependencies](https://david-dm.org/wartoshika/qhun-transpiler.svg)
+[![Known Vulnerabilities](https://snyk.io/test/npm/@wartoshika/qhun-transpiler/badge.svg)](https://snyk.io/test/npm/@wartoshika/qhun-transpiler)
+| Service | Master | Dev |
+|---------|--------|-----|
+| CI Status | [![Build Status](https://travis-ci.org/wartoshika/qhun-transpiler.svg?branch=master)](https://travis-ci.org/wartoshika/qhun-transpiler) | [![Build Status](https://travis-ci.org/wartoshika/qhun-transpiler.svg?branch=dev)](https://travis-ci.org/wartoshika/qhun-transpiler) |
+| Coverage | [![Coverage Status](https://coveralls.io/repos/github/wartoshika/qhun-transpiler/badge.svg?branch=master)](https://coveralls.io/github/wartoshika/qhun-transpiler?branch=master) | [![Coverage Status](https://coveralls.io/repos/github/wartoshika/qhun-transpiler/badge.svg?branch=dev)](https://coveralls.io/github/wartoshika/qhun-transpiler?branch=dev) |
+
+
+## **Description**
+
 This command line tool helps to transpile [Typescript](https://github.com/Microsoft/TypeScript) into other languages. The main goal was to support every aspect of Typescript. Every Typescript version >= 2 & < 3 is supported. Typescript 3 will be supported when my dependencies can handle Typescript 3.
 
 **The following languages are currently supported:**
