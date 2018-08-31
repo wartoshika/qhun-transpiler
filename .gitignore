@@ -72,3 +72,6 @@ typings/
 
 # Serverless directories
 .serverless
+
+# coveralls config
+.coveralls.yml
