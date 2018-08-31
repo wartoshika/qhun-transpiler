@@ -11,9 +11,9 @@
     "url": "https://github.com/wartoshika/qhun-transpiler"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha -r ts-node/register test/**/*.spec.ts",
-    "test-async": "./node_modules/.bin/mocha-parallel-tests -r ts-node/register test/**/*.spec.ts",
-    "coverage": "./node_modules/.bin/nyc ./node_modules/.bin/mocha -r ts-node/register test/**/*.spec.ts",
+    "test": "./node_modules/.bin/mocha -r ts-node/register \"test/**/*.spec.ts\"",
+    "test-async": "./node_modules/.bin/mocha-parallel-tests -r ts-node/register \"test/**/*.spec.ts\"",
+    "coverage": "./node_modules/.bin/nyc ./node_modules/.bin/mocha -r ts-node/register \"test/**/*.spec.ts\"",
     "coverage:send:coveralls": "nyc report --reporter=text-lcov | coveralls",
     "build-ts": "./node_modules/.bin/tsc",
     "build-bundle": "./node_modules/.bin/webpack --config ./webpack.config.js",
