@@ -80,26 +80,50 @@ export class CommandLine {
             return true;
         }
 
-        // build a project reader
+        // get the project data
+        const project = this.getProjectConfig();
+
+        // check for a valid project var
+        if (project === false) {
+            return false;
+        }
+
+        // construct the compiler
+        const compiler = new Compiler(project);
+
+        // start everything else
+        const result = compiler.compile(project.parsedCommandLine.fileNames);
+
+        // print the final result
+        this.printResult(result);
+
+        return result !== false;
+    }
+    /**
+     * get the project config from either json reader or argument reader
+     */
+    private getProjectConfig(): Project | false {
+
+        // delcare reader var
         let reader: Reader;
-        let project: Project;
+
+        if (this.programArguments.project) {
+
+            reader = new JsonReader(this.programArguments.project);
+        } else {
+
+            // take the other arguments to build a project object
+            reader = new ArgumentReader({
+                target: this.programArguments.target as keyof SupportedTargets,
+                file: this.programArguments.file
+            });
+        }
 
         // evaluate if a qhun-transpiler.json file is available
         try {
-            if (this.programArguments.project) {
-
-                reader = new JsonReader(this.programArguments.project);
-            } else {
-
-                // take the other arguments to build a project object
-                reader = new ArgumentReader({
-                    target: this.programArguments.target as keyof SupportedTargets,
-                    file: this.programArguments.file
-                });
-            }
 
             // construct the project object
-            project = reader.read();
+            return reader.read();
 
         } catch (e) {
 
@@ -113,17 +137,6 @@ export class CommandLine {
                 return false;
             }
         }
-
-        // construct the compiler
-        const compiler = new Compiler(project);
-
-        // start everything else
-        const result = compiler.compile(project.parsedCommandLine.fileNames);
-
-        // print the final result
-        this.printResult(result);
-
-        return result !== false;
     }
 
     /**

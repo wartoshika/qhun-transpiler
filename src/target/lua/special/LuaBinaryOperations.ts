@@ -1,4 +1,3 @@
-import { Target } from "../../Target";
 import { BaseTarget } from "../../BaseTarget";
 
 enum LuaBinaryOperationsFunctionsInternal {
@@ -17,9 +16,6 @@ export enum LuaBinaryOperationsFunctions {
 
 // special thanks to: https://gist.github.com/kaeza/8ee7e921c98951b4686d
 export class LuaBinaryOperations {
-
-    private mod: number = 2 ^ 32;
-    private modm: number = this.mod - 1;
 
     /**
      * declare all functions that are nessesary to use the given function

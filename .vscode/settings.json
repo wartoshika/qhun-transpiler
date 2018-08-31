@@ -1,0 +1,6 @@
+{
+    "codemetrics.nodeconfiguration.ReturnStatement": 0,
+    "codemetrics.nodeconfiguration.CaseClause": 0,
+    "codemetrics.nodeconfiguration.DefaultClause": 0,
+    "linter_codeclimate.enabled": true
+}
