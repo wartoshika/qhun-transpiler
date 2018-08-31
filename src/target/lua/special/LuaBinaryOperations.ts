@@ -4,7 +4,8 @@ import { BaseTarget } from "../../BaseTarget";
 enum LuaBinaryOperationsFunctionsInternal {
     TO_BITTABLE_R = "__bitop_to_bittable_r",
     TO_BITTABLE = "__bitop_to_bittable",
-    MAKEOP = "__bitop_make_op"
+    MAKEOP = "__bitop_make_op",
+    BITCALC = "__bitop_bitcalc"
 }
 
 export enum LuaBinaryOperationsFunctions {
@@ -30,7 +31,8 @@ export class LuaBinaryOperations {
         const dependencyStack: ((t: BaseTarget) => void)[] = [
             this.declareToBittableR,
             this.declareToBittable,
-            this.declareMakeOp
+            this.declareMakeOp,
+            this.declareBitcalc
         ];
         switch (binaryFunction) {
             case LuaBinaryOperationsFunctions.AND:
@@ -123,6 +125,24 @@ export class LuaBinaryOperations {
     }
 
     /**
+     * declare the bitcalc function that can count the number of used bytes
+     * @param target the target to declare the function on
+     */
+    private declareBitcalc(target: BaseTarget): void {
+
+        target.addDeclaration(
+            "bitop.bitcalc",
+            [
+                `local function ${LuaBinaryOperationsFunctionsInternal.BITCALC}(a)`,
+                target.addSpacesToString(`local r = table.concat(${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(x))`, 2),
+                target.addSpacesToString(`local b = ("0"):rep(1-#r)..r`, 2),
+                target.addSpacesToString(`return b:len()`, 2),
+                `end`
+            ].join("\n")
+        );
+    }
+
+    /**
      * declare the bitop xor function
      * @param target the target to declare the function on
      */
@@ -168,7 +188,7 @@ export class LuaBinaryOperations {
             "bitop.not",
             [
                 `function ${LuaBinaryOperationsFunctions.NOT}(a)`,
-                target.addSpacesToString(`return ${LuaBinaryOperationsFunctions.XOR}(a, #${LuaBinaryOperationsFunctionsInternal.TO_BITTABLE}(a)-1)`, 2),
+                target.addSpacesToString(`return ${LuaBinaryOperationsFunctions.XOR}(a, 2^${LuaBinaryOperationsFunctionsInternal.BITCALC}(a)-1)`, 2),
                 `end`
             ].join("\n")
         );

@@ -134,7 +134,8 @@ import { LuaSystemTestBase } from "./LuaSystemTestBase";
                 8 ^ 5,
 
                 // NOT
-               // ~3
+                ~0,
+                ~1
             ]
         `;
         expect(this.getLuaParseResult(tsCode)).to.deep.equal([
@@ -145,7 +146,7 @@ import { LuaSystemTestBase } from "./LuaSystemTestBase";
             // XOR
             5, 4, 7, 1, 13,
             // NOT
-            //-4
+            1, 0
         ]);
     }
 }
