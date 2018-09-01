@@ -83,9 +83,28 @@ export class Types {
         // get the node type
         const type = typeChecker.getTypeAtLocation(node);
         const nodeType = typeChecker.typeToTypeNode(type);
+        const symbol = typeChecker.getSymbolAtLocation(node);
+
+        let typeLiteralArrayTypes: ts.SyntaxKind[];
+
+        // at typescript >= 3 array types can be type literals
+        if (symbol && symbol.declarations && nodeType.kind === ts.SyntaxKind.TypeLiteral) {
+
+            typeLiteralArrayTypes = symbol.declarations.map(dec => {
+                return (dec as any).type.kind;
+            });
+        }
 
         // make the test
-        return nodeType && ts.isArrayLiteralExpression(node) || (nodeType.kind === ts.SyntaxKind.ArrayType || nodeType.kind === ts.SyntaxKind.TupleType);
+        return nodeType
+            // is an array literal
+            && ts.isArrayLiteralExpression(node)
+            // is a typescript 3 type literal
+            || (typeLiteralArrayTypes
+                && typeLiteralArrayTypes.every(typeLiteral => typeLiteral === ts.SyntaxKind.ArrayType || typeLiteral === ts.SyntaxKind.TupleType)
+            )
+            // normal types (typescript < 3)
+            || (nodeType.kind === ts.SyntaxKind.ArrayType || nodeType.kind === ts.SyntaxKind.TupleType);
     }
 
     /**
