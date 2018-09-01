@@ -40,7 +40,7 @@ import { UnitTest } from "../../UnitTest";
                 ]
             }, {
                 code: `
-                    const myArray: any[] = [1,2];
+                    const myArray: number[] = [1,2];
                     call(myArray[0])
                 `,
                 expected: [

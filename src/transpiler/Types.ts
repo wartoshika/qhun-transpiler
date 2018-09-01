@@ -85,7 +85,7 @@ export class Types {
         const nodeType = typeChecker.typeToTypeNode(type);
 
         // make the test
-        return nodeType && (nodeType.kind === ts.SyntaxKind.ArrayType || nodeType.kind === ts.SyntaxKind.TupleType);
+        return nodeType && ts.isArrayLiteralExpression(node) || (nodeType.kind === ts.SyntaxKind.ArrayType || nodeType.kind === ts.SyntaxKind.TupleType);
     }
 
     /**

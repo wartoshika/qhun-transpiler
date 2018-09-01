@@ -1,5 +1,6 @@
 {
     "codemetrics.nodeconfiguration.ReturnStatement": 0,
     "codemetrics.nodeconfiguration.CaseClause": 0,
-    "codemetrics.nodeconfiguration.DefaultClause": 0
+    "codemetrics.nodeconfiguration.DefaultClause": 0,
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }

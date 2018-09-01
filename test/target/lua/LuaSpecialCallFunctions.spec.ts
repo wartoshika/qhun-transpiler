@@ -130,6 +130,14 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
     @test "Array.push(...)"() {
         this.runCodeAndExpectResult("lua", [
             {
+                code: `[8,9].push(1,2,3,4);`,
+                expected: [
+                    `__array_push({8, 9}, 1, 2, 3, 4)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.push'
+                ]
+            }, {
                 code: `const a: any[] = []; a.push(1,2,3,4);`,
                 expected: [
                     `local a = {}`,
