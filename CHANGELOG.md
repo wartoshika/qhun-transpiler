@@ -4,13 +4,19 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 
 ## Todo for the next release
 
-- string.charAt()
-- string.split()
-- string.toLowerCase()
-- string.toUpperCase()
+- More Typescript features
 
 ## Implemented but unreleased
+
+- Nothing
+
+## **0.3.0** released 2018-09-01
 
 - Added changelog file for future feature change tracking.
 - Added documentation for currently supported targets.
 - Added most of the typescript feature to `lua` and `wow` target
+- Support of Typescript 3
+- string.charAt()
+- string.split()
+- string.toLowerCase()
+- string.toUpperCase()

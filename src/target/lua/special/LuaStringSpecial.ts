@@ -40,6 +40,12 @@ export class LuaStringSpecial {
                 return this.transpileSpecialStringFunctionSubstr(owner, argumentStack);
             case "trim":
                 return this.transpileSpecialStringFunctionTrim(owner, argumentStack);
+            case "charAt":
+                return this.transpileSpecialStringFunctionCharAt(owner, argumentStack);
+            case "toLowerCase":
+                return this.transpileSpecialStringFunctionLowerCase(owner, argumentStack);
+            case "toUpperCase":
+                return this.transpileSpecialStringFunctionUpperCase(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given string function ${name} is unsupported!`, null);
         }
@@ -136,5 +142,65 @@ export class LuaStringSpecial {
         );
 
         return `__string_trim(${owner})`;
+    }
+
+    /**
+     * an impl. for the string.charAt function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialStringFunctionCharAt(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // add declaration
+        this.addDeclaration(
+            "string.charat",
+            [
+                `local function __string_char_at(a, b)`,
+                this.addSpacesToString(`return string.byte(a, tonumber(b) + 1)`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__string_char_at(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
+    }
+
+    /**
+     * an impl. for the string.toLowerCase function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialStringFunctionLowerCase(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // add declaration
+        this.addDeclaration(
+            "string.lower",
+            [
+                `local function __string_lower(a)`,
+                this.addSpacesToString(`return string.lower(a)`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__string_lower(${owner})`;
+    }
+
+    /**
+     * an impl. for the string.toUpperCase function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialStringFunctionUpperCase(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // add declaration
+        this.addDeclaration(
+            "string.upper",
+            [
+                `local function __string_upper(a)`,
+                this.addSpacesToString(`return string.upper(a)`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__string_upper(${owner})`;
     }
 }

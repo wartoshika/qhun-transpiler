@@ -12,7 +12,7 @@ Coverage | [![Coverage Status](https://coveralls.io/repos/github/wartoshika/qhun
 
 ## **Description**
 
-This command line tool helps to transpile [Typescript](https://github.com/Microsoft/TypeScript) into other languages. The main goal was to support every aspect of Typescript. Every Typescript version >= 2 & < 3 is supported. Typescript 3 will be supported when my dependencies can handle Typescript 3.
+This command line tool helps to transpile [Typescript](https://github.com/Microsoft/TypeScript) into other languages. The main goal was to support every aspect of Typescript. Typescript 2 and 3 are supported!
 
 **The following languages are currently supported:**
 - [LUA](https://www.lua.org/)

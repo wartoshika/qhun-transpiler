@@ -97,6 +97,54 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
 
     }
 
+    @test "String.charAt(...)"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `"test".charAt(0)`,
+                expected: [
+                    `__string_char_at("test", 0)`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.charat'
+                ]
+            }
+        ]);
+
+    }
+
+    @test "String.toLowerCase(...)"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `"test".toLowerCase()`,
+                expected: [
+                    `__string_lower("test")`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.lower'
+                ]
+            }
+        ]);
+
+    }
+
+    @test "String.toUpperCase(...)"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `"test".toUpperCase()`,
+                expected: [
+                    `__string_upper("test")`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.upper'
+                ]
+            }
+        ]);
+
+    }
+
     @test "Array.join(...)"() {
 
         this.runCodeAndExpectResult("lua", [
