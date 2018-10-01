@@ -1,8 +1,9 @@
 import { LuaConfig } from "./LuaConfig";
 import { TargetConfigValidator } from "../../config/validator/TargetConfigValidator";
 import { ValidatorRule } from "../../config/validator/ValidatorRule";
+import { Config } from "../../config/Config";
 
-export class LuaConfigValidator<C = LuaConfig> implements TargetConfigValidator<C> {
+export class LuaConfigValidator<C extends Config = LuaConfig> implements TargetConfigValidator<C> {
 
     public getRules(): ValidatorRule {
 

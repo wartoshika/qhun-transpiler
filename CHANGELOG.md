@@ -4,11 +4,11 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 
 ## Todo for the next release
 
-- More Typescript features
+- Nothing
 
 ## Implemented but unreleased
 
-- Nothing
+- Reflection for the lua and wow target
 
 ## **0.3.0** released 2018-09-01
 

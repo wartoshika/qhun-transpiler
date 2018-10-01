@@ -5,6 +5,7 @@ import * as mockfs from "mock-fs";
 import * as fs from "fs";
 import { WowKeywords } from "../../src/target/wow/WowKeywords";
 import { IntegrationTestBase } from "./IntegrationTestBase";
+import { WowConfig } from "../../src/target/wow/WowConfig";
 
 @suite("[Integration] Complete transpile test for target wow", slow(500), timeout(3000)) class LuaIntegrationTest extends IntegrationTestBase {
 
@@ -26,7 +27,7 @@ import { IntegrationTestBase } from "./IntegrationTestBase";
         const cTs = `export const test: string = "test";`;
 
         expect(
-            this.integrationTranspile(
+            this.integrationTranspile<WowConfig>(
                 {
                     target: "wow",
                     config: {

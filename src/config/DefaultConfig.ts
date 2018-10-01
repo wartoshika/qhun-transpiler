@@ -2,6 +2,7 @@ import * as ts from "typescript";
 import { Project } from "./Project";
 import * as path from "path";
 import { Config } from "./Config";
+import { StaticReflection } from "./StaticReflection";
 
 export class DefaultConfig {
 
@@ -21,6 +22,10 @@ export class DefaultConfig {
      */
     public static mergeDefaultProjectData<C extends Config = Config>(givenProject: Partial<Project<C>> = {}): Project {
 
+        // config block defaults
+        const configBlock: Partial<C> = givenProject.config || {};
+        configBlock.staticReflection = configBlock.staticReflection ? configBlock.staticReflection : StaticReflection.NONE;
+
         return {
             author: givenProject.author ? givenProject.author : "Unknown",
             description: givenProject.description ? givenProject.description : "Unknown",
@@ -31,7 +36,7 @@ export class DefaultConfig {
             version: givenProject.version ? givenProject.version : "0.0.0",
             tsconfig: givenProject.tsconfig ? givenProject.tsconfig : "./tsconfig.json",
             printFileHeader: typeof givenProject.printFileHeader === "boolean" ? givenProject.printFileHeader : true,
-            config: givenProject.config ? givenProject.config : {},
+            config: configBlock,
             stripOutDir: givenProject.stripOutDir ? givenProject.stripOutDir : "",
             rootDir: givenProject.rootDir ? givenProject.rootDir : path.resolve("."),
             parsedCommandLine: givenProject.parsedCommandLine ? givenProject.parsedCommandLine : {

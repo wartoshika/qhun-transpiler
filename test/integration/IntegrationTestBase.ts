@@ -4,10 +4,11 @@ import { DefaultConfig } from "../../src/config/DefaultConfig";
 import * as fs from "fs";
 import { CommandLine } from "../../src/cli/CommandLine";
 import { Test } from "../Test";
+import { Config } from "../../src/config/Config";
 
 export class IntegrationTestBase extends Test {
 
-    public integrationTranspile(projectConfig: Partial<JsonConfig>, fsConfig: mockfs.Config): boolean {
+    public integrationTranspile<C extends Config = Config>(projectConfig: Partial<JsonConfig<Partial<C>>>, fsConfig: mockfs.Config): boolean {
 
         const transpileConfig: JsonConfig = DefaultConfig.mergeDefaultProjectData(projectConfig);
         transpileConfig.tsconfig = "testTsConfig.json";

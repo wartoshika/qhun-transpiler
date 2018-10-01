@@ -4,6 +4,11 @@ import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
 import { Types } from "../../../transpiler/Types";
 import { LuaKeywords } from "../LuaKeywords";
+import { StaticReflection } from "../../../config/StaticReflection";
+
+declare type ReflectionContext = {
+    [methodName: string]: string[]
+};
 
 export interface LuaClassDeclaration extends BaseTarget, Target { }
 export class LuaClassDeclaration implements Partial<Target> {
@@ -23,11 +28,21 @@ export class LuaClassDeclaration implements Partial<Target> {
             this.addExport(name, node);
         }
 
+        // check for static reflection
+        const reflection = this.getStaticReflection(node, name, this.project.config.staticReflection);
+
         // return the whole thing
-        return [
-            this.writeClassHead(name, node),
-            this.writeClassMethods(name, node)
-        ].join("\n") + "\n";
+        const classDef = [this.writeClassHead(name, node)];
+
+        // check for reflections
+        if (reflection) {
+            classDef.push(reflection);
+        }
+
+        // add methods
+        classDef.push(this.writeClassMethods(name, node));
+
+        return classDef.join("\n") + "\n";
     }
 
     /**
@@ -133,11 +148,12 @@ export class LuaClassDeclaration implements Partial<Target> {
         }
 
         // conat constructor and other methods
+        let name: string;
         classMethods.push(...[...constructors, ...methods].map(method => {
 
             // get the name of the method
-            let name: string;
             if (ts.isConstructorDeclaration(method)) {
+
                 name = `${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}`;
             } else if (ts.isMethodDeclaration(method)) {
                 name = `${className}.${this.transpileNode(method.name)}`;
@@ -188,5 +204,64 @@ export class LuaClassDeclaration implements Partial<Target> {
         }
 
         return superName;
+    }
+
+    /**
+     * reflects the class method signatures
+     * @param node the class to transpile
+     * @param name the name of the current class
+     * @param flags the bitop flags wich elements should be reflected
+     */
+    private getStaticReflection(node: ts.ClassDeclaration, className: string, flags: number): string {
+
+        const reflectData: ReflectionContext = {};
+
+        // collect all reflectable members
+        node.members.filter(member => {
+
+            if (flags & StaticReflection.CLASS_CONSTRUCTOR && ts.isConstructorDeclaration(member)) {
+                return true;
+            }
+            return false;
+        }).forEach((method: ts.ConstructorDeclaration | ts.MethodDeclaration) => {
+
+            // reflect!
+            const methodName = this.transpileNode(method.name) || "constructor";
+            reflectData[methodName] = method.parameters.map(param => {
+
+                // get the type
+                const type = this.typeChecker.getTypeAtLocation(param);
+
+                // does the param has a symbol?
+                const symbol = type.getSymbol();
+                if (symbol) {
+
+                    return symbol.getEscapedName().toString();
+                }
+
+                const guess = (type as any).intrinsicName;
+                if (guess !== "error") {
+                    return `"${guess}"`;
+                }
+
+                return this.transpileKeyword(ts.createNull());
+            });
+        });
+
+        if (Object.keys(reflectData).length === 0) {
+            return "";
+        }
+
+        return [
+            `${className}.${LuaKeywords.CLASS_STATIC_REFLECTION} = {`,
+            this.addSpacesToString(Object.keys(reflectData).map(key => {
+                return [
+                    `${key} = {`,
+                    this.addSpacesToString(reflectData[key].join(",\n"), 2),
+                    `}`
+                ].join("\n");
+            }).join("\n"), 2),
+            `}`
+        ].join("\n");
     }
 }

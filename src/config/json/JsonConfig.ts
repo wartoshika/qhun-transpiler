@@ -4,7 +4,7 @@ import { SupportedTargets } from "../../target/TargetFactory";
 /**
  * the project data read from the qhun-transpiler.json file
  */
-export interface JsonConfig<C = Config> {
+export interface JsonConfig<C extends Config = Config> {
 
     /**
      * name of the project
