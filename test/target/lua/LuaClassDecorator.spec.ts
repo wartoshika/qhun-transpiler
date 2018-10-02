@@ -25,7 +25,7 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                     "end",
                     "function B.__init(self)",
                     "end",
-                    "B = A(B)"
+                    "B.__init = A(B)"
                 ]
             }
         ]);
@@ -51,7 +51,7 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                     "end",
                     "function B.__init(self)",
                     "end",
-                    "B = A(\"test\")(B)"
+                    "B.__init = A(\"test\")(B)"
                 ]
             }
         ]);

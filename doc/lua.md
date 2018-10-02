@@ -28,6 +28,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
     - [Array.forEach()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/foreach)
     - [Array.map()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
     - [Array.filter()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+    - [Array.slice()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice) *(only positive index)*
 - Builtin String functions
     - [String.replace()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace)
     - [String.split()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split)
@@ -49,7 +50,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
     - [Array.length](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/length)
     - [String.length](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length)
 - [Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html)
-    - ~~Class level decorators~~
+    - Class level decorators *(experimental support)*
     - Property level decorator
     - Method level decorator *(Not fully supported)*
     - ~~Parameter level decorator~~

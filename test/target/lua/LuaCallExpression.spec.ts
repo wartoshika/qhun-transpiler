@@ -28,7 +28,7 @@ import { UnitTest } from "../../UnitTest";
             {
                 code: `myFunc(a, ...b)`,
                 expected: [
-                    `myFunc(a, table.unpack(b))`
+                    `myFunc(a, unpack(b))`
                 ]
             }
         ]);
@@ -58,6 +58,27 @@ import { UnitTest } from "../../UnitTest";
                 code: `obj.myFunc().myOtherFunc().test();`,
                 expected: [
                     `obj:myFunc():myOtherFunc():test()`
+                ]
+            }
+        ])
+    }
+
+    @test "This argument in function declaration"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `
+                    const fktn: (this: any, arg1: string) => void = (arg1: string) => {};
+                    const obj = {
+                        test: fktn
+                    }
+                    obj.test("hello");
+                `,
+                expected: [
+                     "local fktn = function (arg1)",
+                     "end",
+                     "local obj = {test = fktn}",
+                     "obj.test(\"hello\")" 
                 ]
             }
         ])

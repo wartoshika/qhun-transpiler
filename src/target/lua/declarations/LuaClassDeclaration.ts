@@ -82,6 +82,11 @@ export class LuaClassDeclaration implements Partial<Target> {
         // add the reference index
         classHead.push(`${className}.__index = ${className}`);
 
+        // add class name when reflection is set
+        if (this.project.config.staticReflection & StaticReflection.CLASS_NAME) {
+            classHead.push(`${className}.__name = ${this.transpileStringLiteral(ts.createStringLiteral(className))}`);
+        }
+
         // add static properties
         classHead.push(...staticInitProperties.map(prop => {
             const propertyName = this.transpileNode(prop.name);

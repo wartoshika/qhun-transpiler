@@ -88,10 +88,15 @@ export class Types {
         let typeLiteralArrayTypes: ts.SyntaxKind[];
 
         // at typescript >= 3 array types can be type literals
-        if (symbol && symbol.declarations && nodeType.kind === ts.SyntaxKind.TypeLiteral) {
+        if (symbol && symbol.declarations && nodeType && nodeType.kind === ts.SyntaxKind.TypeLiteral) {
 
             typeLiteralArrayTypes = symbol.declarations.map(dec => {
-                return (dec as any).type.kind;
+
+                const decType = (dec as any).type;
+                if (!decType) {
+                    return ts.SyntaxKind.ObjectLiteralExpression;
+                }
+                return decType.kind;
             });
         }
 

@@ -31,8 +31,11 @@ export class LuaCallExpression implements Partial<Target> {
             base = this.transpileNode(node.expression);
         }
 
+        // transpile params
+        const params = node.arguments.map(this.transpileNode);
+
         // put everything together
-        return `${base}(${node.arguments.map(this.transpileNode).join(", ")})`;
+        return `${base}(${params.join(", ")})`;
     }
 
     /**
@@ -90,7 +93,35 @@ export class LuaCallExpression implements Partial<Target> {
                 return this.transpileSpecialMathFunction(functionName, ownerName, node.arguments);
         }
 
+        // transpile params
+        const params = node.arguments.map(this.transpileNode);
+
+        // check this param
+        const hasThisParam = this.doesMethodDeclarationHasThisParam(node);
+
         // use the default access pattern
-        return `${ownerName}:${functionName}(${node.arguments.map(this.transpileNode).join(", ")})`;
+        return `${ownerName}${hasThisParam ? "." : ":"}${functionName}(${params.join(", ")})`;
+    }
+
+    /**
+     * check if the method declaration requires a this param
+     * @param node the call expression to check
+     */
+    private doesMethodDeclarationHasThisParam(node: ts.CallExpression): boolean {
+
+        let hasThisParam: boolean = false;
+        try {
+            const methodSignature = this.typeChecker.getResolvedSignature(node);
+            methodSignature.getDeclaration().parameters.forEach(param => {
+                const originalKeyworkKind: ts.SyntaxKind = ((param.type.parent as ts.ParameterDeclaration).name as any).originalKeywordKind;
+                if (originalKeyworkKind === ts.SyntaxKind.ThisKeyword) {
+                    hasThisParam = true;
+                }
+            });
+        } catch (e) {
+            // noop
+        }
+
+        return hasThisParam;
     }
 }

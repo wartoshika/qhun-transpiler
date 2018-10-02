@@ -43,6 +43,8 @@ export class LuaArraySpecial {
                 return this.transpileSpecialArrayFunctionMap(owner, argumentStack);
             case "filter":
                 return this.transpileSpecialArrayFunctionFilter(owner, argumentStack);
+            case "slice":
+                return this.transpileSpecialArrayFunctionSlice(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given array function ${name} is unsupported!`, null);
         }
@@ -175,5 +177,42 @@ export class LuaArraySpecial {
         const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack);
 
         return `__array_filter(${owner}, ${resolvedArguments.map(this.transpileNode).join(", ")})`;
+    }
+
+    /**
+     * an impl. for the array.slice function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialArrayFunctionSlice(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // declare the array.filter method
+        this.addDeclaration(
+            "array.slice",
+            [
+                `local function __array_slice(array, begin, stop)`,
+                this.addSpacesToString(`if type(begin) ~= "number" then begin = 1 end`, 2),
+                this.addSpacesToString(`if type(stop) ~= "number" then stop = #array end`, 2),
+                this.addSpacesToString(`local newArray = {}`, 2),
+                this.addSpacesToString(`for k, v in pairs(array) do`, 2),
+                this.addSpacesToString(`if begin >= 0 and k >= begin and k <= stop then`, 4),
+                this.addSpacesToString(`table.insert(newArray, table.remove(array, k))`, 6),
+                this.addSpacesToString(`end`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return newArray`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        // resolve shorthand arguments
+        const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack);
+        const stringArgs = resolvedArguments.map(this.transpileNode);
+
+        // if there are no arguments, pass nil as argument
+        if (stringArgs.length === 0) {
+            stringArgs.push(this.transpileNode(ts.createNull()));
+        }
+
+        return `__array_slice(${owner}, ${stringArgs.join(",")})`;
     }
 }
