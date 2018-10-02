@@ -103,7 +103,7 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                 `function Child.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}(self, test, b)`,
                 `  self.test = test`,
                 `  self.b = b`,
-                `  self.${LuaKeywords.CLASS_SUPER_REFERENCE_NAME}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}(self, test .. b)`,
+                `  Child.${LuaKeywords.CLASS_SUPER_REFERENCE_NAME}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}(self, test .. b)`,
                 `end`,
             ]
         }])

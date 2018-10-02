@@ -2,6 +2,7 @@ import { Target } from "../../Target";
 import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { LuaReservedKeywordError } from "../../../error/lua/LuaReservedKeywordError";
+import { StrictIdentifier } from "../../../transpiler/nodes/StrictIdentifier";
 
 export interface LuaIdentifier extends BaseTarget, Target { }
 export class LuaIdentifier implements Partial<Target> {
@@ -22,7 +23,9 @@ export class LuaIdentifier implements Partial<Target> {
         }
 
         // check for reserved keywords
-        this.checkForReservedIdentifierToken(identifier, node);
+        if (!(node instanceof StrictIdentifier)) {
+            this.checkForReservedIdentifierToken(identifier, node);
+        }
 
         // get the identifier name
         return identifier;

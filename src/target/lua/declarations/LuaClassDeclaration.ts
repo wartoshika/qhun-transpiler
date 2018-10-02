@@ -13,6 +13,8 @@ declare type ReflectionContext = {
 export interface LuaClassDeclaration extends BaseTarget, Target { }
 export class LuaClassDeclaration implements Partial<Target> {
 
+    public lastParsedClassName: string;
+
     public transpileClassDeclaration(node: ts.ClassDeclaration): string {
 
         // check if this is an unnamed class
@@ -22,6 +24,8 @@ export class LuaClassDeclaration implements Partial<Target> {
 
         // get the name of the class
         const name = this.transpileNode(node.name);
+
+        this.lastParsedClassName = name;
 
         // add class export
         if (this.hasExportModifier(node)) {

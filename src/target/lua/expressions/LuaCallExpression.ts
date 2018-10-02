@@ -21,7 +21,7 @@ export class LuaCallExpression implements Partial<Target> {
         if (node.expression.kind === ts.SyntaxKind.SuperKeyword) {
 
             // use the constructor of the super class
-            base = `self.${LuaKeywords.CLASS_SUPER_REFERENCE_NAME}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}`;
+            base = `${this.transpileNode(ts.createSuper())}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}`;
 
             // add the self reference to the arguments
             node.arguments = ts.createNodeArray([ts.createNode(ts.SyntaxKind.ThisKeyword) as ts.Expression, ...node.arguments]);

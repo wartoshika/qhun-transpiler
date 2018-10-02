@@ -47,14 +47,6 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
         }])
     }
 
-    @test "Array destructing with ... token is unsupported"() {
-
-        this.runCodeAndExpectThrow("lua", [{
-            code: `const [a, b, ...c] = d()`,
-            throw: UnsupportedError
-        }])
-    }
-
     @test "Array destruction assigned to array"() {
 
         this.runCodeAndExpectResult("lua", [{

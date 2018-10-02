@@ -12,6 +12,10 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 - This arg support when declaring a function that has an explicit this arg.
 - Array.slice() partial support
 - Class decorators experimental support
+- Parameter decorator experimental support
+- DotDotDot token for array destructing assignment
+- fixed some minor and major bugs in the class heritage design
+- added more unit tests to cover more features
 
 ## **0.3.0** released 2018-09-01
 
