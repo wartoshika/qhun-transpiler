@@ -11,6 +11,6 @@ export class LuaSpreadElement implements Partial<Target> {
         const expression = this.transpileNode(node.expression);
 
         // use table unpack to spread
-        return `table.unpack(${expression})`;
+        return `unpack(${expression})`;
     }
 }

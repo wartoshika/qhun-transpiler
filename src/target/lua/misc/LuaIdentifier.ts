@@ -14,7 +14,12 @@ export class LuaIdentifier implements Partial<Target> {
         }
 
         // get the identifier content
-        const identifier = node.escapedText.toString();
+        let identifier = node.escapedText.toString();
+
+        // workarround for a typescript bug that translates an __identifier to a ___identifier
+        if (identifier.indexOf("___") === 0) {
+            identifier = identifier.substring(1);
+        }
 
         // check for reserved keywords
         this.checkForReservedIdentifierToken(identifier, node);

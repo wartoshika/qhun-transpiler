@@ -32,7 +32,9 @@ export class LuaClassDeclaration implements Partial<Target> {
         const reflection = this.getStaticReflection(node, name, this.project.config.staticReflection);
 
         // return the whole thing
-        const classDef = [this.writeClassHead(name, node)];
+        const classDef = [
+            this.writeClassHead(name, node)
+        ];
 
         // check for reflections
         if (reflection) {
@@ -41,6 +43,9 @@ export class LuaClassDeclaration implements Partial<Target> {
 
         // add methods
         classDef.push(this.writeClassMethods(name, node));
+
+        // add decorators
+        classDef.push(this.transpileClassDecorator(node));
 
         return classDef.join("\n") + "\n";
     }
