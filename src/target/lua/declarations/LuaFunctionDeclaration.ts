@@ -45,6 +45,11 @@ export class LuaFunctionDeclaration implements Partial<Target> {
                 return `if ${paramName} == nil then ${paramName} = ${this.transpileNode(param.initializer)} end`;
             });
 
+        // check for parameter decorators
+        const paramDecorator: string[] = node.parameters
+            .filter(param => param.decorators && param.decorators.length > 0)
+            .map(param => this.transpileParameterDecorator(param));
+
         // add some body head
         const bodyHead: string[] = [];
 
@@ -56,6 +61,11 @@ export class LuaFunctionDeclaration implements Partial<Target> {
         // add initializers
         if (paramInitializer.length > 0) {
             bodyHead.push(paramInitializer.join("\n"));
+        }
+
+        // add parameter decorators
+        if (paramDecorator.length > 0) {
+            bodyHead.push(paramDecorator.join("\n"));
         }
 
         // add rest argument if available

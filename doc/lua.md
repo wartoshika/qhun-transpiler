@@ -53,7 +53,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
     - Class level decorators *(experimental support)*
     - Property level decorator
     - Method level decorator *(Not fully supported)*
-    - ~~Parameter level decorator~~
+    - Parameter level decorator (Partial support. Will be transpiled as parameter assignment: `param = Decorator(...)`)
     - Decorator factories
 - [Array and ~~object~~ destructing](https://basarat.gitbooks.io/typescript/docs/destructuring.html)
 

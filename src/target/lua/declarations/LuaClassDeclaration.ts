@@ -258,7 +258,13 @@ export class LuaClassDeclaration implements Partial<Target> {
             });
         });
 
-        if (Object.keys(reflectData).length === 0) {
+        if (Object.keys(reflectData).length === 0 && flags & StaticReflection.CLASS_CONSTRUCTOR) {
+
+            // no constructur has been given, create an empty constructor signature
+            reflectData["constructor" as any] = [] as string[];
+        } else if (Object.keys(reflectData).length === 0) {
+
+            // no constructor reflection wanted!
             return "";
         }
 
