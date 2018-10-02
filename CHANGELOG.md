@@ -9,6 +9,9 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 ## Implemented but unreleased
 
 - Reflection for the lua and wow target
+- This arg support when declaring a function that has an explicit this arg.
+- Array.slice() partial support
+- Class decorators experimental support
 
 ## **0.3.0** released 2018-09-01
 
