@@ -145,6 +145,31 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
 
     }
 
+    @test "String.match(...)"() {
+
+        const regexp = /\s/;
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `"test".match(${regexp.toString()})`,
+                expected: [
+                    `__string_match("test", "%s")`
+                ],
+                expectedAditionalDeclaration: [
+                    'string.match'
+                ]
+            }
+        ]);
+
+        const regexpUnsupported = /\D/;
+
+        this.runCodeAndExpectThrow("lua", [{
+            code: `"test".match(${regexpUnsupported.toString()})`,
+            throw: UnsupportedError
+        }])
+
+    }
+
     @test "Array.join(...)"() {
 
         this.runCodeAndExpectResult("lua", [

@@ -387,4 +387,10 @@ export interface Target {
      * @param node the node to transpile
      */
     transpileSpreadElement(node: ts.SpreadElement): string;
+
+    /**
+     * transpiles a regular expression litereal
+     * @param node the node to transpile
+     */
+    transpileRegularExpressionLiteral(node: ts.RegularExpressionLiteral): string;
 }

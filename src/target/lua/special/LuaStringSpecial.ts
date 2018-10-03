@@ -46,6 +46,8 @@ export class LuaStringSpecial {
                 return this.transpileSpecialStringFunctionLowerCase(owner, argumentStack);
             case "toUpperCase":
                 return this.transpileSpecialStringFunctionUpperCase(owner, argumentStack);
+            case "match":
+                return this.transpileSpecialStringFunctionMatch(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given string function ${name} is unsupported!`, null);
         }
@@ -202,5 +204,25 @@ export class LuaStringSpecial {
         );
 
         return `__string_upper(${owner})`;
+    }
+
+    /**
+     * an impl. for the string.match function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialStringFunctionMatch(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // add declaration
+        this.addDeclaration(
+            "string.match",
+            [
+                `local function __string_match(s,p)`,
+                this.addSpacesToString(`return s:gsub(p)`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__string_match(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
     }
 }

@@ -22,6 +22,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
 - For, ForIn, ForOf, Do and While statements
 - [Spread element](https://basarat.gitbooks.io/typescript/docs/spread-operator.html) in every context
 - Computed properties
+- [Regular expressions](https://developer.mozilla.org/de/docs/Web/JavaScript/Guide/Regular_Expressions) (only as literal)
 - Builtin Array functions
     - [Array.join()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)
     - [Array.push()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push)
@@ -34,6 +35,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
     - [String.split()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split)
     - [String.substr()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/substr)
     - [String.trim()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim)
+    - [String.match()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match)
 - Builtin Object functions
     - [Object.keys()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys)
     - [Object.values()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values)

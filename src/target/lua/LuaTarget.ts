@@ -1,8 +1,6 @@
 import { Target } from "../Target";
 import { BaseTarget } from "../BaseTarget";
 import * as luaTrait from "./traits";
-
-import * as ts from "typescript";
 import { use } from "typescript-mix";
 import { LuaKeywords } from "./LuaKeywords";
 
@@ -76,6 +74,7 @@ export class LuaTarget extends BaseTarget implements Target {
         luaTrait.LuaArrayBindingPattern,
         luaTrait.LuaObjectBindingPattern,
         luaTrait.LuaSpreadElement,
+        luaTrait.LuaRegularExpressionLiteral,
         // special
         luaTrait.LuaStringSpecial,
         luaTrait.LuaObjectSpecial,

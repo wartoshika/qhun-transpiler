@@ -11,6 +11,7 @@ export * from "./LuaVariableDeclarationList";
 export * from "./LuaArrayBindingPattern";
 export * from "./LuaObjectBindingPattern";
 export * from "./LuaSpreadElement";
+export * from "./LuaRegularExpressionLiteral";
 
 // misc bundle interface
 export * from "./LuaMisc";

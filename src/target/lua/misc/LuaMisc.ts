@@ -11,6 +11,8 @@ import { LuaVariableDeclarationList } from "./LuaVariableDeclarationList";
 import { LuaArrayBindingPattern } from "./LuaArrayBindingPattern";
 import { LuaObjectBindingPattern } from "./LuaObjectBindingPattern";
 import { LuaSpreadElement } from "./LuaSpreadElement";
+import { LuaRegularExpressionLiteral } from "./LuaRegularExpressionLiteral";
 
 export interface LuaMisc extends LuaBlock, LuaEndOfFileToken, LuaIdentifier, LuaStringLiteral, LuaNumericLiteral, LuaKeyword, LuaComputedPropertyName,
-    LuaTypeAssertion, LuaExportAssignment, LuaVariableDeclarationList, LuaArrayBindingPattern, LuaObjectBindingPattern, LuaSpreadElement { }
+    LuaTypeAssertion, LuaExportAssignment, LuaVariableDeclarationList, LuaArrayBindingPattern, LuaObjectBindingPattern, LuaSpreadElement,
+    LuaRegularExpressionLiteral { }
