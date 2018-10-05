@@ -128,4 +128,19 @@ export class Types {
         // make the test
         // return nodeType && (nodeType.kind === ts.SyntaxKind.ObjectLiteralExpression);
     }
+
+    /**
+     * check if the given node is a function
+     * @param node the node to check
+     * @param typeChecker the type checker instance
+     */
+    public static isFunction(node: ts.Node, typeChecker: ts.TypeChecker): boolean {
+
+        // get the node type
+        const type = typeChecker.getTypeAtLocation(node);
+        const nodeType = typeChecker.typeToTypeNode(type);
+
+        // single function type kind check
+        return nodeType.kind === ts.SyntaxKind.FunctionType;
+    }
 }

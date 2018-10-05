@@ -149,4 +149,30 @@ import { LuaSystemTestBase } from "./LuaSystemTestBase";
             1, 0
         ]);
     }
+
+    @test "function.bind(...)"() {
+
+        const tsCode = `
+            const a = (val: number)=>{
+                return val;
+            }
+            const b = a.bind(12);
+
+            const c = (a:number,b:number) => {
+                return a+b;
+            }
+            const d = c.bind(1, 2);
+
+            const e = (a: number, b: number) => {
+                return a+b;
+            }
+            const f = e.bind(1);
+
+            return [b(), d(), f(3)]
+        `;
+
+        expect(this.getLuaParseResult(tsCode)).to.deep.equal([
+            12, 3, 4
+        ]);
+    }
 }

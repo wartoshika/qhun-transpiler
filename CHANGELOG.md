@@ -17,6 +17,7 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 - fixed some minor and major bugs in the class heritage design
 - added more unit tests to cover more features
 - String.match() and RegularExpressionLiteral support for lua and wow target
+- Function.bind(...) added
 
 ## **0.3.0** released 2018-09-01
 

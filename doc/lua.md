@@ -40,6 +40,8 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
     - [Object.keys()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys)
     - [Object.values()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values)
     - [Object.hasOwnProperty()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasownproperty)
+- Builtin Function methods
+    - [Function.bind()](https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
 - Builtin Math functions
     - The lua equivalent will be used. [See the lua documentation for more help](http://lua-users.org/wiki/MathLibraryTutorial).
 - [Switch statements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/switch)

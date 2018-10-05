@@ -2,11 +2,11 @@ import { Target } from "../../Target";
 import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
-import { LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial } from "../special";
+import { LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial, LuaFunctionSpecial } from "../special";
 import { Types } from "../../../transpiler/Types";
 import { LuaKeywords } from "../LuaKeywords";
 
-export interface LuaCallExpression extends BaseTarget, Target, LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial { }
+export interface LuaCallExpression extends BaseTarget, Target, LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial, LuaFunctionSpecial { }
 export class LuaCallExpression implements Partial<Target> {
 
     public transpileCallExpression(node: ts.CallExpression): string {
@@ -59,6 +59,8 @@ export class LuaCallExpression implements Partial<Target> {
             ownerNameCheck = "String";
         } else if (Types.isArray(owner, this.typeChecker)) {
             ownerNameCheck = "Array";
+        } else if (Types.isFunction(owner, this.typeChecker)) {
+            ownerNameCheck = "Function";
         } else if (Types.isObject(owner, this.typeChecker)) {
 
             // be sure to exclude object type special implementations
@@ -85,6 +87,8 @@ export class LuaCallExpression implements Partial<Target> {
                     }
                 }
                 break;
+            case "Function":
+                return this.transpileSpecialFunctionFunction(functionName, ownerName, node.arguments);
             case "String":
                 return this.transpileSpecialStringFunction(functionName, ownerName, node.arguments);
             case "Array":
