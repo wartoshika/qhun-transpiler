@@ -75,13 +75,47 @@ import { UnitTest } from "../../UnitTest";
                     obj.test("hello");
                 `,
                 expected: [
-                     "local fktn = function (arg1)",
-                     "end",
-                     "local obj = {test = fktn}",
-                     "obj.test(\"hello\")" 
+                    "local fktn = function (arg1)",
+                    "end",
+                    "local obj = {test = fktn}",
+                    "obj.test(\"hello\")"
                 ]
             }
         ])
+    }
+
+    @test "*.toString(...) calls"() {
+
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `
+                    const n: number = 10;
+                    const b = n.toString();
+                `,
+                expected: [
+                    "local n = 10",
+                    "local b = tostring(n)"
+                ]
+            }, {
+                code: `
+                    const n: number = 10;
+                    const b = n.toString(10);
+                `,
+                expected: [
+                    "local n = 10",
+                    `local b = string.format("%d", tostring(n))`
+                ]
+            }, {
+                code: `
+                    const n: number = 10;
+                    const b = n.toString(16);
+                `,
+                expected: [
+                    "local n = 10",
+                    `local b = string.format("%x", tostring(n))`
+                ]
+            }
+        ]);
     }
 
 }

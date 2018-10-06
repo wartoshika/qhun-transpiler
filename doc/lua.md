@@ -44,6 +44,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
     - [Function.bind()](https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Function/bind)
 - Builtin Math functions
     - The lua equivalent will be used. [See the lua documentation for more help](http://lua-users.org/wiki/MathLibraryTutorial).
+- Builtin `.toString(base?)` function with base 10, 16 and no given base support.
 - [Switch statements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/switch)
 - [If, else, elseif](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else)
 - [Try catch finally](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch)

@@ -54,6 +54,11 @@ export class LuaCallExpression implements Partial<Target> {
         const ownerName = this.transpileNode(owner);
         let ownerNameCheck = this.transpileNode(owner);
 
+        // check the generic toString(...) function
+        if (functionName === "toString") {
+            return this.transpileSpecialToStringFunction(ownerName, node.arguments);
+        }
+
         // preperation for calls like "test".replace() or [1,2].map()
         if (Types.isString(owner, this.typeChecker)) {
             ownerNameCheck = "String";
@@ -105,6 +110,31 @@ export class LuaCallExpression implements Partial<Target> {
 
         // use the default access pattern
         return `${ownerName}${hasThisParam ? "." : ":"}${functionName}(${params.join(", ")})`;
+    }
+
+    /**
+     * transpiles the special .toString() function
+     * @param owner the owner object
+     * @param arguments the arguments passed to the toString function
+     */
+    private transpileSpecialToStringFunction(owner: string, argStack: ts.NodeArray<ts.Expression>): string {
+
+        // no argument base check
+        if (argStack.length === 0) {
+            return `tostring(${owner})`;
+        }
+
+        // check argument stack wich base should be used
+        const base: number = parseInt(this.transpileNode(argStack[0]), 10);
+
+        switch (base) {
+            case 10:
+                return `string.format("%d", tostring(${owner}))`;
+            case 16:
+                return `string.format("%x", tostring(${owner}))`;
+            default:
+                throw new UnsupportedError(`The given toString base ${base} is unsupported!`, null);
+        }
     }
 
     /**
