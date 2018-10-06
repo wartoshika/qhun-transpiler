@@ -6,7 +6,11 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 
 - Nothing
 
-## Implemented but unreleased
+##  Implemented but unreleased
+
+- Nothing
+
+## **0.4.0** released 2018-10-06
 
 - Reflection for the lua and wow target
 - This arg support when declaring a function that has an explicit this arg.
