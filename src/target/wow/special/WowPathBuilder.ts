@@ -178,8 +178,6 @@ export class WowPathBuilder {
                 currentPath = currentPath.replace(tmpPath, tmpPath.substring(subIndexSrc));
             }
 
-            console.log(currentPath, currentPath.substring(subIndexSrc));
-
             return currentPath.replace(relevantPathFragment, existingModule);
         }
 
