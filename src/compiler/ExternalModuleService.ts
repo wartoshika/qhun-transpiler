@@ -19,9 +19,9 @@ export class ExternalModuleService {
 
     public static instance: ExternalModuleService;
 
-    public static getInstance(project?: Project): ExternalModuleService {
+    public static getInstance(): ExternalModuleService {
         if (!ExternalModuleService.instance) {
-            ExternalModuleService.instance = new ExternalModuleService(project);
+            ExternalModuleService.instance = new ExternalModuleService();
         }
         return ExternalModuleService.instance;
     }
@@ -33,9 +33,18 @@ export class ExternalModuleService {
      */
     private availableExternalModules: ExternalModuleContainer = {};
 
-    protected constructor(
-        private project: Project
-    ) { }
+    /**
+     * the project instance
+     */
+    private project: Project;
+
+    /**
+     * set the project var
+     * @param project the current project config
+     */
+    public setProject(project: Project): void {
+        this.project = project;
+    }
 
     /**
      * check if the given file belongs to an external module

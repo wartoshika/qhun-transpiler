@@ -3,6 +3,11 @@ import { Project } from "./Project";
 import * as path from "path";
 import { Config } from "./Config";
 import { StaticReflection } from "./StaticReflection";
+import { SupportedTargets, SupportedTargetConfig } from "../target/TargetFactory";
+import { DefaultConfigGetter } from "./DefaultConfigGetter";
+import { LuaDefaultConfig } from "../target/lua/LuaDefaultConfig";
+import { WowDefaultConfig } from "../target/wow/WowDefaultConfig";
+import { UnsupportedError } from "../error/UnsupportedError";
 
 export class DefaultConfig {
 
@@ -24,6 +29,15 @@ export class DefaultConfig {
 
         // config block defaults
         const configBlock: Partial<C> = givenProject.config || {};
+        const defaultConfigBlock = DefaultConfig.defaultConfigGetter(givenProject.target).getDefaultConfig();
+        Object.keys(defaultConfigBlock).forEach(key => {
+
+            if (typeof configBlock[key as keyof Partial<C>] === "undefined") {
+                configBlock[key as keyof Partial<C>] = defaultConfigBlock[key];
+            }
+        });
+
+        // add static reflection as global default
         configBlock.staticReflection = configBlock.staticReflection ? configBlock.staticReflection : StaticReflection.NONE;
 
         return {
@@ -45,5 +59,21 @@ export class DefaultConfig {
                 options: DefaultConfig.getDefaultCompilerOptions()
             }
         } as Project;
+    }
+
+    /**
+     * get the default config block entry for the given target
+     * @param target the target to get the getter class from
+     */
+    public static defaultConfigGetter<T extends keyof SupportedTargets>(target: T): DefaultConfigGetter<SupportedTargetConfig[T]> {
+
+        switch (target) {
+            case "lua":
+                return new LuaDefaultConfig() as DefaultConfigGetter<SupportedTargetConfig[T]>;
+            case "wow":
+                return new WowDefaultConfig() as DefaultConfigGetter<SupportedTargetConfig[T]>;
+            default:
+                throw new UnsupportedError(`A default config getter could not be found for the target ${target}`, null, true);
+        }
     }
 }

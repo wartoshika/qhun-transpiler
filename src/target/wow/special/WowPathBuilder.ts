@@ -20,7 +20,7 @@ export class WowPathBuilder {
      * @param addPrefix adds a project name based prefix to the path
      * @param addQuotes wrap the path with quotes, true by default
      */
-    public getFinalPath(sourceFile: SourceFile, givenPath: string, addPrefix: boolean = true, addQuotes: boolean = true): string {
+    public getFinalPath(sourceFile: SourceFile, givenPath: string, addPrefix: boolean = false, addQuotes: boolean = true): string {
 
         // remove given quotes if available
         let stripedPath = this.removeQuotes(givenPath);

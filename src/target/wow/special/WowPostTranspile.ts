@@ -5,10 +5,11 @@ import { WowPathBuilder } from "./WowPathBuilder";
 import { WowConfig } from "../WowConfig";
 import * as path from "path";
 import * as fs from "fs";
-import { WowKeywords } from "../WowKeywords";
 import { SourceFile } from "../../../compiler/SourceFile";
+import { WowGlobalLibrary } from "./WowGlobalLibrary";
+import { WowKeywords } from "../WowKeywords";
 
-export interface WowPostTranspile extends BaseTarget<WowConfig>, Target, WowPathBuilder { }
+export interface WowPostTranspile extends BaseTarget<WowConfig>, Target, WowPathBuilder, WowGlobalLibrary { }
 
 export class WowPostTranspile implements Partial<Target> {
 
@@ -63,15 +64,15 @@ export class WowPostTranspile implements Partial<Target> {
 
         // declare the lib content
         const libContent: string = [
-            `local ${WowKeywords.IMPORT_LIB_NAME} = {}`,
+            `local ${this.getGlobalLibraryVariableName()} = {}`,
             `local declareStack = {}`,
-            `function ${WowKeywords.IMPORT_LIB_NAME}.declare(name, content)`,
+            `function ${this.getGlobalLibraryVariableName()}.declare(name, content)`,
             this.addSpacesToString(`declareStack[name] = content`, 2),
             `end`,
-            `function ${WowKeywords.IMPORT_LIB_NAME}.get(name)`,
+            `function ${this.getGlobalLibraryVariableName()}.get(name)`,
             this.addSpacesToString(`return declareStack[name] or {}`, 2),
             `end`,
-            `_G.${WowKeywords.IMPORT_LIB_NAME} = ${WowKeywords.IMPORT_LIB_NAME}`
+            `_G.${this.getGlobalLibraryVariableName()} = ${this.getGlobalLibraryVariableName()}`
         ].join("\n");
 
         // build the target file path and write it

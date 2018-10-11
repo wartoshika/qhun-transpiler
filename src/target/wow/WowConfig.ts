@@ -34,4 +34,10 @@ export interface WowConfig extends LuaConfig {
      * all saved variables per character
      */
     savedVariablesPerCharacter: string[];
+
+    /**
+     * when true, the global __library object will be unique per addon
+     * @default: true
+     */
+    personalizedLibrary: boolean;
 }

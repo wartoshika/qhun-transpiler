@@ -28,7 +28,7 @@ export declare type TestCodeAndThrow = {
 
 export abstract class UnitTest extends Test {
 
-    protected runCodeAndExpectResult<K extends keyof SupportedTargets>(target: K, test: TestCodeAndResult, config?: SupportedTargetConfig[K]): void {
+    protected runCodeAndExpectResult<K extends keyof SupportedTargets>(target: K, test: TestCodeAndResult, config?: Partial<SupportedTargetConfig[K]>): void {
 
         test.forEach(oneCase => {
 

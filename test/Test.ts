@@ -47,7 +47,7 @@ export abstract class Test {
      * @param config the optional config used while transpiling
      * @param addDeclarations add declaration code into transpiling result
      */
-    protected transpile<K extends keyof SupportedTargets>(target: K, code: string, config?: SupportedTargetConfig[K], addDeclarations: boolean = false): string[] {
+    protected transpile<K extends keyof SupportedTargets>(target: K, code: string, config?: Partial<SupportedTargetConfig[K]>, addDeclarations: boolean = false): string[] {
 
         // build compiler host
         const compilerHost = {
@@ -74,7 +74,7 @@ export abstract class Test {
 
         // build program
         const program = ts.createProgram(["test.ts"], this.getCompilerOptions(), compilerHost);
-        this.lastProject = this.lastProject || this.getProject(target, config);
+        this.lastProject = this.getProject(target, config);
 
         // build target
         const targetFactory = new TargetFactory();

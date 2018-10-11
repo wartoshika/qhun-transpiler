@@ -3,7 +3,6 @@ import { Target } from "../Target";
 import { BaseTarget } from "../BaseTarget";
 import { use } from "typescript-mix";
 import * as wowTrait from "./traits";
-import { WowKeywords } from "./WowKeywords";
 import { LuaKeywords } from "../lua/LuaKeywords";
 import { WowConfig } from "./WowConfig";
 import { Project } from "../../config/Project";
@@ -26,7 +25,8 @@ export class WowTarget extends LuaTarget implements Target {
         wowTrait.WowImportDeclaration,
         // specials
         wowTrait.WowPathBuilder,
-        wowTrait.WowPostTranspile
+        wowTrait.WowPostTranspile,
+        wowTrait.WowGlobalLibrary
     ) protected this: WowTarget;
 
     /**
@@ -82,7 +82,7 @@ export class WowTarget extends LuaTarget implements Target {
             // the name of the exported module is a path, to the final result should
             // be an export of an import. transpile an import statement
             const importPath = this.getFinalPath(this.sourceFile as SourceFile, exp.name);
-            const importStatement = `${WowKeywords.IMPORT_LIB_NAME}.get(${importPath})`;
+            const importStatement = `${this.getGlobalLibraryVariableName()}.get(${importPath})`;
 
             return [
                 `for mod, data in pairs(${importStatement}) do`,
@@ -97,7 +97,7 @@ export class WowTarget extends LuaTarget implements Target {
         // return all including a final declare statement
         return [
             ...exportStack,
-            `${WowKeywords.IMPORT_LIB_NAME}.declare(${finalPath}, ${LuaKeywords.EXPORT_LOCAL_NAME})`
+            `${this.getGlobalLibraryVariableName()}.declare(${finalPath}, ${LuaKeywords.EXPORT_LOCAL_NAME})`
         ].join("\n");
     }
 

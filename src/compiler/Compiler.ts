@@ -32,7 +32,9 @@ export class Compiler {
         private project: Project
     ) {
 
-        this.externalModuleService = ExternalModuleService.getInstance(this.project);
+        // setup external module service
+        this.externalModuleService = ExternalModuleService.getInstance();
+        this.externalModuleService.setProject(this.project);
     }
 
     /**

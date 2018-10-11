@@ -23,9 +23,11 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                 `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
                 `  abc = abc`,
                 `}`,
-                `${WowKeywords.IMPORT_LIB_NAME}.declare("${this.lastProject.name}@test", ${LuaKeywords.EXPORT_LOCAL_NAME})`
+                `${WowKeywords.IMPORT_LIB_NAME}.declare("test", ${LuaKeywords.EXPORT_LOCAL_NAME})`
             ]
-        }]);
+        }], {
+                personalizedLibrary: false
+            });
     }
 
     @test "Namespace exports (export * from )"() {
@@ -35,11 +37,13 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
             expected: [
                 `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
                 `}`,
-                `for mod, data in pairs(${WowKeywords.IMPORT_LIB_NAME}.get("${this.lastProject.name}@a")) do`,
+                `for mod, data in pairs(${WowKeywords.IMPORT_LIB_NAME}.get("a")) do`,
                 `  ${LuaKeywords.EXPORT_LOCAL_NAME}[mod] = data`,
                 `end`,
-                `${WowKeywords.IMPORT_LIB_NAME}.declare("${this.lastProject.name}@test", ${LuaKeywords.EXPORT_LOCAL_NAME})`
+                `${WowKeywords.IMPORT_LIB_NAME}.declare("test", ${LuaKeywords.EXPORT_LOCAL_NAME})`
             ]
-        }]);
+        }], {
+                personalizedLibrary: false
+            });
     }
 }

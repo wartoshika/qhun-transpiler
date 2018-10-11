@@ -32,7 +32,8 @@ import { WowConfig } from "../../src/target/wow/WowConfig";
                     target: "wow",
                     config: {
                         visibleName: "name",
-                        interface: 12343
+                        interface: 12343,
+                        personalizedLibrary: false
                     }
                 }, {
                     "index.ts": indexTs,

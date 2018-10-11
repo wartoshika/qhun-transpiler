@@ -2,12 +2,11 @@ import { Target } from "../../Target";
 import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
-import { WowKeywords } from "../WowKeywords";
-import { WowPathBuilder } from "../special";
+import { WowPathBuilder, WowGlobalLibrary } from "../special";
 import { WowConfig } from "../WowConfig";
 import { SourceFile } from "../../../compiler/SourceFile";
 
-export interface WowImportDeclaration extends BaseTarget<WowConfig>, Target, WowPathBuilder { }
+export interface WowImportDeclaration extends BaseTarget<WowConfig>, Target, WowPathBuilder, WowGlobalLibrary { }
 
 export class WowImportDeclaration implements Partial<Target> {
 
@@ -40,7 +39,7 @@ export class WowImportDeclaration implements Partial<Target> {
                     const moduleName = element.propertyName ? this.transpileNode(element.propertyName) : givenName;
 
                     // build the import
-                    return `local ${givenName} = ${WowKeywords.IMPORT_LIB_NAME}.get(${finalPath}).${moduleName}`;
+                    return `local ${givenName} = ${this.getGlobalLibraryVariableName()}.get(${finalPath}).${moduleName}`;
                 });
             } else if (ts.isNamespaceImport(imports)) {
 
@@ -48,7 +47,7 @@ export class WowImportDeclaration implements Partial<Target> {
                 const givenName = this.transpileNode(imports.name);
 
                 importedElements = [
-                    `local ${givenName} = ${WowKeywords.IMPORT_LIB_NAME}.get(${finalPath})`
+                    `local ${givenName} = ${this.getGlobalLibraryVariableName()}.get(${finalPath})`
                 ];
             } else {
                 // unsupported import type

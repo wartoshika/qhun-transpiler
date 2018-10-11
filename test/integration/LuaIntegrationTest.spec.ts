@@ -43,7 +43,7 @@ import { IntegrationTestBase } from "./IntegrationTestBase";
         expect(fs.existsSync("dist/index.lua")).to.be.true;
         expect(fs.existsSync("dist/a.lua")).to.be.true;
         expect(fs.existsSync("dist/b.lua")).to.be.true;
-        expect(fs.existsSync("dist/c.lua")).to.be.true
+        expect(fs.existsSync("dist/c.lua")).to.be.true;
     }
 
     @test "Transpile using ArgumentReader"() {
