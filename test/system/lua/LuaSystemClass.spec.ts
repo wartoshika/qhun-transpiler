@@ -175,4 +175,15 @@ import { LuaSystemTestBase } from "./LuaSystemTestBase";
             12, 3, 4
         ]);
     }
+
+    @test "Escape sequences in strings"() {
+
+        const tsCode = `
+            return "A\\b";
+        `;
+
+        expect(this.getLuaParseResult(tsCode)).to.deep.equal([
+            "A\\b"
+        ]);
+    }
 }

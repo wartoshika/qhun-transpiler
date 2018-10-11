@@ -8,7 +8,7 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 
 ##  Implemented but unreleased
 
-- Nothing
+- Added the possability to add external node_modules sources as embeded dependency (targets: lua, wow)
 
 ## **0.4.0** released 2018-10-06
 

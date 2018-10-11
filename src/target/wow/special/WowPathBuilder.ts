@@ -3,6 +3,8 @@ import { Target } from "../../Target";
 import * as path from "path";
 import * as fs from "fs";
 import { WowConfig } from "../WowConfig";
+import { SourceFile } from "../../../compiler/SourceFile";
+import { ExternalModuleService } from "../../../compiler/ExternalModuleService";
 
 export interface WowPathBuilder extends BaseTarget<WowConfig>, Target { }
 
@@ -13,11 +15,12 @@ export class WowPathBuilder {
 
     /**
      * builds the final path for import and exports relative to the project root
+     * @param sourceFile the related sourcefile
      * @param givenPath the given path of the required file relative to the current source file
      * @param addPrefix adds a project name based prefix to the path
      * @param addQuotes wrap the path with quotes, true by default
      */
-    public getFinalPath(givenPath: string, addPrefix: boolean = true, addQuotes: boolean = true): string {
+    public getFinalPath(sourceFile: SourceFile, givenPath: string, addPrefix: boolean = true, addQuotes: boolean = true): string {
 
         // remove given quotes if available
         let stripedPath = this.removeQuotes(givenPath);
@@ -31,7 +34,23 @@ export class WowPathBuilder {
         const relativePath = this.getRelativeFilePath(stripedPath);
 
         // construct the new path
-        let finalPath = `${relativePath}`;
+        let finalPath = relativePath;
+
+        // check if the requesting file is external
+        if (sourceFile.isExternal) {
+
+            // transform the path by removing the filesystem external path indicator
+            finalPath = finalPath.replace(sourceFile.externalNodeModulesPath, "");
+
+            // prefix the path with the module name and the external folder name
+            finalPath = ExternalModuleService.EXTERNAL_FOLDER_NAME + sourceFile.externalModuleName + finalPath;
+        } else {
+
+            // replace the module root path with an external indicator
+            // when the requested file is an internal file, the replacement
+            // fill not change anything
+            finalPath = this.replaceExternalModuleRequest(finalPath);
+        }
 
         // check for prefix adding
         if (addPrefix) {
@@ -106,5 +125,65 @@ export class WowPathBuilder {
             .replace(this.project.stripOutDir ? this.project.stripOutDir + "/" : "", "")
             // replace trailing ts extension if available
             .replace(/\.tsx?$/, "");
+    }
+
+    /**
+     * searches for available external modules in the current path and replaces them with
+     * its new external path
+     * @param currentPath the current build path
+     */
+    private replaceExternalModuleRequest(currentPath: string): string {
+
+        // get instance of the external module service
+        const externalModuleService = ExternalModuleService.getInstance();
+        const existingExternalModules = externalModuleService.getAvailableExternalModules();
+
+        // get all path fragments
+        let existingModule: string = "";
+        let relevantPathFragment: string = "";
+        externalModuleService.getPathFragments(currentPath).some(fragment => {
+
+            // remove trailing /
+            fragment = fragment.replace(/\/$/, "");
+
+            if (existingExternalModules[fragment]) {
+                existingModule = existingExternalModules[fragment];
+                relevantPathFragment = fragment;
+                return true;
+            }
+
+            return false;
+        });
+
+        // if the requested file is part of an external module, replace the relevant path
+        if (existingModule) {
+
+            // first remove the fragment and search for an existing src like folder that needs
+            // to be removed due to the stripOutDir property in the transpiler config
+            const tmpPath = currentPath.replace(relevantPathFragment, "");
+            let subIndexSrc: number = 0;
+            if (tmpPath.indexOf("src") === 0 || tmpPath.indexOf("/src") === 0) {
+
+                // remove that src folder from the path
+                let tmpSubIndexSrc = tmpPath.indexOf("src/");
+                if (tmpSubIndexSrc >= 0) {
+
+                    // add src/ path
+                    tmpSubIndexSrc += 3;
+
+                    // set the sub index
+                    subIndexSrc = tmpSubIndexSrc;
+                }
+
+                currentPath = currentPath.replace(tmpPath, tmpPath.substring(subIndexSrc));
+            }
+
+            console.log(currentPath, currentPath.substring(subIndexSrc));
+
+            return currentPath.replace(relevantPathFragment, existingModule);
+        }
+
+        // requested file is internal, dont corrupt the path
+        return currentPath;
     }
 }

@@ -5,6 +5,7 @@ import { UnsupportedError } from "../../../error/UnsupportedError";
 import { WowKeywords } from "../WowKeywords";
 import { WowPathBuilder } from "../special";
 import { WowConfig } from "../WowConfig";
+import { SourceFile } from "../../../compiler/SourceFile";
 
 export interface WowImportDeclaration extends BaseTarget<WowConfig>, Target, WowPathBuilder { }
 
@@ -14,7 +15,7 @@ export class WowImportDeclaration implements Partial<Target> {
 
         // get the path of the module
         const path = this.transpileNode(node.moduleSpecifier);
-        const finalPath = this.getFinalPath(path);
+        const finalPath = this.getFinalPath(node.getSourceFile() as SourceFile, path);
 
         // get imported elements
         let importedElements: string[] = [];

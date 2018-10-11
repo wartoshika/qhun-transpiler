@@ -21,4 +21,9 @@ export interface Project<C = Config> extends JsonConfig<C> {
      * the root dir of the project. this must be absolute!
      */
     rootDir: string;
+
+    /**
+     * when true, every file will be treated as internal file
+     */
+    skipExternalModuleCheck: boolean;
 }

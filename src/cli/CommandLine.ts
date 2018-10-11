@@ -9,6 +9,7 @@ import { ArgumentReader } from "../config/argument/ArgumentReader";
 import { Compiler } from "../compiler/Compiler";
 import { CommandLineColors } from "./CommandLineColors";
 import { ValidationError } from "../error/ValidationError";
+import { ExternalModuleService } from "../compiler/ExternalModuleService";
 
 // tslint:disable-next-line
 const packageJson = require("../../package.json");
@@ -168,6 +169,18 @@ export class CommandLine {
     private printResult(result: number | boolean): void {
 
         if (typeof result === "number") {
+
+            // print the embeded external modules
+            const externalModuleService = ExternalModuleService.getInstance();
+            const embededModules = Object.keys(externalModuleService.getAvailableExternalModules());
+
+            // only print something about external modules when some are referenced
+            if (embededModules.length > 0) {
+                embededModules.forEach(moduleName => {
+                    console.log(`${CommandLineColors.GREEN}%s${CommandLineColors.RESET}`, `Added ${moduleName} as external module.`);
+                });
+            }
+
             console.log(`${CommandLineColors.GREEN}%s${CommandLineColors.RESET}`, `Successfully transpiled ${result} files.`);
         } else {
             console.log(`${CommandLineColors.RED}%s${CommandLineColors.RESET}`, `An error occured while transpiling your files.`);

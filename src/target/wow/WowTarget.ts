@@ -7,6 +7,7 @@ import { WowKeywords } from "./WowKeywords";
 import { LuaKeywords } from "../lua/LuaKeywords";
 import { WowConfig } from "./WowConfig";
 import { Project } from "../../config/Project";
+import { SourceFile } from "../../compiler/SourceFile";
 
 export interface WowTarget extends BaseTarget<WowConfig>, Target, wowTrait.WowDeclarations, wowTrait.WowSpecial { }
 
@@ -80,7 +81,7 @@ export class WowTarget extends LuaTarget implements Target {
 
             // the name of the exported module is a path, to the final result should
             // be an export of an import. transpile an import statement
-            const importPath = this.getFinalPath(exp.name);
+            const importPath = this.getFinalPath(this.sourceFile as SourceFile, exp.name);
             const importStatement = `${WowKeywords.IMPORT_LIB_NAME}.get(${importPath})`;
 
             return [
@@ -91,7 +92,7 @@ export class WowTarget extends LuaTarget implements Target {
         }));
 
         // get the relative source file path
-        const finalPath = this.getFinalPath(this.sourceFile.fileName);
+        const finalPath = this.getFinalPath(this.sourceFile as SourceFile, this.sourceFile.fileName);
 
         // return all including a final declare statement
         return [

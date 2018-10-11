@@ -37,8 +37,9 @@ export class DefaultConfig {
             tsconfig: givenProject.tsconfig ? givenProject.tsconfig : "./tsconfig.json",
             printFileHeader: typeof givenProject.printFileHeader === "boolean" ? givenProject.printFileHeader : true,
             config: configBlock,
-            stripOutDir: givenProject.stripOutDir ? givenProject.stripOutDir : "",
+            stripOutDir: givenProject.stripOutDir ? givenProject.stripOutDir : "src",
             rootDir: givenProject.rootDir ? givenProject.rootDir : path.resolve("."),
+            skipExternalModuleCheck: typeof givenProject.skipExternalModuleCheck === "boolean" ? givenProject.skipExternalModuleCheck : false,
             parsedCommandLine: givenProject.parsedCommandLine ? givenProject.parsedCommandLine : {
                 fileNames: [],
                 options: DefaultConfig.getDefaultCompilerOptions()

@@ -1,11 +1,11 @@
-import * as ts from "typescript";
+import { SourceFile } from "./SourceFile";
 
 export interface CompilerWrittenFile {
 
     /**
      * the source file
      */
-    sourcefile: ts.SourceFile;
+    sourcefile: SourceFile;
 
     /**
      * the absolute path of the generated file

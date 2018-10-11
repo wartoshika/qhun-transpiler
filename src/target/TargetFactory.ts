@@ -5,6 +5,7 @@ import { Project } from "../config/Project";
 import * as ts from "typescript";
 import { LuaConfig } from "./lua/LuaConfig";
 import { WowConfig } from "./wow/WowConfig";
+import { SourceFile } from "../compiler/SourceFile";
 
 export declare type SupportedTargets = {
     lua: LuaTarget,
@@ -43,7 +44,7 @@ export class TargetFactory {
         target: T,
         project: Project,
         typeChecker: ts.TypeChecker,
-        sourceFile: ts.SourceFile
+        sourceFile: SourceFile
     ): SupportedTargets[T] {
 
         return new TargetFactory.supportedTargets[target](project, typeChecker, sourceFile);

@@ -6,6 +6,7 @@ import { WowConfig } from "../WowConfig";
 import * as path from "path";
 import * as fs from "fs";
 import { WowKeywords } from "../WowKeywords";
+import { SourceFile } from "../../../compiler/SourceFile";
 
 export interface WowPostTranspile extends BaseTarget<WowConfig>, Target, WowPathBuilder { }
 
@@ -17,7 +18,7 @@ export class WowPostTranspile implements Partial<Target> {
         const tocFileNames = files.map(file => {
 
             // get the relative  file path
-            const relativePath = this.getFinalPath(file.sourcefile.fileName, false, false);
+            const relativePath = this.getFinalPath(file.sourcefile as SourceFile, file.sourcefile.fileName, false, false);
 
             // append the file extension suffix
             return `${relativePath}.${this.getFileExtension()}`;

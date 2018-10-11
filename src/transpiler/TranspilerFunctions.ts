@@ -13,6 +13,7 @@ export class TranspilerFunctions {
             .replace(/\n/g, "\\n")
             .replace(/\r/g, "\\r")
             .replace(/\t/g, "\\t");
+
     }
 
     /**

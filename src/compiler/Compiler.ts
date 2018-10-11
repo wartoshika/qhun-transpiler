@@ -1,15 +1,17 @@
-import { Project } from "../config/Project";
+import * as path from "path";
+import * as fs from "fs";
+import * as mkdirp from "mkdirp";
 import * as ts from "typescript";
+
+import { Project } from "../config/Project";
 import { TargetFactory } from "../target/TargetFactory";
 import { Transpiler } from "../transpiler/Transpiler";
 import { CompilerWrittenFile } from "./CompilerWrittenFile";
 import { Target } from "../target/Target";
 import { TranspilerFunctions } from "../transpiler/TranspilerFunctions";
 import { ErrorWithNode } from "../error/ErrorWithNode";
-
-import * as path from "path";
-import * as fs from "fs";
-import * as mkdirp from "mkdirp";
+import { ExternalModuleService } from "./ExternalModuleService";
+import { SourceFile } from "./SourceFile";
 
 export class Compiler {
 
@@ -19,11 +21,19 @@ export class Compiler {
     private writtenFileStack: CompilerWrittenFile[] = [];
 
     /**
+     * the external module service instance
+     */
+    private externalModuleService: ExternalModuleService;
+
+    /**
      * @param project the project configuration
      */
     constructor(
         private project: Project
-    ) { }
+    ) {
+
+        this.externalModuleService = ExternalModuleService.getInstance(this.project);
+    }
 
     /**
      * compiles the given files and transpiles them into the target language
@@ -43,7 +53,15 @@ export class Compiler {
 
         // iterate over every source file
         try {
-            program.getSourceFiles().filter(file => !file.isDeclarationFile).forEach(sourceFile => {
+
+            // analyze all source files and detect external modules
+            this.externalModuleService.analyseSourceFilesAndCastToSourceFile(
+
+                // analyse all program sourcefiles
+                program.getSourceFiles()
+                    // that are not declaration files
+                    .filter(file => !file.isDeclarationFile)
+            ).forEach(sourceFile => {
 
                 // create the transpiler
                 const target = targetFactory.create(this.project.target, this.project, typeChecker, sourceFile);
@@ -65,9 +83,14 @@ export class Compiler {
             });
 
             // run post project transpile
-            if (lastTarget.postProjectTranspile(this.writtenFileStack)) {
+            if (lastTarget && lastTarget.postProjectTranspile(this.writtenFileStack)) {
 
                 return this.writtenFileStack.length;
+            } else if (!lastTarget) {
+
+                // no error has been thrown and no last target available,
+                // means that no files were transpiled.
+                return 0;
             }
 
         } catch (e) {
@@ -114,9 +137,10 @@ export class Compiler {
      * @param transpiled the transpiled source code
      * @param extension the target file extension
      */
-    private writeDestinationFile(sourcefile: ts.SourceFile, transpiled: string, extension: string): void {
+    private writeDestinationFile(sourcefile: SourceFile, transpiled: string, extension: string): void {
 
-        const filePath = path.resolve(sourcefile.fileName);
+        // use the transpiler file name to make sure that external modules are written to the correct path
+        const filePath = path.resolve(sourcefile.transpilerFileName);
 
         // remove the cwd from the file path
         const partOfFilePath = filePath.replace(this.project.rootDir, "");

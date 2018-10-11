@@ -37,6 +37,7 @@ export class ArgumentReader implements Reader {
             target: this.args.target,
             rootDir: path.dirname(path.resolve(this.args.file)),
             outDir: ".",
+            skipExternalModuleCheck: true,
             parsedCommandLine: {
                 fileNames: [
                     this.args.file

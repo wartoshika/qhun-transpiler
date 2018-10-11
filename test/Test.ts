@@ -7,6 +7,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Target } from "../src/target/Target";
 import { DefaultConfig } from "../src/config/DefaultConfig";
+import { SourceFile } from "../src/compiler/SourceFile";
 
 const libSource = fs.readFileSync(path.join(path.dirname(require.resolve("typescript")), "lib.es6.d.ts")).toString();
 
@@ -77,7 +78,7 @@ export abstract class Test {
 
         // build target
         const targetFactory = new TargetFactory();
-        const targetTranspiler = targetFactory.create(target, this.lastProject, program.getTypeChecker(), program.getSourceFile("test.ts"));
+        const targetTranspiler = targetFactory.create(target, this.lastProject, program.getTypeChecker(), program.getSourceFile("test.ts") as SourceFile);
         this.lastTarget = targetTranspiler;
 
         // build transpiler
