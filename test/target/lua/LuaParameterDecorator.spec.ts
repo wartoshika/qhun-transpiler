@@ -18,22 +18,25 @@ import { UnitTest } from "../../UnitTest";
                 a.b();
             `,
             expected: [
-                 "local a = {}",
-                 "a.__index = a",
-                 "function a.__new(self, ...)",
-                 "  local instance = setmetatable({}, a)",
-                 "  if self and a.__init then",
-                 "    a.__init(instance, ...)",
-                 "  end",
-                 "  return instance",
-                 "end",
-                 "function a.__init(self)",
-                 "end",
-                 "function a.b(self, arg1, arg2)",
-                 "  arg1 = Test(self, \"b\", 0)",
-                 "  arg2 = Test(\"c\")(self, \"b\", 1)",
-                 "end",
-                 "a:b()"
+                "local a = {}",
+                "a.__index = a",
+                "function a.__new(self, ...)",
+                "  local instance = setmetatable({}, a)",
+                "  if self and a.__prepareNonStatic then",
+                "    a.__prepareNonStatic(instance)",
+                "  end",
+                "  if self and a.__init then",
+                "    a.__init(instance, ...)",
+                "  end",
+                "  return instance",
+                "end",
+                "function a.__init(self)",
+                "end",
+                "function a.b(self, arg1, arg2)",
+                "  arg1 = Test(self, \"b\", 0)",
+                "  arg2 = Test(\"c\")(self, \"b\", 1)",
+                "end",
+                "a:b()"
             ]
         }])
     }

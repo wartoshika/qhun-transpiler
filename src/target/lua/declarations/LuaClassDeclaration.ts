@@ -100,15 +100,8 @@ export class LuaClassDeclaration implements Partial<Target> {
 
         // add static class initializer function
         classHead.push(...[
-            `function ${className}.${LuaKeywords.CLASS_NEW_FUNCTION_NAME}(self, ...)`,
+            `function ${className}.${LuaKeywords.CLASS_NEW_FUNCTION_NAME}(${LuaKeywords.CLASS_THIS_KEYWORD}, ...)`,
             this.addSpacesToString(`local ${LuaKeywords.CLASS_INSTANCE_LOCAL_NAME} = setmetatable({}, ${className})`, 2),
-            // add non static properties
-            this.addSpacesToString(
-                nonStaticInitProperties.map(p => {
-                    const propertyName = this.transpileNode(p.name);
-                    const initializer = this.transpileNode(p.initializer);
-                    return `${LuaKeywords.CLASS_INSTANCE_LOCAL_NAME}.${propertyName} = ${initializer}`;
-                }).join("\n"), 2),
             // add property decorators
             this.addSpacesToString(node.members
                 .filter(ts.isPropertyDeclaration)
@@ -116,14 +109,33 @@ export class LuaClassDeclaration implements Partial<Target> {
                 .map(dec => this.transpilePropertyDecorator(dec))
                 .filter(dec => !!dec)
                 .join("\n"), 2),
+            // add prepare non static function
+            this.addSpacesToString(`if ${LuaKeywords.CLASS_THIS_KEYWORD} and ${className}.${LuaKeywords.CLASS_PREPARE_NON_STATIC} then`, 2),
+            this.addSpacesToString(`${className}.${LuaKeywords.CLASS_PREPARE_NON_STATIC}(${LuaKeywords.CLASS_INSTANCE_LOCAL_NAME})`, 4),
+            this.addSpacesToString(`end`, 2),
             // add the constructor call
-            this.addSpacesToString(`if self and ${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME} then`, 2),
+            this.addSpacesToString(`if ${LuaKeywords.CLASS_THIS_KEYWORD} and ${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME} then`, 2),
             this.addSpacesToString(`${className}.${LuaKeywords.CLASS_INIT_FUNCTION_NAME}(${LuaKeywords.CLASS_INSTANCE_LOCAL_NAME}, ...)`, 4),
             this.addSpacesToString(`end`, 2),
             // return the constructed instance
             this.addSpacesToString(`return ${LuaKeywords.CLASS_INSTANCE_LOCAL_NAME}`, 2),
             `end`
         ]);
+
+        // add non static initializer function
+        if (nonStaticInitProperties.length > 0) {
+            classHead.push(...[
+                `function ${className}.${LuaKeywords.CLASS_PREPARE_NON_STATIC}(${LuaKeywords.CLASS_THIS_KEYWORD})`,
+                // add non static properties
+                this.addSpacesToString(
+                    nonStaticInitProperties.map(p => {
+                        const propertyName = this.transpileNode(p.name);
+                        const initializer = this.transpileNode(p.initializer);
+                        return `${LuaKeywords.CLASS_THIS_KEYWORD}.${propertyName} = ${initializer}`;
+                    }).join("\n"), 2),
+                `end`
+            ]);
+        }
 
         return this.removeEmptyLines(classHead.join("\n"));
     }
@@ -173,9 +185,9 @@ export class LuaClassDeclaration implements Partial<Target> {
                 name = `${className}.${this.transpileNode(method.name)}`;
             }
 
-            // add the self parameter
+            // add the ${LuaKeywords.CLASS_THIS_KEYWORD} parameter
             const parameters: ts.ParameterDeclaration[] = [
-                ts.createParameter([], [], null, "self")
+                ts.createParameter([], [], null, LuaKeywords.CLASS_THIS_KEYWORD)
             ];
             method.parameters.forEach(param => {
                 parameters.push(param);
