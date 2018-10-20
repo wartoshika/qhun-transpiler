@@ -37,7 +37,7 @@ There are two possible ways of transpiling your sourcecode into other languages.
 
 The `qhun-transpiler.json` file must have the following structure:
 
-```json
+```js
 {
     "name": "The name of your program/project",
     "version": "The version number as string of your program/project",

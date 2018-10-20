@@ -100,10 +100,17 @@ local function myOtherFunc()
     return a
 end
 ```
-5. Lua does not know about `Arrays`. But there are object wich can have a number based index. An array is transpiled into object without any key. See some examples:
-```ts
-const myArray = [1,2,3];
-```
+
+5. Lua has no type reference to variables. But there is some kind of static reflection added at compiling time. Currently the following reflections are available via Bitop flag in the `qhun-transpiler.json` config entry `staticReflection`:
+
+| Number | Result |
+| --- | --- |
+| 0 | No reflection at all |
+| 1 | Class constructor signature analysis is written to `constructor.__staticReflection` |
+| 2 | Class name is written to `constructor.__name` |
+| 4 | Class namespace or folder path is written to `constructor.__namespace` |
+
+**Usage:** Sum up the required reflection options and put the result in the json file. E.g: `1 (constructor signature) + 4 (class namespace) = 5` The number `5` will enable both selected features. In this example no class name is written into the transpiled file.
 
 ## Config block
 
