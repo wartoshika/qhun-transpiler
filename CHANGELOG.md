@@ -15,6 +15,7 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 - Added namespace reflection to adress the origin path of the file relative to its project root at compile time
 - [Wow target] Added a preprocessor function to dynamicly require files by its namespace and class name
 - [Wow target] Added a file meta var to get vararg values like addon name. Variable name is __FILE_META
+- Added an api folder that contains transpiler specific preprocessor functions and may contain future api files to the transpiler
 
 ## **0.4.0** released 2018-10-06
 
