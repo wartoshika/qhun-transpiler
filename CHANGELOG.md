@@ -8,7 +8,7 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 
 ##  Implemented but unreleased
 
-- Nothing
+- Fixed a bug in lua and wow target that causes string literals in an object context to be generated without the nessesary computed property wrapper brackets.
 
 ##  **0.5.0** released 2018-10-20
 

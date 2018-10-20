@@ -77,4 +77,23 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
             }
         ]);
     }
+
+    @test "object key is a string literal"() {
+
+        this.runCodeAndExpectResult("lua", [{
+            code: `
+                const a = {
+                    "test.test": 1,
+                    "test.other": 2,
+                    last: 3
+                }
+
+                const c = a["test.test"];
+            `,
+            expected: [
+                "local a = {[\"test.test\"] = 1, [\"test.other\"] = 2, last = 3}",
+                "local c = a[\"test.test\"]"
+            ]
+        }])
+    }
 }

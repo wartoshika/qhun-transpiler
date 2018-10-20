@@ -12,14 +12,22 @@ export class LuaObjectLiteralExpression implements Partial<Target> {
         const propertyStack: string[] = [];
         node.properties.forEach(property => {
 
-            const nameOrKey = this.transpileNode(property.name);
+            let nameOrKey = this.transpileNode(property.name);
             let initializer: string = "";
 
             // check if there is an initializer
             if (ts.isPropertyAssignment(property)) {
                 initializer = this.transpileNode(property.initializer);
+
             } else {
                 throw new UnsupportedError(`ObjectLiterals Element ${ts.SyntaxKind[property.kind]} is unsupported!`, property);
+            }
+
+            // if the initializer was a string literal, add computed property brackets
+            // because lua does not unterstand {"test" = 1}
+            if (ts.isStringLiteral(property.name)) {
+
+                nameOrKey = this.transpileComputedPropertyName(ts.createComputedPropertyName(property.name));
             }
 
             // add the property
