@@ -9,8 +9,12 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 ##  Implemented but unreleased
 
 - Added the possability to add external node_modules sources as embeded dependency (targets: lua, wow)
-- Wow target: Global __library var is now unique per addon to allow multiple addons that uses qhun-transpiler for ts->lua transpiling
+- [Wow target] Global __library var is now unique per addon to allow multiple addons that uses qhun-transpiler for ts->lua transpiling
 - Fixed a bug where non static properties in classes using the this keyword outside of functions breaks because of the non existing self var
+- Fixed a bug in the wow post transpiling process where saved variables were not added to the toc file
+- Added namespace reflection to adress the origin path of the file relative to its project root at compile time
+- [Wow target] Added a preprocessor function to dynamicly require files by its namespace and class name
+- [Wow target] Added a file meta var to get vararg values like addon name. Variable name is __FILE_META
 
 ## **0.4.0** released 2018-10-06
 

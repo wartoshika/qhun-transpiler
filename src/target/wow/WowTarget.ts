@@ -7,8 +7,9 @@ import { LuaKeywords } from "../lua/LuaKeywords";
 import { WowConfig } from "./WowConfig";
 import { Project } from "../../config/Project";
 import { SourceFile } from "../../compiler/SourceFile";
+import { WowKeywords } from "./WowKeywords";
 
-export interface WowTarget extends BaseTarget<WowConfig>, Target, wowTrait.WowDeclarations, wowTrait.WowSpecial { }
+export interface WowTarget extends BaseTarget<WowConfig>, Target, wowTrait.WowDeclarations, wowTrait.WowSpecial, wowTrait.WowCallExpression { }
 
 /**
  * the wow target
@@ -21,13 +22,24 @@ export class WowTarget extends LuaTarget implements Target {
     protected project: Project<WowConfig>;
 
     @use(
+        // call expressions overrides
+        wowTrait.WowCallExpression,
         // declaration overrides
         wowTrait.WowImportDeclaration,
+        wowTrait.WowClassDeclaration,
         // specials
         wowTrait.WowPathBuilder,
         wowTrait.WowPostTranspile,
         wowTrait.WowGlobalLibrary
     ) protected this: WowTarget;
+
+    /**
+     * @Override LuaTarget.preTranspile()
+     */
+    public preTranspile(): string | void {
+
+        return `local ${WowKeywords.FILE_META_VARIABLE} = {...}\n`;
+    }
 
     /**
      * @override LuaTarget.postTranspile()

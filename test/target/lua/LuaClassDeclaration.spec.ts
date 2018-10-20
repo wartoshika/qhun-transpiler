@@ -174,4 +174,32 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
         }]);
     }
 
+    @test "Static properties in a class context"() {
+
+        this.runCodeAndExpectResult("lua", [{
+            code: `
+                class A {
+                    public static TEST: string = "hello world";
+                }
+            `,
+            expected: [
+                "local A = {}",
+                "A.__index = A",
+                "A.TEST = \"hello world\"",
+                "function A.__new(self, ...)",
+                "  local instance = setmetatable({}, A)",
+                "  if self and A.__prepareNonStatic then",
+                "    A.__prepareNonStatic(instance)",
+                "  end",
+                "  if self and A.__init then",
+                "    A.__init(instance, ...)",
+                "  end",
+                "  return instance",
+                "end",
+                "function A.__init(self)",
+                "end"
+            ]
+        }])
+    }
+
 }

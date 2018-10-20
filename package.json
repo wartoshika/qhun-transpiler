@@ -3,6 +3,7 @@
   "version": "0.4.0",
   "description": "A command line tool to transpiles a Typescript project into supported other languages.",
   "main": "dist/index.js",
+  "types": "dist/api/main.d.ts",
   "bin": {
     "qhun-transpiler": "./dist/bin/qhun-transpiler.js"
   },
@@ -16,8 +17,9 @@
     "coverage": "./node_modules/.bin/nyc ./node_modules/.bin/mocha -r ts-node/register \"test/**/*.spec.ts\"",
     "coverage:send:coveralls": "nyc report --reporter=text-lcov | coveralls",
     "build-ts": "./node_modules/.bin/tsc",
+    "build-api": "./node_modules/.bin/copyfiles -f \"./src/api/**/*.d.ts\" \"./dist/api\"",
     "build-bundle": "./node_modules/.bin/webpack --config ./webpack.config.js",
-    "build": "./node_modules/.bin/npm-run-all build-ts build-bundle",
+    "build": "./node_modules/.bin/npm-run-all build-ts build-api build-bundle",
     "run-ts": "./node_modules/.bin/ts-node src/index.ts",
     "postversion": "git push --follow-tags"
   },
@@ -32,6 +34,7 @@
     "@types/mock-fs": "^3.6.30",
     "@types/node": "^10.5.2",
     "chai": "^4.1.2",
+    "copyfiles": "^2.1.0",
     "coveralls": "^3.0.2",
     "file-loader": "^2.0.0",
     "istanbul": "^0.4.5",

@@ -12,6 +12,10 @@ import { TranspilerFunctions } from "../transpiler/TranspilerFunctions";
 import { ErrorWithNode } from "../error/ErrorWithNode";
 import { ExternalModuleService } from "./ExternalModuleService";
 import { SourceFile } from "./SourceFile";
+import { QhunTranspilerMetadata } from "../target/QhunTranspilerMetadata";
+
+// tslint:disable-next-line
+const packageJson = require("../../package.json");
 
 export class Compiler {
 
@@ -52,6 +56,7 @@ export class Compiler {
         const targetFactory = new TargetFactory();
         let lastSourceFile: ts.SourceFile;
         let lastTarget: Target;
+        const transpilerMetadata: QhunTranspilerMetadata = this.getMetadata();
 
         // iterate over every source file
         try {
@@ -66,7 +71,7 @@ export class Compiler {
             ).forEach(sourceFile => {
 
                 // create the transpiler
-                const target = targetFactory.create(this.project.target, this.project, typeChecker, sourceFile);
+                const target = targetFactory.create(this.project.target, this.project, typeChecker, sourceFile, transpilerMetadata);
                 const extension = target.getFileExtension();
                 const transpiler = new Transpiler(target);
 
@@ -164,5 +169,15 @@ export class Compiler {
             sourcefile,
             generatedFileName: destinationFileName
         });
+    }
+
+    /**
+     * get the current transpiler metadata
+     */
+    private getMetadata(): QhunTranspilerMetadata {
+
+        return {
+            version: packageJson.version
+        };
     }
 }

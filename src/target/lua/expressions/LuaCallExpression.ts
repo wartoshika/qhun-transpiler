@@ -5,6 +5,7 @@ import { UnsupportedError } from "../../../error/UnsupportedError";
 import { LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial, LuaFunctionSpecial } from "../special";
 import { Types } from "../../../transpiler/Types";
 import { LuaKeywords } from "../LuaKeywords";
+import { PreProcessorFunction } from "../../../compiler/PreProcessor";
 
 export interface LuaCallExpression extends BaseTarget, Target, LuaArraySpecial, LuaObjectSpecial, LuaStringSpecial, LuaMathSpecial, LuaFunctionSpecial { }
 export class LuaCallExpression implements Partial<Target> {
@@ -29,6 +30,11 @@ export class LuaCallExpression implements Partial<Target> {
 
             // normal funcion call.
             base = this.transpileNode(node.expression);
+
+            // check for preprocessor function
+            if (Object.keys(PreProcessorFunction).indexOf(base) >= 0) {
+                return this.transpilePreprocessorCallExpression(node, base);
+            }
         }
 
         // transpile params
@@ -36,6 +42,16 @@ export class LuaCallExpression implements Partial<Target> {
 
         // put everything together
         return `${base}(${params.join(", ")})`;
+    }
+
+    /**
+     * transpiles a preprocessor call expression
+     * @param node the call expression to transpile
+     * @param fktnName the preprocessor function name
+     */
+    public transpilePreprocessorCallExpression(node: ts.CallExpression, fktnName: string): string {
+
+        throw new UnsupportedError(`Given PreProcessor function ${fktnName} is not supported on target lua`, node);
     }
 
     /**

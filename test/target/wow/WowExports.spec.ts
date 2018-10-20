@@ -18,6 +18,7 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
         this.runCodeAndExpectResult("wow", [{
             code: `export function abc() {}`,
             expected: [
+                `local __FILE_META = {...}`,
                 `local function abc()`,
                 `end`,
                 `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
@@ -35,6 +36,7 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
         this.runCodeAndExpectResult("wow", [{
             code: `export * from "./a";`,
             expected: [
+                `local __FILE_META = {...}`,
                 `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
                 `}`,
                 `for mod, data in pairs(${WowKeywords.IMPORT_LIB_NAME}.get("a")) do`,

@@ -78,7 +78,9 @@ export abstract class Test {
 
         // build target
         const targetFactory = new TargetFactory();
-        const targetTranspiler = targetFactory.create(target, this.lastProject, program.getTypeChecker(), program.getSourceFile("test.ts") as SourceFile);
+        const targetTranspiler = targetFactory.create(target, this.lastProject, program.getTypeChecker(), program.getSourceFile("test.ts") as SourceFile, {
+            version: "0.0.0"
+        });
         this.lastTarget = targetTranspiler;
 
         // build transpiler

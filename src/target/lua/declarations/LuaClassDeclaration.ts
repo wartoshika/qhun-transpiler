@@ -15,6 +15,15 @@ export class LuaClassDeclaration implements Partial<Target> {
 
     public lastParsedClassName: string;
 
+    /**
+     * get the class namespace (or folder path)
+     * @param node the class to transpile
+     */
+    public getClassNamespace(node: ts.ClassDeclaration): string {
+
+        return node.getSourceFile().fileName;
+    }
+
     public transpileClassDeclaration(node: ts.ClassDeclaration): string {
 
         // check if this is an unnamed class
@@ -89,6 +98,11 @@ export class LuaClassDeclaration implements Partial<Target> {
         // add class name when reflection is set
         if (this.project.config.staticReflection & StaticReflection.CLASS_NAME) {
             classHead.push(`${className}.__name = ${this.transpileStringLiteral(ts.createStringLiteral(className))}`);
+        }
+
+        // add class namespace if reflection is set
+        if (this.project.config.staticReflection & StaticReflection.CLASS_NAMESPACE) {
+            classHead.push(`${className}.__namespace = ${this.transpileStringLiteral(ts.createStringLiteral(this.getClassNamespace(node)))}`);
         }
 
         // add static properties

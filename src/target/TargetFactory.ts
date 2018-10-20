@@ -6,6 +6,7 @@ import * as ts from "typescript";
 import { LuaConfig } from "./lua/LuaConfig";
 import { WowConfig } from "./wow/WowConfig";
 import { SourceFile } from "../compiler/SourceFile";
+import { QhunTranspilerMetadata } from "./QhunTranspilerMetadata";
 
 export declare type SupportedTargets = {
     lua: LuaTarget,
@@ -39,14 +40,16 @@ export class TargetFactory {
      * @param target the target name
      * @param project the project object
      * @param typeChecker the current typer checker
+     * @param metadata the transpiler metadata
      */
     public create<T extends keyof SupportedTargetConstructors>(
         target: T,
         project: Project,
         typeChecker: ts.TypeChecker,
-        sourceFile: SourceFile
+        sourceFile: SourceFile,
+        metadata: QhunTranspilerMetadata
     ): SupportedTargets[T] {
 
-        return new TargetFactory.supportedTargets[target](project, typeChecker, sourceFile);
+        return new TargetFactory.supportedTargets[target](project, typeChecker, sourceFile, metadata);
     }
 }

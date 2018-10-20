@@ -119,17 +119,20 @@ export class WowPostTranspile implements Partial<Target> {
 
         // add optional toc meta content
         if (this.project.config.optionalDependencies && this.project.config.optionalDependencies.length > 0) {
-            this.getTocFileMetadataLine("OptionalDeps", this.project.config.optionalDependencies.join(", "));
+            tocFileContent.push(this.getTocFileMetadataLine("OptionalDeps", this.project.config.optionalDependencies.join(", ")));
         }
         if (this.project.config.dependencies && this.project.config.dependencies.length > 0) {
-            this.getTocFileMetadataLine("Dependencies", this.project.config.dependencies.join(", "));
+            tocFileContent.push(this.getTocFileMetadataLine("Dependencies", this.project.config.dependencies.join(", ")));
         }
         if (this.project.config.savedVariables && this.project.config.savedVariables.length > 0) {
-            this.getTocFileMetadataLine("SavedVariables", this.project.config.savedVariables.join(", "));
+            tocFileContent.push(this.getTocFileMetadataLine("SavedVariables", this.project.config.savedVariables.join(", ")));
         }
         if (this.project.config.savedVariablesPerCharacter && this.project.config.savedVariablesPerCharacter.length > 0) {
-            this.getTocFileMetadataLine("SavedVariablesPerCharacter", this.project.config.savedVariablesPerCharacter.join(", "));
+            tocFileContent.push(this.getTocFileMetadataLine("SavedVariablesPerCharacter", this.project.config.savedVariablesPerCharacter.join(", ")));
         }
+
+        // addon qhun-transpiler version
+        tocFileContent.push(this.getTocFileMetadataLine("X-QhunTranspilerVersion", this.qhunTranspilerMetadata.version));
 
         return tocFileContent.join("\n");
     }

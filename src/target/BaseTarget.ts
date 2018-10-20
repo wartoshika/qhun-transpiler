@@ -7,6 +7,7 @@ import { Config } from "../config/Config";
 import * as path from "path";
 import * as fs from "fs";
 import { SourceFile } from "../compiler/SourceFile";
+import { QhunTranspilerMetadata } from "./QhunTranspilerMetadata";
 
 declare type TypescriptExport = {
     name: string,
@@ -44,7 +45,8 @@ export abstract class BaseTarget<C extends Config = Config> implements Partial<T
     constructor(
         protected project: Project<C>,
         protected typeChecker: ts.TypeChecker,
-        protected sourceFile: SourceFile
+        protected sourceFile: SourceFile,
+        protected qhunTranspilerMetadata: QhunTranspilerMetadata
     ) { }
 
     /**
