@@ -93,6 +93,19 @@ export class ExternalModuleService {
             (file as SourceFile).isExternal = isExternal;
             (file as SourceFile).transpilerFileName = file.fileName;
 
+            // calculate the new target file name
+            const tmpTargetName = path.resolve(file.fileName)
+                // remove root dir
+                .replace(this.project.rootDir, "")
+                // to unix style directory seperator
+                .replace(/\\/g, "/")
+                // remove striped source folder
+                .replace("/" + this.project.stripOutDir + "/", "")
+                // remove extension
+                .replace(/\.tsx?$/, "");
+
+            (file as SourceFile).targetFileNameTranspiled = tmpTargetName;
+
             // when external, override the name and path to embed the file
             // into the project's path
             if (isExternal) {
@@ -117,6 +130,11 @@ export class ExternalModuleService {
                 (file as SourceFile).transpilerFileName = relativeFilePath;
                 (file as SourceFile).externalModuleRoot = newModuleRoot;
                 (file as SourceFile).externalModuleName = projectName;
+                (file as SourceFile).targetFileNameTranspiled = relativeFilePath
+                    // remove extension
+                    .replace(/\.tsx?$/, "")
+                    // remove striped source folder
+                    .replace("/" + this.project.stripOutDir + "/", "/");
 
                 // get node module root path
                 let nodeModuleRootPath = moduleRoot.replace(this.project.rootDir.replace(/\\/g, "/"), "");

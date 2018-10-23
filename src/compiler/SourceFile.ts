@@ -35,4 +35,9 @@ export interface SourceFile extends ts.SourceFile {
      */
     externalModuleName?: string;
 
+    /**
+     * the new complete filename (excl. extension)
+     */
+    targetFileNameTranspiled?: string;
+
 }

@@ -15,6 +15,7 @@ export abstract class Test {
 
     protected lastTarget: Target;
     protected lastProject: Project;
+    protected lastProgram: ts.Program;
 
     /**
      * get a test project object
@@ -41,13 +42,11 @@ export abstract class Test {
     }
 
     /**
-     * an inline transpiler function
-     * @param target the target 
-     * @param code the code to transpile into the target language
-     * @param config the optional config used while transpiling
-     * @param addDeclarations add declaration code into transpiling result
+     * generates a ts compiler environment
+     * @param code the code to inject
+     * @param testFileName the name of the test file where to inject code
      */
-    protected transpile<K extends keyof SupportedTargets>(target: K, code: string, config?: Partial<SupportedTargetConfig[K]>, addDeclarations: boolean = false): string[] {
+    protected generateProgram(code: string, testFileName: string = "test.ts"): ts.Program {
 
         // build compiler host
         const compilerHost = {
@@ -59,7 +58,7 @@ export abstract class Test {
             getDirectories: (): any[] => [],
             getNewLine: () => "\n",
             getSourceFile: (filename: string, languageVersion: any) => {
-                if (filename === "test.ts") {
+                if (filename === testFileName) {
                     return ts.createSourceFile(filename, code, ts.ScriptTarget.Latest, false);
                 }
                 if (filename === "lib.es6.d.ts") {
@@ -73,14 +72,39 @@ export abstract class Test {
         };
 
         // build program
-        const program = ts.createProgram(["test.ts"], this.getCompilerOptions(), compilerHost);
+        return ts.createProgram([testFileName], this.getCompilerOptions(), compilerHost);
+    }
+
+    /**
+     * generates the given target class
+     * @param target the target to create
+     * @param code the code to inject
+     * @param config the config to use while transpiling
+     */
+    protected createTarget<K extends keyof SupportedTargets>(target: K, code: string = "// test", config?: Partial<SupportedTargetConfig[K]>): SupportedTargets[K] {
+
+        // generate a ts program
+        this.lastProgram = this.generateProgram(code);
         this.lastProject = this.getProject(target, config);
 
         // build target
         const targetFactory = new TargetFactory();
-        const targetTranspiler = targetFactory.create(target, this.lastProject, program.getTypeChecker(), program.getSourceFile("test.ts") as SourceFile, {
+        return targetFactory.create(target, this.lastProject, this.lastProgram.getTypeChecker(), this.lastProgram.getSourceFile("test.ts") as SourceFile, {
             version: "0.0.0"
         });
+    }
+
+    /**
+     * an inline transpiler function
+     * @param target the target 
+     * @param code the code to transpile into the target language
+     * @param config the optional config used while transpiling
+     * @param addDeclarations add declaration code into transpiling result
+     */
+    protected transpile<K extends keyof SupportedTargets>(target: K, code: string, config?: Partial<SupportedTargetConfig[K]>, addDeclarations: boolean = false): string[] {
+
+        // create the target
+        const targetTranspiler = this.createTarget(target, code, config);
         this.lastTarget = targetTranspiler;
 
         // build transpiler
@@ -88,7 +112,7 @@ export abstract class Test {
 
         // return the transpiled code
         return transpiler
-            .transpile(program.getSourceFile("test.ts"), addDeclarations)
+            .transpile(this.lastProgram.getSourceFile("test.ts"), addDeclarations)
             .split("\n")
             .filter(line => !!line);
     }

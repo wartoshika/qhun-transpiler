@@ -14,7 +14,7 @@ export class WowImportDeclaration implements Partial<Target> {
 
         // get the path of the module
         const path = this.transpileNode(node.moduleSpecifier);
-        const finalPath = this.getFinalPath(node.getSourceFile() as SourceFile, path);
+        const finalPath = `"${this.getImportPath(node.getSourceFile() as SourceFile, path)}"`;
 
         // get imported elements
         let importedElements: string[] = [];

@@ -19,7 +19,7 @@ export class WowPostTranspile implements Partial<Target> {
         const tocFileNames = files.map(file => {
 
             // get the relative  file path
-            const relativePath = this.getFinalPath(file.sourcefile as SourceFile, file.sourcefile.fileName, false, false);
+            const relativePath = file.sourcefile.targetFileNameTranspiled;
 
             // append the file extension suffix
             return `${relativePath}.${this.getFileExtension()}`;

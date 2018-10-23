@@ -11,6 +11,6 @@ export class WowClassDeclaration implements Partial<LuaClassDeclaration> {
 
     public getClassNamespace(node: ts.ClassDeclaration): string {
 
-        return this.getFinalPath(node.getSourceFile() as SourceFile, node.getSourceFile().fileName, false, false);
+        return this.getFilePath(node.getSourceFile() as SourceFile);
     }
 }

@@ -93,8 +93,8 @@ export class WowTarget extends LuaTarget implements Target {
 
             // the name of the exported module is a path, to the final result should
             // be an export of an import. transpile an import statement
-            const importPath = this.getFinalPath(this.sourceFile as SourceFile, exp.name);
-            const importStatement = `${this.getGlobalLibraryVariableName()}.get(${importPath})`;
+            const importPath = this.getImportPath(this.sourceFile as SourceFile, exp.name);
+            const importStatement = `${this.getGlobalLibraryVariableName()}.get("${importPath}")`;
 
             return [
                 `for mod, data in pairs(${importStatement}) do`,
@@ -104,7 +104,7 @@ export class WowTarget extends LuaTarget implements Target {
         }));
 
         // get the relative source file path
-        const finalPath = this.getFinalPath(this.sourceFile as SourceFile, this.sourceFile.fileName);
+        const finalPath = `"${this.getFilePath(this.sourceFile as SourceFile)}"`;
 
         // return all including a final declare statement
         return [
