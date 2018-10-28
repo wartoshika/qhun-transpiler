@@ -219,6 +219,22 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
                 expectedAditionalDeclaration: [
                     'array.push'
                 ]
+            }, {
+                code: `
+                const listeners: {
+                    [P in keyof E]?: Array<(payload: E[P]) => void>
+                } = {};
+                listeners["test"].push((...args: any[])=>{});
+                `,
+                expected: [
+                    "local listeners = {}",
+                    "__array_push(listeners[\"test\"], function (...)",
+                    "  local args = {...}",
+                    "end)"
+                ],
+                expectedAditionalDeclaration: [
+                    'array.push'
+                ]
             }
         ]);
     }

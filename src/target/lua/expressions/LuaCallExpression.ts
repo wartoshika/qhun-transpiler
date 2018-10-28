@@ -78,7 +78,7 @@ export class LuaCallExpression implements Partial<Target> {
         // preperation for calls like "test".replace() or [1,2].map()
         if (Types.isString(owner, this.typeChecker)) {
             ownerNameCheck = "String";
-        } else if (Types.isArray(owner, this.typeChecker)) {
+        } else if (Types.isArray(owner, this.typeChecker, true)) {
             ownerNameCheck = "Array";
         } else if (Types.isFunction(owner, this.typeChecker)) {
             ownerNameCheck = "Function";
@@ -101,7 +101,7 @@ export class LuaCallExpression implements Partial<Target> {
 
                     // if this method does not exists on object, use the normal object call pattern
                     // because in most cases the function is declared on the object so dont
-                    // throw an exception here. check the bubble boolean to devide if this exception must
+                    // throw an exception here. check the bubble boolean to decide if this exception must
                     // be forwarded
                     if (e instanceof UnsupportedError && e.bubble) {
                         throw e;

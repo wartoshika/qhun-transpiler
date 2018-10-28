@@ -77,8 +77,9 @@ export class Types {
      * check if the given node is an array
      * @param node the node to check
      * @param typeChecker the type checker instance
+     * @param isCallExpression flag if the node origins at a call expression
      */
-    public static isArray(node: ts.Node, typeChecker: ts.TypeChecker): boolean {
+    public static isArray(node: ts.Node, typeChecker: ts.TypeChecker, isCallExpression: boolean = false): boolean {
 
         // get the node type
         const type = typeChecker.getTypeAtLocation(node);
@@ -87,14 +88,43 @@ export class Types {
 
         let typeLiteralArrayTypes: ts.SyntaxKind[];
 
+        // try to identify mapped types with string or number index signature and array type values
+        try {
+
+            // check if the given node is a mapped type node
+            const mappedTypeKind: ts.SyntaxKind = (node as any).expression.flowNode.node.symbol.valueDeclaration.type.kind;
+            if (mappedTypeKind === ts.SyntaxKind.MappedType) {
+
+                // get the type of the value
+                const targetType: ts.SyntaxKind = (node as any).expression.flowNode.node.symbol.valueDeclaration.type.type.kind;
+
+                // check for types like: { test: any[] }
+                if (targetType === ts.SyntaxKind.ArrayType) {
+                    return true;
+                } else if (
+                    // check for types like: { test: Array<any> }
+                    // array is a type reference, use the reference text to check if this is an array
+                    targetType === ts.SyntaxKind.TypeReference &&
+                    (node as any).expression.flowNode.node.symbol.valueDeclaration.type.type.typeName.escapedText === "Array"
+                ) {
+                    return true;
+                }
+            }
+        } catch (e) {
+
+            // ignore catch and proceed
+        }
+
         // at typescript >= 3 array types can be type literals
-        if (symbol && symbol.declarations && nodeType && nodeType.kind === ts.SyntaxKind.TypeLiteral) {
+        if (symbol && symbol.declarations && nodeType && (nodeType.kind === ts.SyntaxKind.TypeLiteral || nodeType.kind === ts.SyntaxKind.MappedType)) {
 
             typeLiteralArrayTypes = symbol.declarations.map(dec => {
 
                 const decType = (dec as any).type;
-                if (!decType) {
-                    return ts.SyntaxKind.ObjectLiteralExpression;
+                if (isCallExpression && decType && decType.type && decType.type.kind) {
+                    return decType.type.kind;
+                } else if (!decType) {
+                    return ts.SyntaxKind.Unknown;
                 }
                 return decType.kind;
             });
@@ -103,13 +133,18 @@ export class Types {
         // make the test
         return nodeType
             // is an array literal
-            && ts.isArrayLiteralExpression(node)
-            // is a typescript 3 type literal
-            || (typeLiteralArrayTypes
-                && typeLiteralArrayTypes.every(typeLiteral => typeLiteral === ts.SyntaxKind.ArrayType || typeLiteral === ts.SyntaxKind.TupleType)
-            )
-            // normal types (typescript < 3)
-            || (nodeType.kind === ts.SyntaxKind.ArrayType || nodeType.kind === ts.SyntaxKind.TupleType);
+            && (
+                ts.isArrayLiteralExpression(node)
+                // is a typescript 3 type literal
+                || (typeLiteralArrayTypes
+                    && typeLiteralArrayTypes.every(typeLiteral => typeLiteral === ts.SyntaxKind.ArrayType || typeLiteral === ts.SyntaxKind.TupleType)
+                )
+                // normal types (typescript < 3)
+                || (nodeType.kind === ts.SyntaxKind.ArrayType || nodeType.kind === ts.SyntaxKind.TupleType)
+            ) || (
+                // search for deeper existing types in a call expression
+                isCallExpression && (node as any).expression && Types.isArray((node as any).expression, typeChecker, isCallExpression)
+            );
     }
 
     /**

@@ -1,6 +1,22 @@
 {
-    "codemetrics.nodeconfiguration.ReturnStatement": 0,
-    "codemetrics.nodeconfiguration.CaseClause": 0,
-    "codemetrics.nodeconfiguration.DefaultClause": 0,
-    "typescript.tsdk": "node_modules\\typescript\\lib"
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "fileHeaderComment.parameter":{
+        "*":{
+            "commentbegin": "/*",
+            "commentprefix": " *",
+            "commentend": " */",
+            "project": "qhun-transpiler",
+            "company": "Oliver Leve <dev@qhun.de>"
+        }
+    },
+    "fileHeaderComment.template": {
+        "*":[
+            "${commentbegin}",
+            "${commentprefix} Copyright (c) ${year} ${company}",
+            "${commentprefix}",
+            "${commentprefix} This file is part of ${project}.",
+            "${commentprefix} MIT license. See LISENSE file for details.",
+            "${commentend}"
+        ]
+    }
 }
