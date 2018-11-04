@@ -76,6 +76,10 @@ You can find a documentation file for the desired target in the `doc` folder.
 - [Lua documentation](./doc/lua.md)
 - [WoW documentation](./doc/wow.md)
 
+## **Known bugs in latest release**
+- When using a number indexed object at default values in functions.
+- BITOPS OR does not work as expected in certain cases
+
 ## **License**
 
 MIT license. See [LICENSE](./LICENSE) for more details.
