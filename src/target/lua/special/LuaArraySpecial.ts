@@ -39,6 +39,8 @@ export class LuaArraySpecial {
                 return this.transpileSpecialArrayFunctionPush(owner, argumentStack);
             case "forEach":
                 return this.transpileSpecialArrayFunctionForEach(owner, argumentStack);
+            case "some":
+                return this.transpileSpecialArrayFunctionSome(owner, argumentStack);
             case "map":
                 return this.transpileSpecialArrayFunctionMap(owner, argumentStack);
             case "filter":
@@ -214,5 +216,37 @@ export class LuaArraySpecial {
         }
 
         return `__array_slice(${owner}, ${stringArgs.join(",")})`;
+    }
+
+    /**
+     * an impl. for the array.some function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialArrayFunctionSome(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // declare the array.filter method
+        this.addDeclaration(
+            "array.some",
+            [
+                `local function __array_some(array, predicate)`,
+                this.addSpacesToString(`for k, v in pairs(array) do`, 2),
+                this.addSpacesToString(`if predicate(v,k) == true then return true end`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return false`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        // resolve shorthand arguments
+        const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack);
+        const stringArgs = resolvedArguments.map(this.transpileNode);
+
+        // if there are no arguments, pass nil as argument
+        if (stringArgs.length === 0) {
+            stringArgs.push(this.transpileNode(ts.createNull()));
+        }
+
+        return `__array_some(${owner}, ${stringArgs.join(",")})`;
     }
 }
