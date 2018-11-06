@@ -218,7 +218,15 @@ export class LuaStringSpecial {
             "string.match",
             [
                 `local function __string_match(s,p)`,
-                this.addSpacesToString(`return s:gsub(p)`, 2),
+                this.addSpacesToString(`local match = {string.match(s, p)}`, 2),
+                this.addSpacesToString(`if #match <= 0 then return nil end`, 2),
+                this.addSpacesToString(`local matchList = {}`, 2),
+                this.addSpacesToString(`for i = 1, #match do`, 2),
+                this.addSpacesToString(`if i%2 == 1 then`, 4),
+                this.addSpacesToString(`table.insert(matchList, match[i])`, 6),
+                this.addSpacesToString(`end`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return matchList`, 2),
                 `end`
             ].join("\n")
         );
