@@ -3,10 +3,12 @@ test/
 .nyc_output/
 .vscode/
 coverage/
+declarations/
 dist/**/*.js.map
 .gitignore
 .gitlab-ci.yml
 .nycrc
+.travis.yml
 webpack.config.js
 tsconfig.json
 tslint.json
