@@ -242,11 +242,6 @@ export class LuaArraySpecial {
         const resolvedArguments = LuaSpecialFunctions.resolveShorthandCallback(argumentStack);
         const stringArgs = resolvedArguments.map(this.transpileNode);
 
-        // if there are no arguments, pass nil as argument
-        if (stringArgs.length === 0) {
-            stringArgs.push(this.transpileNode(ts.createNull()));
-        }
-
         return `__array_some(${owner}, ${stringArgs.join(",")})`;
     }
 }

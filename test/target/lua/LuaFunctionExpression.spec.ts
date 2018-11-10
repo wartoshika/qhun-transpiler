@@ -38,4 +38,16 @@ import { UnitTest } from "../../UnitTest";
             }
         ]);
     }
+
+    @test "shorthand function expression"() {
+
+        this.runCodeAndExpectResult("lua", [{
+            code: `test(a => a.boolean === a.boolean2)`,
+            expected: [
+                `test(function (a)`,
+                `  return a.boolean == a.boolean2`,
+                `end)`
+            ]
+        }]);
+    }
 }

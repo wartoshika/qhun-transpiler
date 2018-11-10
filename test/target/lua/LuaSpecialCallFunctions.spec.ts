@@ -329,6 +329,60 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
         ]);
     }
 
+    @test "Array.some(...)"() {
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `
+                    const hasNumber = [1,2,3].some(el => el >= 2);
+                `,
+                expected: [
+                    `local hasNumber = __array_some({1, 2, 3}, function (el)`,
+                    `  return el >= 2`,
+                    `end)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.some'
+                ]
+            }
+        ]);
+    }
+
+    @test "Array.slice(...)"() {
+        this.runCodeAndExpectResult("lua", [
+            {
+                code: `
+                    [1,2,3].slice(2);
+                `,
+                expected: [
+                    `__array_slice({1, 2, 3}, 2)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.slice'
+                ]
+            }, {
+                code: `
+                    [1,2,3].slice();
+                `,
+                expected: [
+                    `__array_slice({1, 2, 3}, nil)`
+                ],
+                expectedAditionalDeclaration: [
+                    'array.slice'
+                ]
+            }
+        ]);
+    }
+
+    @test "Array unsupported function"() {
+
+        this.runCodeAndExpectThrow("lua", [
+            {
+                code: `[1,2,3].notExists()`,
+                throw: UnsupportedError
+            }
+        ]);
+    }
+
     @test "Object.keys()"() {
 
         this.runCodeAndExpectResult("lua", [

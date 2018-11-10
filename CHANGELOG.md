@@ -13,6 +13,7 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 - Fixed a bug in lua and wow target where MappedTypes with array values were not detected as arrays
 - Fixed a bug in String.match.
 - Added Array.some(...)
+- Fixed a bug in lua and wow target where shorthand arrow function usage has been transpiled without return statement
 
 ##  **0.5.0** released 2018-10-20
 

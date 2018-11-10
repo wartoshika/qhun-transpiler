@@ -3,7 +3,6 @@ import { Target } from "../../Target";
 import * as path from "path";
 import { WowConfig } from "../WowConfig";
 import { SourceFile } from "../../../compiler/SourceFile";
-import * as md5 from "md5";
 import * as fs from "fs";
 
 export interface WowPathBuilder extends BaseTarget<WowConfig>, Target { }
@@ -22,8 +21,8 @@ export class WowPathBuilder {
             // remove extension
             .replace(/\.tsx?$/, "");
 
-        // build the hash of the absolute path
-        return md5(preparedPath);
+        // build the final path
+        return this.resolveRelativeRootPath(preparedPath);
     }
 
     /**
@@ -64,7 +63,19 @@ export class WowPathBuilder {
         // change dir sep style
         absolutePath = absolutePath.replace(/\\/g, "/");
 
-        // build the hash
-        return md5(absolutePath);
+        // build the final path
+        return this.resolveRelativeRootPath(absolutePath);
+    }
+
+    /**
+     * removes the project root path from the current path without leading slash
+     */
+    private resolveRelativeRootPath(currentPath: string): string {
+
+        return currentPath
+            // remove root path
+            .replace(this.project.rootDir.replace(/\\/g, "/"), "")
+            // remove leading slash
+            .replace(/^\//, "");
     }
 }
