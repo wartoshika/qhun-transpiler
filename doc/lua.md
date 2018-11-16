@@ -5,6 +5,7 @@ This transpiler target is called `lua` and can be used to transpile Typescript i
 ## What is supported?
 
 - [Classes and heritage](https://www.typescriptlang.org/docs/handbook/classes.html)
+- [Class expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/class)
 - New expressions
 - [Interfaces](https://www.typescriptlang.org/docs/handbook/interfaces.html) *(Will be omitted in the output)*
 - [Enums](https://www.typescriptlang.org/docs/handbook/enums.html)
