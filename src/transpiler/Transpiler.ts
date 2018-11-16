@@ -67,6 +67,8 @@ export class Transpiler {
                 return this.target.transpileImportDeclaration(node as ts.ImportDeclaration);
             case ts.SyntaxKind.ClassDeclaration:
                 return this.target.transpileClassDeclaration(node as ts.ClassDeclaration);
+            case ts.SyntaxKind.ClassExpression:
+                return this.target.transpileClassExpression(node as ts.ClassExpression);
             case ts.SyntaxKind.ModuleDeclaration:
                 return this.target.transpileModuleDeclaration(node as ts.ModuleDeclaration);
             case ts.SyntaxKind.ModuleBlock:

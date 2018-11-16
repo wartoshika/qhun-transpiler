@@ -59,6 +59,12 @@ export interface Target {
     transpileClassDeclaration(node: ts.ClassDeclaration): string;
 
     /**
+     * transpiles a class expression
+     * @param node the node to transpile
+     */
+    transpileClassExpression(node: ts.ClassExpression): string;
+
+    /**
      * transpiles existing class level decorators
      * @param node the node to transpile
      */

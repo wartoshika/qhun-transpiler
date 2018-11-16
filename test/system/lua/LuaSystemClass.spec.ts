@@ -175,4 +175,63 @@ import { LuaSystemTestBase } from "./LuaSystemTestBase";
             12, 3, 4
         ]);
     }
+
+    @test "Class expression test"() {
+
+        const tsCode = `
+            const expressionFunction = (ctor: Function)=>{
+                return class extends ctor {
+                    public test(): string {
+                        return "test worked";
+                    }
+                }
+            }
+
+            class BaseClass {
+                public baseTest(): string {
+                    return "base test worked";
+                }
+            }
+
+            const instantiableConstructor = expressionFunction(BaseClass);
+
+            const instance = new instantiableConstructor();
+            return [instance.baseTest(), instance.test()];
+        `;
+
+        expect(this.getLuaParseResult(tsCode)).to.deep.equal([
+            "base test worked", "test worked"
+        ]);
+    }
+
+    @test "Class decorator test"() {
+
+        const tsCode = `
+            const ClassDecorator = <T extends Function>(target: T) => {
+                return class ClassDecoratorImpl extends target {
+                    constructor(...args: any[]) {
+                        this.test = () => {
+                            return "test";
+                        };
+                        super(...args);
+                    }
+                };
+            };
+
+            @ClassDecorator
+            class TestClass {
+
+                public otherTest(): string {
+                    return "otherTest";
+                }
+            }
+
+            const instance = new TestClass();
+            return [instance.test(), instance.otherTest()];
+        `;
+
+        expect(this.getLuaParseResult(tsCode)).to.deep.equal([
+            "test", "otherTest"
+        ]);
+    }
 }

@@ -28,7 +28,12 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                     "end",
                     "function B.__init(self)",
                     "end",
-                    "B.__init = A(B)"
+                    "local __decoratorAssignment_0 = A(B)",
+                    "if type(__decoratorAssignment_0) == \"function\" then",
+                    "  B.__init = __decoratorAssignment_0",
+                    "elseif type(__decoratorAssignment_0) == \"table\" then",
+                    "  B.__new = __decoratorAssignment_0.__new",
+                    "end"
                 ]
             }
         ]);
@@ -57,7 +62,12 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                     "end",
                     "function B.__init(self)",
                     "end",
-                    "B.__init = A(\"test\")(B)"
+                    "local __decoratorAssignment_0 = A(\"test\")(B)",
+                    "if type(__decoratorAssignment_0) == \"function\" then",
+                    "  B.__init = __decoratorAssignment_0",
+                    "elseif type(__decoratorAssignment_0) == \"table\" then",
+                    "  B.__new = __decoratorAssignment_0.__new",
+                    "end"
                 ]
             }
         ]);

@@ -176,6 +176,6 @@ export class Types {
         const nodeType = typeChecker.typeToTypeNode(type);
 
         // single function type kind check
-        return nodeType.kind === ts.SyntaxKind.FunctionType;
+        return nodeType && nodeType.kind === ts.SyntaxKind.FunctionType;
     }
 }
