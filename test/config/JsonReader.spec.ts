@@ -2,11 +2,9 @@ import { suite, test, slow, timeout } from "mocha-typescript";
 import { expect } from "chai";
 import { JsonReader } from "../../src/config/json/JsonReader";
 import * as mockfs from "mock-fs";
-import { FileNotExistsError } from "../../src/error/FileNotExistsError";
 import { UnexpectedError } from "../../src/error/UnexpectedError";
 import { JsonConfig } from "../../src/config/json/JsonConfig";
 import * as path from "path";
-import { ValidationError } from "../../src/error/ValidationError";
 
 @suite("[Unit] JsonReader", slow(500), timeout(3000)) class JsonReaderTest {
 
@@ -81,7 +79,7 @@ import { ValidationError } from "../../src/error/ValidationError";
         try {
             new JsonReader("nonExistingPath").read();
         } catch (e) {
-            expect(e).to.be.an.instanceof(FileNotExistsError);
+            expect(e).to.be.an.instanceof(Error);
             thrown = true;
         }
 
@@ -135,7 +133,7 @@ import { ValidationError } from "../../src/error/ValidationError";
         try {
             new JsonReader("./qhun-transpiler.json").read();
         } catch (e) {
-            expect(e).to.be.an.instanceof(ValidationError);
+            expect(e).to.be.an.instanceof(Error);
             thrown = true;
         }
 

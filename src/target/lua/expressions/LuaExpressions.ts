@@ -14,8 +14,9 @@ import { LuaNewExpression } from "./LuaNewExpression";
 import { LuaParenthesizedExpression } from "./LuaParenthesizedExpression";
 import { LuaAsExpression } from "./LuaAsExpression";
 import { LuaTypeOfExpression } from "./LuaTypeOfExpression";
+import { LuaClassExpression } from "./LuaClassExpression";
 
 export interface LuaExpressions extends LuaBinaryExpression, LuaConditionalExpression, LuaCallExpression, LuaPropertyAccessExpression,
     LuaElementAccessExpression, LuaTemplateExpression, LuaPostfixUnaryExpression, LuaPrefixUnaryExpression, LuaObjectLiteralExpression,
     LuaArrayLiteralExpression, LuaDeleteExpression, LuaFunctionExpression, LuaNewExpression, LuaParenthesizedExpression, LuaAsExpression,
-    LuaTypeOfExpression { }
+    LuaTypeOfExpression, LuaClassExpression { }

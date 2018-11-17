@@ -60,6 +60,7 @@ export class LuaTarget extends BaseTarget implements Target {
         luaTrait.LuaParenthesizedExpression,
         luaTrait.LuaAsExpression,
         luaTrait.LuaTypeOfExpression,
+        luaTrait.LuaClassExpression,
         // misc
         luaTrait.LuaBlock,
         luaTrait.LuaEndOfFileToken,
