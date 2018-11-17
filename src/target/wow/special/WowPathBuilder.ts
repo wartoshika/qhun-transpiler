@@ -15,7 +15,7 @@ export class WowPathBuilder {
     public getFilePath(sourceFile: SourceFile): string {
 
         // prepare the path
-        const preparedPath = path.resolve(sourceFile.fileName)
+        const preparedPath = path.resolve(sourceFile ? sourceFile.fileName : "")
             // to unix style dir sep
             .replace(/\\/g, "/")
             // remove extension

@@ -21,7 +21,9 @@ export class LuaClassDeclaration implements Partial<Target> {
      */
     public getClassNamespace(node: ts.ClassDeclaration): string {
 
-        return node.getSourceFile().fileName;
+        const sourceFile = node.getSourceFile();
+
+        return sourceFile ? sourceFile.fileName : "";
     }
 
     public transpileClassDeclaration(node: ts.ClassDeclaration): string {

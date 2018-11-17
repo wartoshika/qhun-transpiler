@@ -41,4 +41,44 @@ import { StaticReflection } from "../../../src/config/StaticReflection";
                 staticReflection: StaticReflection.CLASS_CONSTRUCTOR
             });
     }
+
+    @test "class expression reflection"() {
+
+        this.runCodeAndExpectResult("lua", [{
+            code: `
+                const a = class {
+                    constructor(a: string, b: void) {}
+                }
+            `,
+            expected: [
+                "local a = (function () ",
+                "  local __classExpression_0 = {}",
+                "  __classExpression_0.__index = __classExpression_0",
+                "  __classExpression_0.__name = \"__classExpression_0\"",
+                "  __classExpression_0.__namespace = \"\"",
+                "  function __classExpression_0.__new(self, ...)",
+                "    local instance = setmetatable({}, __classExpression_0)",
+                "    if self and __classExpression_0.__prepareNonStatic then",
+                "      __classExpression_0.__prepareNonStatic(instance)",
+                "    end",
+                "    if self and __classExpression_0.__init then",
+                "      __classExpression_0.__init(instance, ...)",
+                "    end",
+                "    return instance",
+                "  end",
+                "  __classExpression_0.__staticReflection = {",
+                "    constructor = {",
+                "      \"string\",",
+                "      \"void\"",
+                "    }",
+                "  }",
+                "  function __classExpression_0.__init(self, a, b)",
+                "  end",
+                "  return __classExpression_0",
+                "end)()"
+            ]
+        }], {
+                staticReflection: StaticReflection.CLASS_CONSTRUCTOR + StaticReflection.CLASS_NAME + StaticReflection.CLASS_NAMESPACE
+            });
+    }
 }
