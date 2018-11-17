@@ -8,7 +8,12 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 
 ##  Implemented but unreleased
 
-- Nothing
+- Fixed a bug where wow target could not reflect class expressions
+
+## **0.7.0** released 2018-11-17
+
+- Support for ClassExpressions (#2)
+- Transpiler now exit with a correct exit code (#1)
 
 ## **0.6.0** released 2018-11-10
 
