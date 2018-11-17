@@ -34,7 +34,7 @@ import { spawn } from "child_process";
         }
     }
 
-    @test(slow(1500), timeout(10000)) "process should exit with 0 when transpiling was successfull"(done: Function) {
+    @test(slow(1500), timeout(30000)) "process should exit with 0 when transpiling was successfull"(done: Function) {
 
         // write file
         fs.writeFileSync(this.tempFile, `console.log("test");`);
@@ -50,7 +50,7 @@ import { spawn } from "child_process";
         });
     }
 
-    @test(slow(1500), timeout(3000)) "process should exit with != 0 when an error occurs"(done: Function) {
+    @test(slow(1500), timeout(30000)) "process should exit with != 0 when an error occurs"(done: Function) {
 
         // write file
         fs.writeFileSync(this.tempFile, `console.log(Math.fktnDoesNotExists());`);
