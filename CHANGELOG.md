@@ -8,7 +8,7 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 
 ##  Implemented but unreleased
 
-- Nothing
+- Lua support for Array.unshift(...)
 
 ## **0.7.1** released 2018-11-17
 

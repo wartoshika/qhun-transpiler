@@ -47,6 +47,8 @@ export class LuaArraySpecial {
                 return this.transpileSpecialArrayFunctionFilter(owner, argumentStack);
             case "slice":
                 return this.transpileSpecialArrayFunctionSlice(owner, argumentStack);
+            case "unshift":
+                return this.transpileSpecialArrayFunctionUnshift(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given array function ${name} is unsupported!`, null);
         }
@@ -243,5 +245,28 @@ export class LuaArraySpecial {
         const stringArgs = resolvedArguments.map(this.transpileNode);
 
         return `__array_some(${owner}, ${stringArgs.join(",")})`;
+    }
+
+    /**
+     * an impl. for the array.unshift function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialArrayFunctionUnshift(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // declare the array.push method
+        this.addDeclaration(
+            "array.unshift",
+            [
+                `local function __array_unshift(array, ...)`,
+                this.addSpacesToString(`for _, v in pairs({...}) do`, 2),
+                this.addSpacesToString(`table.insert(array, 1, v)`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return #array`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__array_unshift(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
     }
 }
