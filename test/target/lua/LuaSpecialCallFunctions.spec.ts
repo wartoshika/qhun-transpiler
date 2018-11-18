@@ -239,6 +239,22 @@ import { UnsupportedError } from "../../../src/error/UnsupportedError";
         ]);
     }
 
+    @test "Array.unshift(...)"() {
+        this.runCodeAndExpectResult("lua", [{
+            code: `
+                const arr: string[] = [2];
+                arr.unshift(1);
+            `,
+            expected: [
+                `local arr = {2}`,
+                `__array_unshift(arr, 1)`
+            ],
+            expectedAditionalDeclaration: [
+                "array.unshift"
+            ]
+        }]);
+    }
+
     @test "Array.forEach(...)"() {
         this.runCodeAndExpectResult("lua", [
             {
