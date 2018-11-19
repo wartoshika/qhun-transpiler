@@ -10,6 +10,8 @@ import { Compiler } from "../compiler/Compiler";
 import { CommandLineColors } from "./CommandLineColors";
 import { ValidationError } from "../error/ValidationError";
 import { ExternalModuleService } from "../compiler/ExternalModuleService";
+import { FileWatcher } from "./FileWatcher";
+import { Logger } from "./Logger";
 
 // tslint:disable-next-line
 const packageJson = require("../../package.json");
@@ -18,7 +20,8 @@ declare type ProgramArguments = {
     help: boolean,
     project: string,
     target: string,
-    file: string
+    file: string,
+    watch: boolean
 };
 
 export class CommandLine {
@@ -49,6 +52,11 @@ export class CommandLine {
             type: String,
             description: "The file that shoule be transpiled",
             typeLabel: "<file.ts>"
+        }, {
+            name: "watch",
+            alias: "w",
+            type: Boolean,
+            description: "Watches over edited and created files to automaticly trigger the transpiling process"
         }
     ];
 
@@ -56,6 +64,16 @@ export class CommandLine {
      * the given program arguments
      */
     private programArguments: ProgramArguments;
+
+    /**
+     * the current project reference
+     */
+    private currentProject: Project;
+
+    /**
+     * the file watcher instance
+     */
+    private fileWatcher: FileWatcher;
 
     /**
      * @param args the arguments
@@ -71,9 +89,9 @@ export class CommandLine {
     }
 
     /**
-     * executes the command line tool with the given arguments
+     * prepares the execution of the transpiling process
      */
-    public execute(): boolean {
+    public prepare(): boolean {
 
         // evaluate help page
         if (this.programArguments.help || this.args.length === 0) {
@@ -89,17 +107,49 @@ export class CommandLine {
             return false;
         }
 
+        // print an execution header
+        this.printProgramExecuteInfo();
+
+        // save project reference
+        this.currentProject = project;
+
+        // watch for file changes
+        if (this.programArguments.watch) {
+
+            this.fileWatcher = new FileWatcher(this.currentProject, this.execute.bind(this));
+        }
+    }
+
+    /**
+     * executes the command line tool with the given arguments
+     */
+    public execute(): boolean {
+
+        // check if state is prepared
+        if (!this.currentProject) {
+            return false;
+        }
+
         // construct the compiler
-        const compiler = new Compiler(project);
+        const compiler = new Compiler(this.currentProject);
 
         // start everything else
-        const result = compiler.compile(project.parsedCommandLine.fileNames);
+        const result = compiler.compile(this.currentProject.parsedCommandLine.fileNames);
 
         // print the final result
         this.printResult(result);
 
         return result !== false;
     }
+
+    /**
+     * test if the cli is watching over files
+     */
+    public isWatchingFiles(): boolean {
+
+        return !!this.fileWatcher;
+    }
+
     /**
      * get the project config from either json reader or argument reader
      */
@@ -132,7 +182,7 @@ export class CommandLine {
             if (e instanceof ValidationError) {
 
                 // write the error
-                console.error(`${CommandLineColors.RED}${e.message}${CommandLineColors.RESET}`);
+                Logger.error(e.message, undefined, CommandLineColors.RED);
 
                 // no transpiling!
                 return false;
@@ -177,14 +227,26 @@ export class CommandLine {
             // only print something about external modules when some are referenced
             if (embededModules.length > 0) {
                 embededModules.forEach(moduleName => {
-                    console.log(`${CommandLineColors.GREEN}%s${CommandLineColors.RESET}`, `Added ${moduleName} as external module.`);
+                    Logger.log(`Added ${moduleName} as external module.`, undefined, CommandLineColors.GREEN);
                 });
             }
 
-            console.log(`${CommandLineColors.GREEN}%s${CommandLineColors.RESET}`, `Successfully transpiled ${result} files.`);
+            Logger.log(`Successfully transpiled ${result} files.`, undefined, CommandLineColors.GREEN);
         } else {
-            console.log(`${CommandLineColors.RED}%s${CommandLineColors.RESET}`, `An error occured while transpiling your files.`);
+            Logger.log(`An error occured while transpiling your files.`, undefined, CommandLineColors.GREEN);
         }
     }
 
+    /**
+     * print some program metadata for the command line
+     */
+    private printProgramExecuteInfo(): void {
+
+        // read package.json file
+        const packageObject = packageJson;
+
+        Logger.log();
+        Logger.log(`${packageObject.name} (${packageObject.version})`, "");
+        Logger.log();
+    }
 }

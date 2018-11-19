@@ -8,7 +8,7 @@ The qhun-transpiler project uses [Semantic Versioning](https://semver.org/spec/v
 
 ##  Implemented but unreleased
 
-- Nothing
+- Added support for watching over file changes in the source directory to automaticly trigger the transpile process. `-w` flag on the cli.
 
 ##  **0.7.2** released 2018-11-18
 

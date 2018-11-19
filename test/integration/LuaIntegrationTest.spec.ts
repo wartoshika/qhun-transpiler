@@ -55,7 +55,7 @@ import { IntegrationTestBase } from "./IntegrationTestBase";
         const cli = new CommandLine([
             "-t", "lua", "-f", "myFile.ts"
         ]);
-
+        cli.prepare();
         cli.execute();
 
         expect(fs.existsSync("myFile.lua")).to.be.true;

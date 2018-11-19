@@ -69,6 +69,7 @@ export class IntegrationTestBase extends Test {
         const cli = new CommandLine([
             "-p", "testTranspilerConfig.json"
         ]);
+        cli.prepare();
 
         return cli.execute();
     }
