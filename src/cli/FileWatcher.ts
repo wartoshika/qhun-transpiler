@@ -21,7 +21,7 @@ export class FileWatcher {
 
     constructor(
         private project: Project,
-        private executeOnChange: (filenameFromSourceRoot: string) => any
+        private executeOnChange: (filesChanged: string[]) => any
     ) {
 
         // get watching directory
@@ -58,7 +58,8 @@ export class FileWatcher {
         }
 
         // get md5 from file
-        const buffer = fs.readFileSync(path.join(this.watchedRootPath, filename));
+        const absolutePath = path.join(this.watchedRootPath, filename);
+        const buffer = fs.readFileSync(absolutePath);
         const fileMd5 = md5(buffer);
 
         // prepare fileContentHash
@@ -71,7 +72,7 @@ export class FileWatcher {
         if (this.fileContentHash[filename].fsWait === false && this.fileContentHash[filename].md5 !== fileMd5) {
 
             // yes, changed.
-            this.executeFileChangeHandler(filename);
+            this.executeFileChangeHandler(filename, absolutePath);
 
             // update md5
             this.fileContentHash[filename] = {
@@ -89,12 +90,14 @@ export class FileWatcher {
     /**
      * executes the handler for file changes
      * @param filename the filename that has been changed
+     * @param absolutePath the complete path of the changed file
      */
-    private executeFileChangeHandler(filename: string): void {
+    private executeFileChangeHandler(filename: string, absolutePath: string): void {
 
         // print some info
+        Logger.log(""); // one empty line
         Logger.log("Detected file change: " + filename + " > Transpiling started.");
 
-        this.executeOnChange(filename);
+        this.executeOnChange([absolutePath]);
     }
 }

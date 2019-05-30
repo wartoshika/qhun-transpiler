@@ -76,6 +76,11 @@ export class CommandLine {
     private fileWatcher: FileWatcher;
 
     /**
+     * the compiler instance
+     */
+    private compiler: Compiler;
+
+    /**
      * @param args the arguments
      */
     constructor(
@@ -113,6 +118,9 @@ export class CommandLine {
         // save project reference
         this.currentProject = project;
 
+        // construct the compiler
+        this.compiler = new Compiler(this.currentProject);
+
         // watch for file changes
         if (this.programArguments.watch) {
 
@@ -123,18 +131,15 @@ export class CommandLine {
     /**
      * executes the command line tool with the given arguments
      */
-    public execute(): boolean {
+    public execute(fileNames: string[] = this.currentProject.parsedCommandLine.fileNames): boolean {
 
         // check if state is prepared
         if (!this.currentProject) {
             return false;
         }
 
-        // construct the compiler
-        const compiler = new Compiler(this.currentProject);
-
         // start everything else
-        const result = compiler.compile(this.currentProject.parsedCommandLine.fileNames);
+        const result = this.compiler.compile(fileNames);
 
         // print the final result
         this.printResult(result);

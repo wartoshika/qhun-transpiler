@@ -30,6 +30,11 @@ export class Compiler {
     private externalModuleService: ExternalModuleService;
 
     /**
+     * a storage that exists over the lifetime of the compiler
+     */
+    private keyValueStorage: { [key: string]: any } = {};
+
+    /**
      * @param project the project configuration
      */
     constructor(
@@ -58,8 +63,6 @@ export class Compiler {
         let lastTarget: Target;
         const transpilerMetadata: QhunTranspilerMetadata = this.getMetadata();
 
-        const keyValueStorage = {};
-
         // iterate over every source file
         try {
 
@@ -73,7 +76,7 @@ export class Compiler {
             ).forEach(sourceFile => {
 
                 // create the transpiler
-                const target = targetFactory.create(this.project.target, this.project, typeChecker, sourceFile, transpilerMetadata, keyValueStorage);
+                const target = targetFactory.create(this.project.target, this.project, typeChecker, sourceFile, transpilerMetadata, this.keyValueStorage);
                 const extension = target.getFileExtension();
                 const transpiler = new Transpiler(target);
 
@@ -91,16 +94,22 @@ export class Compiler {
                 this.writeDestinationFile(sourceFile, transpiledCode, extension);
             });
 
+            let transpiledFilesAmount: number = 0;
+
             // run post project transpile
             if (lastTarget && lastTarget.postProjectTranspile(this.writtenFileStack)) {
 
-                return this.writtenFileStack.length;
+                transpiledFilesAmount = this.writtenFileStack.length;
             } else if (!lastTarget) {
 
                 // no error has been thrown and no last target available,
                 // means that no files were transpiled.
-                return 0;
+                transpiledFilesAmount = 0;
             }
+
+            // cleanup compiler vars and return the amount
+            this.writtenFileStack = [];
+            return transpiledFilesAmount;
 
         } catch (e) {
 
