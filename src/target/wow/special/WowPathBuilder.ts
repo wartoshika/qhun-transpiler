@@ -63,8 +63,30 @@ export class WowPathBuilder {
         // change dir sep style
         absolutePath = absolutePath.replace(/\\/g, "/");
 
-        // build the final path
-        return this.resolveRelativeRootPath(absolutePath);
+        // generate unique path name
+        return this.getUniquePathNameForFile(absolutePath);
+    }
+
+    /**
+     * creates a unique projectwide name for an import file
+     * @param absolutePath the absolute path to the file
+     */
+    public getUniquePathNameForFile(absolutePath: string): string {
+
+        // avoid possible symlink problems
+        absolutePath = fs.realpathSync(absolutePath + ".ts");
+
+        // find existing file import name
+        let name = this.keyValueStorage[absolutePath];
+        if (name) {
+            return name;
+        }
+
+        // generate a new one
+        name = this.generateUniqueVariableName(path.basename(absolutePath, ".ts"));
+        this.keyValueStorage[absolutePath] = name;
+
+        return name;
     }
 
     /**
@@ -78,4 +100,5 @@ export class WowPathBuilder {
             // remove leading slash
             .replace(/^\//, "");
     }
+
 }

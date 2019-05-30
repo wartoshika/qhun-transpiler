@@ -1,5 +1,3 @@
-// tslint:disable variable-name
-
 import * as ts from "typescript";
 
 export class StrictIdentifier implements Partial<ts.Identifier>, Partial<ts.Expression> {

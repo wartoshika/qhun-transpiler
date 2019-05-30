@@ -5,6 +5,7 @@ import { UnsupportedError } from "../../../error/UnsupportedError";
 import { WowPathBuilder, WowGlobalLibrary } from "../special";
 import { WowConfig } from "../WowConfig";
 import { SourceFile } from "../../../compiler/SourceFile";
+import { WowKeywords } from "../WowKeywords";
 
 export interface WowImportDeclaration extends BaseTarget<WowConfig>, Target, WowPathBuilder, WowGlobalLibrary { }
 
@@ -39,7 +40,8 @@ export class WowImportDeclaration implements Partial<Target> {
                     const moduleName = element.propertyName ? this.transpileNode(element.propertyName) : givenName;
 
                     // build the import
-                    return `local ${givenName} = ${this.getGlobalLibraryVariableName()}.get(${finalPath}).${moduleName}`;
+                    // return `local ${givenName} = ${this.getGlobalLibraryVariableName()}.get(${finalPath}).${moduleName}`;
+                    return `local ${givenName} = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get(${finalPath}).${moduleName}`;
                 });
             } else if (ts.isNamespaceImport(imports)) {
 
@@ -47,7 +49,8 @@ export class WowImportDeclaration implements Partial<Target> {
                 const givenName = this.transpileNode(imports.name);
 
                 importedElements = [
-                    `local ${givenName} = ${this.getGlobalLibraryVariableName()}.get(${finalPath})`
+                    // `local ${givenName} = ${this.getGlobalLibraryVariableName()}.get(${finalPath})`
+                    `local ${givenName} = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get(${finalPath})`
                 ];
             } else {
                 // unsupported import type

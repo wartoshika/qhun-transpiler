@@ -26,11 +26,6 @@ export abstract class BaseTarget<C extends Config = Config> implements Partial<T
     protected transpileNode: (node: ts.Node) => string;
 
     /**
-     * a variable counter for truely unique vars
-     */
-    private uniqueVariableCounter: number = 0;
-
-    /**
      * all declared exports of the file
      */
     private exportStack: TypescriptExport[] = [];
@@ -46,7 +41,8 @@ export abstract class BaseTarget<C extends Config = Config> implements Partial<T
         protected project: Project<C>,
         protected typeChecker: ts.TypeChecker,
         protected sourceFile: SourceFile,
-        protected qhunTranspilerMetadata: QhunTranspilerMetadata
+        protected qhunTranspilerMetadata: QhunTranspilerMetadata,
+        protected keyValueStorage: { [key: string]: any }
     ) { }
 
     /**
@@ -133,7 +129,10 @@ export abstract class BaseTarget<C extends Config = Config> implements Partial<T
      */
     protected generateUniqueVariableName(name: string): string {
 
-        return `__${name}_${this.uniqueVariableCounter++}`;
+        // init or current
+        this.keyValueStorage.uniqueVariableCounter = this.keyValueStorage.uniqueVariableCounter || 0;
+
+        return `__${name}_${this.keyValueStorage.uniqueVariableCounter++}`;
     }
 
     /**

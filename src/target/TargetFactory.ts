@@ -47,9 +47,10 @@ export class TargetFactory {
         project: Project,
         typeChecker: ts.TypeChecker,
         sourceFile: SourceFile,
-        metadata: QhunTranspilerMetadata
+        metadata: QhunTranspilerMetadata,
+        keyValueStorage: { [key: string]: any }
     ): SupportedTargets[T] {
 
-        return new TargetFactory.supportedTargets[target](project, typeChecker, sourceFile, metadata);
+        return new TargetFactory.supportedTargets[target](project, typeChecker, sourceFile, metadata, keyValueStorage);
     }
 }

@@ -64,15 +64,16 @@ export class WowPostTranspile implements Partial<Target> {
 
         // declare the lib content
         const libContent: string = [
-            `local ${this.getGlobalLibraryVariableName()} = {}`,
-            `local declareStack = {}`,
-            `function ${this.getGlobalLibraryVariableName()}.declare(name, content)`,
-            this.addSpacesToString(`declareStack[name] = content`, 2),
+            `local addon, namespace = ...`,
+            `local __library = {}`,
+            `local __declarations = {}`,
+            `function __library.declare(name, content)`,
+            this.addSpacesToString(`__declarations[name] = content`, 2),
             `end`,
-            `function ${this.getGlobalLibraryVariableName()}.get(name)`,
-            this.addSpacesToString(`return declareStack[name] or {}`, 2),
+            `function __library.get(name)`,
+            this.addSpacesToString(`return __declarations[name] or {}`, 2),
             `end`,
-            `_G.${this.getGlobalLibraryVariableName()} = ${this.getGlobalLibraryVariableName()}`
+            `namespace.importExport = __library`
         ].join("\n");
 
         // build the target file path and write it

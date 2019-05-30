@@ -58,6 +58,8 @@ export class Compiler {
         let lastTarget: Target;
         const transpilerMetadata: QhunTranspilerMetadata = this.getMetadata();
 
+        const keyValueStorage = {};
+
         // iterate over every source file
         try {
 
@@ -71,7 +73,7 @@ export class Compiler {
             ).forEach(sourceFile => {
 
                 // create the transpiler
-                const target = targetFactory.create(this.project.target, this.project, typeChecker, sourceFile, transpilerMetadata);
+                const target = targetFactory.create(this.project.target, this.project, typeChecker, sourceFile, transpilerMetadata, keyValueStorage);
                 const extension = target.getFileExtension();
                 const transpiler = new Transpiler(target);
 

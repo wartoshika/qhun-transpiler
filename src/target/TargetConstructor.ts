@@ -9,5 +9,5 @@ import { QhunTranspilerMetadata } from "./QhunTranspilerMetadata";
  */
 export interface TargetConstructor<T extends Target = Target> {
 
-    new(project: Project, typeChecker: ts.TypeChecker, sourceFile: SourceFile, metadata: QhunTranspilerMetadata): T;
+    new(project: Project, typeChecker: ts.TypeChecker, sourceFile: SourceFile, metadata: QhunTranspilerMetadata, keyValueStorage: { [key: string]: any }): T;
 }
