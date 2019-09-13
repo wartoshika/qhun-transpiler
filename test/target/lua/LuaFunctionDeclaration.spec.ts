@@ -80,6 +80,16 @@ import { UnitTest } from "../../UnitTest";
                     `local a = function ()`,
                     `end`
                 ]
+            },
+            {
+                code: `
+                    const a = () => 1
+                `,
+                expected: [
+                    "local a = function ()",
+                    "  return 1",
+                    "end"
+                ]
             }
         ]);
     }

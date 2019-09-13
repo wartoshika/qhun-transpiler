@@ -91,7 +91,7 @@ export abstract class Test {
         const targetFactory = new TargetFactory();
         return targetFactory.create(target, this.lastProject, this.lastProgram.getTypeChecker(), this.lastProgram.getSourceFile("test.ts") as SourceFile, {
             version: "0.0.0"
-        });
+        }, {});
     }
 
     /**

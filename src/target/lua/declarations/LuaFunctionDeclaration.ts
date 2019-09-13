@@ -90,7 +90,7 @@ export class LuaFunctionDeclaration implements Partial<Target> {
         let body = this.transpileNode(node.body);
 
         // check for shorthand arrow function usage eg: (x) => x + 1
-        if (node.body && (node.body.kind as ts.SyntaxKind) === ts.SyntaxKind.BinaryExpression) {
+        if (node.body && (node.body.kind as ts.SyntaxKind) !== ts.SyntaxKind.Block) {
 
             // add a return statement to ensure the shorthand call is correctly transpiled
             body = `return ${body}`;

@@ -1,6 +1,5 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
-import { UnsupportedError } from "../../../src/error/UnsupportedError";
 import { WowKeywords } from "../../../src/target/wow/WowKeywords";
 import { WowConfig } from "../../../src/target/wow/WowConfig";
 import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
@@ -24,11 +23,9 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                 `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
                 `  abc = abc`,
                 `}`,
-                `${WowKeywords.IMPORT_LIB_NAME}.declare("test", ${LuaKeywords.EXPORT_LOCAL_NAME})`
+                `${WowKeywords.FILE_META_IMPORT_EXPORT}.declare("__test_0", ${LuaKeywords.EXPORT_LOCAL_NAME})`
             ]
-        }], {
-                personalizedLibrary: false
-            });
+        }]);
     }
 
     @test "Namespace exports (export * from )"() {
@@ -39,13 +36,11 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
                 `local __FILE_META = {...}`,
                 `local ${LuaKeywords.EXPORT_LOCAL_NAME} = {`,
                 `}`,
-                `for mod, data in pairs(${WowKeywords.IMPORT_LIB_NAME}.get("a/index")) do`,
+                `for mod, data in pairs(${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0")) do`,
                 `  ${LuaKeywords.EXPORT_LOCAL_NAME}[mod] = data`,
                 `end`,
-                `${WowKeywords.IMPORT_LIB_NAME}.declare("test", ${LuaKeywords.EXPORT_LOCAL_NAME})`
+                `${WowKeywords.FILE_META_IMPORT_EXPORT}.declare("__test_1", ${LuaKeywords.EXPORT_LOCAL_NAME})`
             ]
-        }], {
-                personalizedLibrary: false
-            });
+        }]);
     }
 }

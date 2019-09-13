@@ -1,5 +1,6 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
+import { WowKeywords } from "../../../src/target/wow/WowKeywords";
 
 
 @suite("[Unit] Target: Wow | Path building", slow(1000), timeout(10000)) class WowPathBuilderTest extends UnitTest {
@@ -10,28 +11,26 @@ import { UnitTest } from "../../UnitTest";
             code: `import {C} from "./test";`,
             expected: [
                 "local __FILE_META = {...}",
-                "local C = __library.get(\"test/index\").C"
+                `local C = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").C`
             ]
         }, {
             code: `import {D as Q} from "./test/test2";`,
             expected: [
                 "local __FILE_META = {...}",
-                "local Q = __library.get(\"test/test2/index\").D"
+                `local Q = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").D`
             ]
         }, {
             code: `import {D} from "@wartoshika/test/test2";`,
             expected: [
                 "local __FILE_META = {...}",
-                "local D = __library.get(\"node_modules/@wartoshika/test/test2/index\").D"
+                `local D = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").D`
             ]
         }, {
             code: `import {D} from "@wartoshika/test/test2/../test2";`,
             expected: [
                 "local __FILE_META = {...}",
-                "local D = __library.get(\"node_modules/@wartoshika/test/test2/index\").D"
+                `local D = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").D`
             ]
-        }], {
-                personalizedLibrary: false
-            })
+        }])
     }
 }

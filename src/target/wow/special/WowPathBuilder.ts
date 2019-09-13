@@ -74,7 +74,11 @@ export class WowPathBuilder {
     public getUniquePathNameForFile(absolutePath: string): string {
 
         // avoid possible symlink problems
-        absolutePath = fs.realpathSync(absolutePath + ".ts");
+        try {
+            absolutePath = fs.realpathSync(absolutePath + ".ts");
+        } catch (e) {
+            absolutePath = `${absolutePath}.ts`;
+        }
 
         // find existing file import name
         let name = this.keyValueStorage[absolutePath];

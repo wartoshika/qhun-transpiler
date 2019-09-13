@@ -1,6 +1,6 @@
 {
   "name": "@wartoshika/qhun-transpiler",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "A command line tool to transpiles a Typescript project into supported other languages.",
   "main": "dist/index.js",
   "types": "dist/api/main.d.ts",
@@ -52,6 +52,7 @@
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
+    "typescript": "~3.2",
     "webpack": "^4.16.5",
     "webpack-cli": "^3.1.0"
   },
@@ -60,7 +61,6 @@
     "command-line-usage": "^5.0.5",
     "mkdirp": "^0.5.1",
     "md5": "^2.2.1",
-    "typescript": "^3.0.3",
     "typescript-mix": "^3.1.3"
   }
 }

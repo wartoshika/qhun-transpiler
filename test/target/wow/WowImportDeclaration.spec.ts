@@ -18,11 +18,9 @@ import { WowConfig } from "../../../src/target/wow/WowConfig";
             code: `import * as a from "./b"`,
             expected: [
                 `local __FILE_META = {...}`,
-                `local a = ${WowKeywords.IMPORT_LIB_NAME}.get("b/index")`
+                `local a = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0")`
             ]
-        }], {
-            personalizedLibrary: false
-        })
+        }])
     }
 
     @test "Names imports"() {
@@ -32,20 +30,18 @@ import { WowConfig } from "../../../src/target/wow/WowConfig";
                 code: `import {A} from "./a"`,
                 expected: [
                     `local __FILE_META = {...}`,
-                    `local A = ${WowKeywords.IMPORT_LIB_NAME}.get("a/index").A`
+                    `local A = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").A`
                 ]
 
             }, {
                 code: `import { A as B } from "./a";`,
                 expected: [
                     `local __FILE_META = {...}`,
-                    `local B = ${WowKeywords.IMPORT_LIB_NAME}.get("a/index").A`
+                    `local B = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").A`
                 ]
 
             }
-        ], {
-            personalizedLibrary: false
-        });
+        ]);
 
     }
 
@@ -56,15 +52,13 @@ import { WowConfig } from "../../../src/target/wow/WowConfig";
                 code: `import {A, B, C as D} from "./a"`,
                 expected: [
                     `local __FILE_META = {...}`,
-                    `local A = ${WowKeywords.IMPORT_LIB_NAME}.get("a/index").A`,
-                    `local B = ${WowKeywords.IMPORT_LIB_NAME}.get("a/index").B`,
-                    `local D = ${WowKeywords.IMPORT_LIB_NAME}.get("a/index").C`
+                    `local A = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").A`,
+                    `local B = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").B`,
+                    `local D = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").C`
                 ]
 
             }
-        ], {
-            personalizedLibrary: false
-        });
+        ]);
 
     }
 
@@ -74,11 +68,9 @@ import { WowConfig } from "../../../src/target/wow/WowConfig";
             code: `import {A} from "./a/b/c/d";`,
             expected: [
                 `local __FILE_META = {...}`,
-                `local A = ${WowKeywords.IMPORT_LIB_NAME}.get("a/b/c/d/index").A`
+                `local A = ${WowKeywords.FILE_META_IMPORT_EXPORT}.get("__index_0").A`
             ]
-        }], {
-            personalizedLibrary: false
-        })
+        }])
     }
 
     @test "File imports should fail"() {

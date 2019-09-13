@@ -33,7 +33,7 @@ export class LuaMathSpecial {
             "deg", "exp", "floor", "modf", "huge", "log",
             "max", "maxinteger", "min", "mininteger", "modf",
             "pi", "rad", "random", "randomseed", "sin", "sqrt",
-            "tan", "tointeger", "type", "ult"
+            "tan", "tointeger", "type", "ult", "pow"
         ];
     }
 }

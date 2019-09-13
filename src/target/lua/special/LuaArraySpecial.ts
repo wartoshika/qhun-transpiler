@@ -49,6 +49,10 @@ export class LuaArraySpecial {
                 return this.transpileSpecialArrayFunctionSlice(owner, argumentStack);
             case "unshift":
                 return this.transpileSpecialArrayFunctionUnshift(owner, argumentStack);
+            case "indexOf":
+                return this.transpileSpecialArrayFunctionIndexOf(owner, argumentStack);
+            case "splice":
+                return this.transpileSpecialArrayFunctionSplice(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given array function ${name} is unsupported!`, null);
         }
@@ -268,5 +272,68 @@ export class LuaArraySpecial {
         );
 
         return `__array_unshift(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
+    }
+
+    /**
+     * an impl. for the array.indexOf function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialArrayFunctionIndexOf(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // declare the array.push method
+        this.addDeclaration(
+            "array.indexof",
+            [
+                `local function __array_indexof(array, predicate)`,
+                this.addSpacesToString(`for k, v in pairs(array) do`, 2),
+                this.addSpacesToString(`if v == predicate then`, 4),
+                this.addSpacesToString(`return k`, 6),
+                this.addSpacesToString(`end`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return -1`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__array_indexof(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
+    }
+
+    /**
+     * an impl. for the array.indexOf function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialArrayFunctionSplice(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // declare the array.push method
+        this.addDeclaration(
+            "array.splice",
+            [
+                `local function __array_splice(array, index, delete, ...)`,
+                this.addSpacesToString(`index = index or 1`, 2),
+                this.addSpacesToString(`delete = delete or (#array - index)`, 2),
+                this.addSpacesToString(`local newItems = {...}`, 2),
+                this.addSpacesToString(`local i = 1`, 2),
+                this.addSpacesToString(`local n`, 2),
+                this.addSpacesToString(`local spliced = {}`, 2),
+                this.addSpacesToString(`for _, v in pairs({...}) do`, 2),
+                this.addSpacesToString(`if i == index then`, 4),
+                this.addSpacesToString(`table.insert(spliced, v)`, 6),
+                this.addSpacesToString(`table.remove(array, i)`, 6),
+                this.addSpacesToString(`i = i - 1`, 6),
+                this.addSpacesToString(`end`, 4),
+                this.addSpacesToString(`i = i + 1`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`for _, v in pairs(newItems) do`, 2),
+                this.addSpacesToString(`table.insert(array, index + n, v)`, 4),
+                this.addSpacesToString(`n = n + 1`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return spliced`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__array_splice(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
     }
 }
