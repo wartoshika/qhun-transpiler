@@ -2,12 +2,12 @@ import { Target } from "../../Target";
 import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
-import { WowPathBuilder, WowGlobalLibrary } from "../special";
+import { WowPathBuilder } from "../special";
 import { WowConfig } from "../WowConfig";
 import { SourceFile } from "../../../compiler/SourceFile";
 import { WowKeywords } from "../WowKeywords";
 
-export interface WowImportDeclaration extends BaseTarget<WowConfig>, Target, WowPathBuilder, WowGlobalLibrary { }
+export interface WowImportDeclaration extends BaseTarget<WowConfig>, Target, WowPathBuilder { }
 
 export class WowImportDeclaration implements Partial<Target> {
 

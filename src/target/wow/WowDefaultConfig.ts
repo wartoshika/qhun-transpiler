@@ -9,8 +9,6 @@ export class WowDefaultConfig implements DefaultConfigGetter<WowConfig> {
     public getDefaultConfig(): Partial<WowConfig> {
 
         // currently no default config for lua
-        return {
-            personalizedLibrary: true
-        };
+        return {};
     }
 }

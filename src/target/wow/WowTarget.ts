@@ -29,8 +29,7 @@ export class WowTarget extends LuaTarget implements Target {
         wowTrait.WowClassDeclaration,
         // specials
         wowTrait.WowPathBuilder,
-        wowTrait.WowPostTranspile,
-        wowTrait.WowGlobalLibrary
+        wowTrait.WowPostTranspile
     ) protected this: WowTarget;
 
     /**

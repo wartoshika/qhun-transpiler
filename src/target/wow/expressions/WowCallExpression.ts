@@ -3,10 +3,10 @@ import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
 import { PreProcessorFunction } from "../../../compiler/PreProcessor";
-import { WowGlobalLibrary } from "../special";
 import { WowConfig } from "../WowConfig";
+import { WowKeywords } from "../WowKeywords";
 
-export interface WowCallExpression extends BaseTarget<WowConfig>, Target, WowGlobalLibrary { }
+export interface WowCallExpression extends BaseTarget<WowConfig>, Target { }
 export class WowCallExpression implements Partial<Target> {
 
     /**
@@ -31,7 +31,6 @@ export class WowCallExpression implements Partial<Target> {
     private transpilePreprocessorRequire(node: ts.CallExpression): string {
 
         const [namespace, className] = node.arguments;
-        const libName = this.getGlobalLibraryVariableName();
 
         // transpile arguments
         const transpiledNamespace = this.transpileNode(namespace);
@@ -42,7 +41,7 @@ export class WowCallExpression implements Partial<Target> {
             "global.require_lib",
             [
                 "local function global_require_lib(namespace, className)",
-                this.addSpacesToString(`return ${libName}.get(namespace)[className]`, 2),
+                this.addSpacesToString(`return ${WowKeywords.FILE_META_IMPORT_EXPORT}.get(namespace)[className]`, 2),
                 `end`
             ].join("\n")
         );

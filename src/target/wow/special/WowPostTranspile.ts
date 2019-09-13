@@ -5,11 +5,9 @@ import { WowPathBuilder } from "./WowPathBuilder";
 import { WowConfig } from "../WowConfig";
 import * as path from "path";
 import * as fs from "fs";
-import { SourceFile } from "../../../compiler/SourceFile";
-import { WowGlobalLibrary } from "./WowGlobalLibrary";
 import { WowKeywords } from "../WowKeywords";
 
-export interface WowPostTranspile extends BaseTarget<WowConfig>, Target, WowPathBuilder, WowGlobalLibrary { }
+export interface WowPostTranspile extends BaseTarget<WowConfig>, Target, WowPathBuilder { }
 
 export class WowPostTranspile implements Partial<Target> {
 
