@@ -3,10 +3,9 @@ import * as ts from "typescript";
 import { BaseTarget } from "../../BaseTarget";
 import { UnsupportedError } from "../../../error/UnsupportedError";
 import { PreProcessorFunction } from "../../../compiler/PreProcessor";
-import { WowConfig } from "../WowConfig";
 import { WowKeywords } from "../WowKeywords";
 
-export interface WowCallExpression extends BaseTarget<WowConfig>, Target { }
+export interface WowCallExpression extends BaseTarget<"wow">, Target { }
 export class WowCallExpression implements Partial<Target> {
 
     /**

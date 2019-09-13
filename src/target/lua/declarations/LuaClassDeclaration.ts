@@ -44,7 +44,7 @@ export class LuaClassDeclaration implements Partial<Target> {
         }
 
         // check for static reflection
-        const reflection = this.getStaticReflection(node, name, this.project.config.staticReflection);
+        const reflection = this.getStaticReflection(node, name, this.project.configuration.targetConfig.staticReflection);
 
         // return the whole thing
         const classDef = [
@@ -98,12 +98,12 @@ export class LuaClassDeclaration implements Partial<Target> {
         classHead.push(`${className}.__index = ${className}`);
 
         // add class name when reflection is set
-        if (this.project.config.staticReflection & StaticReflection.CLASS_NAME) {
+        if (this.project.configuration.targetConfig.staticReflection & StaticReflection.CLASS_NAME) {
             classHead.push(`${className}.__name = ${this.transpileStringLiteral(ts.createStringLiteral(className))}`);
         }
 
         // add class namespace if reflection is set
-        if (this.project.config.staticReflection & StaticReflection.CLASS_NAMESPACE) {
+        if (this.project.configuration.targetConfig.staticReflection & StaticReflection.CLASS_NAMESPACE) {
             classHead.push(`${className}.__namespace = ${this.transpileStringLiteral(ts.createStringLiteral(this.getClassNamespace(node)))}`);
         }
 

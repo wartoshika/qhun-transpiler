@@ -1,13 +1,14 @@
-import * as ts from "typescript";
 import { Project } from "./Project";
-import * as path from "path";
-import { Config } from "./Config";
-import { StaticReflection } from "./StaticReflection";
 import { SupportedTargets, SupportedTargetConfig } from "../target/TargetFactory";
 import { DefaultConfigGetter } from "./DefaultConfigGetter";
 import { LuaDefaultConfig } from "../target/lua/LuaDefaultConfig";
 import { WowDefaultConfig } from "../target/wow/WowDefaultConfig";
 import { UnsupportedError } from "../error/UnsupportedError";
+import { ApiOptions } from "../api/ApiOptions";
+import { ApiConfiguration } from "../api/ApiConfiguration";
+
+import * as ts from "typescript";
+import * as fs from "fs";
 
 export class DefaultConfig {
 
@@ -21,44 +22,38 @@ export class DefaultConfig {
         };
     }
 
-    /**
-     * merge an existing or get the default project data
-     * @param givenProject the given project data
-     */
-    public static mergeDefaultProjectData<C extends Config = Config>(givenProject: Partial<Project<C>> = {}): Project {
+    public static apiOptionsToProject(options: ApiOptions<any>): Required<Project> {
 
-        // config block defaults
-        const configBlock: Partial<C> = givenProject.config || {};
-        const defaultConfigBlock = DefaultConfig.defaultConfigGetter(givenProject.target).getDefaultConfig();
-        Object.keys(defaultConfigBlock).forEach(key => {
+        const compilerOptions = options.compilerOptions ? options.compilerOptions : DefaultConfig.getDefaultCompilerOptions();
+        const rootDir = fs.realpathSync(".");
+        return {
+            ...options,
+            compilerOptions: options.compilerOptions ? options.compilerOptions : DefaultConfig.getDefaultCompilerOptions(),
+            overwrite: options.overwrite ? options.overwrite : {},
+            watch: typeof options.watch === "boolean" ? options.watch : false,
+            outDir: compilerOptions.outDir || "dist",
+            rootDir: rootDir,
+            configuration: DefaultConfig.mergeDefaultConfiguration(options.configuration, rootDir)
+        };
+    }
 
-            if (typeof configBlock[key as keyof Partial<C>] === "undefined") {
-                configBlock[key as keyof Partial<C>] = defaultConfigBlock[key];
-            }
-        });
+    public static mergeDefaultConfiguration(configuration: ApiConfiguration<any>, rootDir: string): Required<ApiConfiguration<any>> {
 
-        // add static reflection as global default
-        configBlock.staticReflection = configBlock.staticReflection ? configBlock.staticReflection : StaticReflection.NONE;
+        if (!configuration.project) {
+
+            // read from package.json file
+            configuration.project = DefaultConfig.readPackageJson(rootDir);
+        }
+
+        const configGetter = DefaultConfig.defaultConfigGetter(configuration.target);
 
         return {
-            author: givenProject.author ? givenProject.author : "Unknown",
-            description: givenProject.description ? givenProject.description : "Unknown",
-            licence: givenProject.licence ? givenProject.licence : "Unknown",
-            name: givenProject.name ? givenProject.name : "Unknown",
-            outDir: givenProject.outDir ? givenProject.outDir : "dist",
-            target: givenProject.target ? givenProject.target : "lua",
-            version: givenProject.version ? givenProject.version : "0.0.0",
-            tsconfig: givenProject.tsconfig ? givenProject.tsconfig : "./tsconfig.json",
-            printFileHeader: typeof givenProject.printFileHeader === "boolean" ? givenProject.printFileHeader : true,
-            config: configBlock,
-            stripOutDir: givenProject.stripOutDir ? givenProject.stripOutDir : "src",
-            rootDir: givenProject.rootDir ? givenProject.rootDir : path.resolve("."),
-            skipExternalModuleCheck: typeof givenProject.skipExternalModuleCheck === "boolean" ? givenProject.skipExternalModuleCheck : false,
-            parsedCommandLine: givenProject.parsedCommandLine ? givenProject.parsedCommandLine : {
-                fileNames: [],
-                options: DefaultConfig.getDefaultCompilerOptions()
-            }
-        } as Project;
+            project: configuration.project,
+            directoryWithSource: configuration.directoryWithSource ? configuration.directoryWithSource : "src",
+            printFileHeader: typeof configuration.printFileHeader === "boolean" ? configuration.printFileHeader : false,
+            targetConfig: configuration.targetConfig ? configuration.targetConfig : configGetter.getDefaultConfig(),
+            target: configuration.target
+        };
     }
 
     /**
@@ -75,5 +70,17 @@ export class DefaultConfig {
             default:
                 throw new UnsupportedError(`A default config getter could not be found for the target ${target}`, null, true);
         }
+    }
+
+    private static readPackageJson(rootDir: string): ApiConfiguration<any>["project"] {
+
+        const packageJson = require(`${rootDir}/package.json`);
+        return {
+            author: packageJson.author,
+            description: packageJson.description,
+            license: packageJson.license,
+            name: packageJson.name,
+            version: packageJson.version
+        };
     }
 }

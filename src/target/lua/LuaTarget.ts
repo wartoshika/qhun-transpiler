@@ -3,15 +3,16 @@ import { BaseTarget } from "../BaseTarget";
 import * as luaTrait from "./traits";
 import { use } from "typescript-mix";
 import { LuaKeywords } from "./LuaKeywords";
+import { SupportedTargets } from "../TargetFactory";
 
-export interface LuaTarget extends BaseTarget, Target,
+export interface LuaTarget<T extends keyof SupportedTargets = "lua"> extends BaseTarget<T>, Target,
     luaTrait.LuaDeclarations, luaTrait.LuaDeclarations, luaTrait.LuaExpressions, luaTrait.LuaMisc,
     luaTrait.LuaSpecial, luaTrait.LuaDecorators { }
 
 /**
  * the lua target
  */
-export class LuaTarget extends BaseTarget implements Target {
+export class LuaTarget<T extends keyof SupportedTargets = "lua"> extends BaseTarget<T> implements Target {
 
     /**
      * import traits
@@ -87,7 +88,7 @@ export class LuaTarget extends BaseTarget implements Target {
         luaTrait.LuaFunctionDecorator,
         luaTrait.LuaParameterDecorator,
         luaTrait.LuaPropertyDecorator
-    ) protected this: LuaTarget;
+    ) protected this: LuaTarget<T>;
 
     /**
      * get the file extension of the target language

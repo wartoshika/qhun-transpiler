@@ -1,11 +1,10 @@
 import { BaseTarget } from "../../BaseTarget";
 import { Target } from "../../Target";
 import * as path from "path";
-import { WowConfig } from "../WowConfig";
 import { SourceFile } from "../../../compiler/SourceFile";
 import * as fs from "fs";
 
-export interface WowPathBuilder extends BaseTarget<WowConfig>, Target { }
+export interface WowPathBuilder extends BaseTarget<"wow">, Target { }
 
 /**
  * a class that handles path building relative to the project root

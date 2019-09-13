@@ -63,7 +63,7 @@ export class ExternalModuleService {
             // strip leading slash
             .replace(/^\/?/, "");
 
-        return relativeFilePath.indexOf(this.project.stripOutDir) !== 0;
+        return relativeFilePath.indexOf(this.project.configuration.directoryWithSource) !== 0;
     }
 
     /**
@@ -84,10 +84,7 @@ export class ExternalModuleService {
         return files.map(file => {
 
             // check if this file is an external file
-            let isExternal = this.isExternalModule(file);
-            if (this.project.skipExternalModuleCheck) {
-                isExternal = false;
-            }
+            const isExternal = this.isExternalModule(file);
 
             // add transpiler source file attributes
             (file as SourceFile).isExternal = isExternal;
@@ -100,7 +97,7 @@ export class ExternalModuleService {
                 // to unix style directory seperator
                 .replace(/\\/g, "/")
                 // remove striped source folder
-                .replace("/" + this.project.stripOutDir + "/", "")
+                .replace("/" + this.project.configuration.directoryWithSource + "/", "")
                 // remove extension
                 .replace(/\.tsx?$/, "");
 
@@ -134,7 +131,7 @@ export class ExternalModuleService {
                     // remove extension
                     .replace(/\.tsx?$/, "")
                     // remove striped source folder
-                    .replace("/" + this.project.stripOutDir + "/", "/");
+                    .replace("/" + this.project.configuration.directoryWithSource + "/", "/");
 
                 // get node module root path
                 let nodeModuleRootPath = moduleRoot.replace(this.project.rootDir.replace(/\\/g, "/"), "");

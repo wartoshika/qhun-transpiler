@@ -2,12 +2,11 @@ import { BaseTarget } from "../../BaseTarget";
 import { Target } from "../../Target";
 import { CompilerWrittenFile } from "../../../compiler/CompilerWrittenFile";
 import { WowPathBuilder } from "./WowPathBuilder";
-import { WowConfig } from "../WowConfig";
 import * as path from "path";
 import * as fs from "fs";
 import { WowKeywords } from "../WowKeywords";
 
-export interface WowPostTranspile extends BaseTarget<WowConfig>, Target, WowPathBuilder { }
+export interface WowPostTranspile extends BaseTarget<"wow">, Target, WowPathBuilder { }
 
 export class WowPostTranspile implements Partial<Target> {
 
@@ -87,7 +86,7 @@ export class WowPostTranspile implements Partial<Target> {
      */
     private sanitizeTocFileName(): string {
 
-        return this.project.name
+        return this.project.configuration.project.name
             .replace(/[^a-z0-9\_\-]/ig, "")
             .replace(/\-/, "_");
     }
@@ -109,25 +108,33 @@ export class WowPostTranspile implements Partial<Target> {
 
         // construct the toc meta string
         const tocFileContent: string[] = [
-            this.getTocFileMetadataLine("Interface", this.project.config.interface),
-            this.getTocFileMetadataLine("Title", this.project.config.visibleName),
-            this.getTocFileMetadataLine("Author", this.project.author),
-            this.getTocFileMetadataLine("Version", this.project.version),
-            this.getTocFileMetadataLine("Notes", this.project.description)
+            this.getTocFileMetadataLine("Interface", this.project.configuration.targetConfig.interface),
+            this.getTocFileMetadataLine("Title", this.project.configuration.targetConfig.visibleName),
+            this.getTocFileMetadataLine("Author", this.project.configuration.project.author),
+            this.getTocFileMetadataLine("Version", this.project.configuration.project.version),
+            this.getTocFileMetadataLine("Notes", this.project.configuration.project.description)
         ];
 
         // add optional toc meta content
-        if (this.project.config.optionalDependencies && this.project.config.optionalDependencies.length > 0) {
-            tocFileContent.push(this.getTocFileMetadataLine("OptionalDeps", this.project.config.optionalDependencies.join(", ")));
+        if (this.project.configuration.targetConfig.optionalDependencies && this.project.configuration.targetConfig.optionalDependencies.length > 0) {
+            tocFileContent.push(this.getTocFileMetadataLine("OptionalDeps", this.project.configuration.targetConfig.optionalDependencies.join(", ")));
         }
-        if (this.project.config.dependencies && this.project.config.dependencies.length > 0) {
-            tocFileContent.push(this.getTocFileMetadataLine("Dependencies", this.project.config.dependencies.join(", ")));
+        if (this.project.configuration.targetConfig.dependencies && this.project.configuration.targetConfig.dependencies.length > 0) {
+            tocFileContent.push(this.getTocFileMetadataLine("Dependencies", this.project.configuration.targetConfig.dependencies.join(", ")));
         }
-        if (this.project.config.savedVariables && this.project.config.savedVariables.length > 0) {
-            tocFileContent.push(this.getTocFileMetadataLine("SavedVariables", this.project.config.savedVariables.join(", ")));
+        if (this.project.configuration.targetConfig.savedVariables && this.project.configuration.targetConfig.savedVariables.length > 0) {
+            tocFileContent.push(this.getTocFileMetadataLine("SavedVariables", this.project.configuration.targetConfig.savedVariables.join(", ")));
         }
-        if (this.project.config.savedVariablesPerCharacter && this.project.config.savedVariablesPerCharacter.length > 0) {
-            tocFileContent.push(this.getTocFileMetadataLine("SavedVariablesPerCharacter", this.project.config.savedVariablesPerCharacter.join(", ")));
+        if (
+            this.project.configuration.targetConfig.savedVariablesPerCharacter &&
+            this.project.configuration.targetConfig.savedVariablesPerCharacter.length > 0
+        ) {
+            tocFileContent.push(
+                this.getTocFileMetadataLine(
+                    "SavedVariablesPerCharacter",
+                    this.project.configuration.targetConfig.savedVariablesPerCharacter.join(", ")
+                )
+            );
         }
 
         // addon qhun-transpiler version

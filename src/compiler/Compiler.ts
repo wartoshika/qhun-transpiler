@@ -38,7 +38,7 @@ export class Compiler {
      * @param project the project configuration
      */
     constructor(
-        private project: Project
+        private project: Required<Project>
     ) {
 
         // setup external module service
@@ -54,7 +54,7 @@ export class Compiler {
     public compile(files: string[]): number | boolean {
 
         // create a typescript program
-        const program = ts.createProgram(files, this.project.parsedCommandLine.options);
+        const program = ts.createProgram(files, this.project.compilerOptions);
         const typeChecker = program.getTypeChecker();
 
         // create the transpiling target
@@ -76,7 +76,11 @@ export class Compiler {
             ).forEach(sourceFile => {
 
                 // create the transpiler
-                const target = targetFactory.create(this.project.target, this.project, typeChecker, sourceFile, transpilerMetadata, this.keyValueStorage);
+                const target = targetFactory.create(this.project.configuration.target,
+                    this.project, typeChecker,
+                    sourceFile, transpilerMetadata,
+                    this.keyValueStorage
+                );
                 const extension = target.getFileExtension();
                 const transpiler = new Transpiler(target);
 
@@ -164,7 +168,7 @@ export class Compiler {
         const partOfFilePath = filePath.replace(this.project.rootDir, "");
         const destinationDir = path.dirname(
             path.join(this.project.rootDir, path.basename(this.project.outDir), partOfFilePath)
-        ).replace(this.project.stripOutDir, "");
+        ).replace(this.project.configuration.directoryWithSource, "");
 
         // create that dir
         mkdirp.sync(destinationDir);

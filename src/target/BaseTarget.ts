@@ -3,11 +3,9 @@ import * as ts from "typescript";
 import { Project } from "../config/Project";
 import { Types } from "../transpiler/Types";
 import { CompilerWrittenFile } from "../compiler/CompilerWrittenFile";
-import { Config } from "../config/Config";
-import * as path from "path";
-import * as fs from "fs";
 import { SourceFile } from "../compiler/SourceFile";
 import { QhunTranspilerMetadata } from "./QhunTranspilerMetadata";
+import { SupportedTargets } from "./TargetFactory";
 
 declare type TypescriptExport = {
     name: string,
@@ -18,7 +16,7 @@ declare type TypescriptExport = {
 /**
  * the base target class that implements cross language functionality
  */
-export abstract class BaseTarget<C extends Config = Config> implements Partial<Target> {
+export abstract class BaseTarget<T extends keyof SupportedTargets = any> implements Partial<Target> {
 
     /**
      * the node transpiler
@@ -38,7 +36,7 @@ export abstract class BaseTarget<C extends Config = Config> implements Partial<T
     } = {};
 
     constructor(
-        protected project: Project<C>,
+        protected project: Project<T>,
         protected typeChecker: ts.TypeChecker,
         protected sourceFile: SourceFile,
         protected qhunTranspilerMetadata: QhunTranspilerMetadata,

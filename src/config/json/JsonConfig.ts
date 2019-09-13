@@ -1,10 +1,9 @@
-import { Config } from "../Config";
-import { SupportedTargets } from "../../target/TargetFactory";
+import { SupportedTargets, SupportedTargetConfig } from "../../target/TargetFactory";
 
 /**
  * the project data read from the qhun-transpiler.json file
  */
-export interface JsonConfig<C extends Config = Config> {
+export interface JsonConfig<T extends keyof SupportedTargets = "lua", C = SupportedTargetConfig[T]> {
 
     /**
      * name of the project
@@ -29,7 +28,7 @@ export interface JsonConfig<C extends Config = Config> {
     /**
      * the target language
      */
-    target: keyof SupportedTargets;
+    target: T;
 
     /**
      * the path to the tsconfig.json file

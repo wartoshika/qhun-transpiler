@@ -20,7 +20,7 @@ export class FileWatcher {
     } = {};
 
     constructor(
-        private project: Project,
+        private project: Project<any>,
         private executeOnChange: (filesChanged: string[]) => any
     ) {
 
@@ -42,7 +42,7 @@ export class FileWatcher {
     private getPathToWatch(): string {
 
         return path.resolve(...[
-            this.project.rootDir, this.project.stripOutDir ? this.project.stripOutDir : undefined
+            this.project.rootDir, this.project.configuration.directoryWithSource ? this.project.configuration.directoryWithSource : undefined
         ]);
     }
 
