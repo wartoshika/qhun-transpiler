@@ -6,7 +6,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { WowKeywords } from "../WowKeywords";
 
-export interface WowPostTranspile extends BaseTarget<"wow">, Target, WowPathBuilder { }
+export interface WowPostTranspile extends BaseTarget, Target, WowPathBuilder { }
 
 export class WowPostTranspile implements Partial<Target> {
 

@@ -61,133 +61,212 @@ export class Transpiler {
             return "";
         }
 
+        // find transpiler sub function
+        let nodeTranspiler: (node: ts.Node) => string;
+        let nodeArgument: ts.Node = node;
+        let boundArg: object = this.target;
+
         // check the node kind and decide what to do with this node kind
         switch (node.kind) {
             case ts.SyntaxKind.ImportDeclaration:
-                return this.target.transpileImportDeclaration(node as ts.ImportDeclaration);
+                nodeTranspiler = this.target.transpileImportDeclaration;
+                break;
             case ts.SyntaxKind.ClassDeclaration:
-                return this.target.transpileClassDeclaration(node as ts.ClassDeclaration);
+                nodeTranspiler = this.target.transpileClassDeclaration;
+                break;
             case ts.SyntaxKind.ClassExpression:
-                return this.target.transpileClassExpression(node as ts.ClassExpression);
+                nodeTranspiler = this.target.transpileClassExpression;
+                break;
             case ts.SyntaxKind.ModuleDeclaration:
-                return this.target.transpileModuleDeclaration(node as ts.ModuleDeclaration);
+                nodeTranspiler = this.target.transpileModuleDeclaration;
+                break;
             case ts.SyntaxKind.ModuleBlock:
-                return this.target.transpileBlock(node as ts.Block);
+                nodeTranspiler = this.target.transpileBlock;
+                break;
             case ts.SyntaxKind.EnumDeclaration:
-                return this.target.transpileEnumDeclaration(node as ts.EnumDeclaration);
+                nodeTranspiler = this.target.transpileEnumDeclaration;
+                break;
             case ts.SyntaxKind.FunctionDeclaration:
-                return this.target.transpileFunctionDeclaration(node as ts.FunctionDeclaration);
+                nodeTranspiler = this.target.transpileFunctionDeclaration;
+                break;
             case ts.SyntaxKind.VariableStatement:
-                return this.target.transpileVariableStatement(node as ts.VariableStatement);
+                nodeTranspiler = this.target.transpileVariableStatement;
+                break;
             case ts.SyntaxKind.VariableDeclarationList:
-                return this.target.transpileVariableDeclarationList(node as ts.VariableDeclarationList);
+                nodeTranspiler = this.target.transpileVariableDeclarationList;
+                break;
             case ts.SyntaxKind.VariableDeclaration:
-                return this.target.transpileVariableDeclaration(node as ts.VariableDeclaration);
+                nodeTranspiler = this.target.transpileVariableDeclaration;
+                break;
             case ts.SyntaxKind.ExpressionStatement:
-                return this.transpileNode((node as ts.ExpressionStatement).expression);
+                nodeTranspiler = this.transpileNode;
+                boundArg = this;
+                nodeArgument = (node as ts.ExpressionStatement).expression;
+                break;
             case ts.SyntaxKind.ReturnStatement:
-                return this.target.transpileReturnStatement(node as ts.ReturnStatement);
+                nodeTranspiler = this.target.transpileReturnStatement;
+                break;
             case ts.SyntaxKind.Block:
-                return this.target.transpileBlock(node as ts.Block);
+                nodeTranspiler = this.target.transpileBlock;
+                break;
             case ts.SyntaxKind.IfStatement:
-                return this.target.transpileIfStatement(node as ts.IfStatement);
+                nodeTranspiler = this.target.transpileIfStatement;
+                break;
             case ts.SyntaxKind.WhileStatement:
-                return this.target.transpileWhileStatement(node as ts.WhileStatement);
+                nodeTranspiler = this.target.transpileWhileStatement;
+                break;
             case ts.SyntaxKind.DoStatement:
-                return this.target.transpileDoStatement(node as ts.DoStatement);
+                nodeTranspiler = this.target.transpileDoStatement;
+                break;
             case ts.SyntaxKind.ForStatement:
-                return this.target.transpileForStatement(node as ts.ForStatement);
+                nodeTranspiler = this.target.transpileForStatement;
+                break;
             case ts.SyntaxKind.ForOfStatement:
-                return this.target.transpileForOfStatement(node as ts.ForOfStatement);
+                nodeTranspiler = this.target.transpileForOfStatement;
+                break;
             case ts.SyntaxKind.ForInStatement:
-                return this.target.transpileForInStatement(node as ts.ForInStatement);
+                nodeTranspiler = this.target.transpileForInStatement;
+                break;
             case ts.SyntaxKind.SwitchStatement:
-                return this.target.transpileSwitchStatement(node as ts.SwitchStatement);
+                nodeTranspiler = this.target.transpileSwitchStatement;
+                break;
             case ts.SyntaxKind.BreakStatement:
-                return this.target.transpileBreakStatement(node as ts.BreakStatement);
+                nodeTranspiler = this.target.transpileBreakStatement;
+                break;
             case ts.SyntaxKind.TryStatement:
-                return this.target.transpileTryStatement(node as ts.TryStatement);
+                nodeTranspiler = this.target.transpileTryStatement;
+                break;
             case ts.SyntaxKind.ThrowStatement:
-                return this.target.transpileThrowStatement(node as ts.ThrowStatement);
+                nodeTranspiler = this.target.transpileThrowStatement;
+                break;
             case ts.SyntaxKind.ContinueStatement:
-                return this.target.transpileContinueStatement(node as ts.ContinueStatement);
+                nodeTranspiler = this.target.transpileContinueStatement;
+                break;
             case ts.SyntaxKind.TypeAliasDeclaration:
-                return this.target.transpileTypeAliasDeclaration(node as ts.TypeAliasDeclaration);
+                nodeTranspiler = this.target.transpileTypeAliasDeclaration;
+                break;
             case ts.SyntaxKind.InterfaceDeclaration:
-                return this.target.transpileInterfaceDeclaration(node as ts.InterfaceDeclaration);
+                nodeTranspiler = this.target.transpileInterfaceDeclaration;
+                break;
             case ts.SyntaxKind.EndOfFileToken:
-                return this.target.transpileEndOfFileToken(node as ts.EndOfFileToken);
+                nodeTranspiler = this.target.transpileEndOfFileToken;
+                break;
             case ts.SyntaxKind.BinaryExpression:
-                return this.target.transpileBinaryExpression(node as ts.BinaryExpression);
+                nodeTranspiler = this.target.transpileBinaryExpression;
+                break;
             case ts.SyntaxKind.ConditionalExpression:
-                return this.target.transpileConditionalExpression(node as ts.ConditionalExpression);
+                nodeTranspiler = this.target.transpileConditionalExpression;
+                break;
             case ts.SyntaxKind.CallExpression:
-                return this.target.transpileCallExpression(node as ts.CallExpression);
+                nodeTranspiler = this.target.transpileCallExpression;
+                break;
             case ts.SyntaxKind.PropertyAccessExpression:
-                return this.target.transpilePropertyAccessExpression(node as ts.PropertyAccessExpression);
+                nodeTranspiler = this.target.transpilePropertyAccessExpression;
+                break;
             case ts.SyntaxKind.ElementAccessExpression:
-                return this.target.transpileElementAccessExpression(node as ts.ElementAccessExpression);
+                nodeTranspiler = this.target.transpileElementAccessExpression;
+                break;
             case ts.SyntaxKind.Identifier:
-                return this.target.transpileIdentifier(node as ts.Identifier);
+                nodeTranspiler = this.target.transpileIdentifier;
+                break;
             case ts.SyntaxKind.ArrayBindingPattern:
-                return this.target.transpileArrayBindingPattern(node as ts.ArrayBindingPattern);
+                nodeTranspiler = this.target.transpileArrayBindingPattern;
+                break;
             case ts.SyntaxKind.ObjectBindingPattern:
-                return this.target.transpileObjectBindingPattern(node as ts.ObjectBindingPattern);
+                nodeTranspiler = this.target.transpileObjectBindingPattern;
+                break;
             case ts.SyntaxKind.StringLiteral:
             case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
-                return this.target.transpileStringLiteral(node as ts.StringLiteral);
+                nodeTranspiler = this.target.transpileStringLiteral;
+                break;
             case ts.SyntaxKind.TemplateExpression:
-                return this.target.transpileTemplateExpression(node as ts.TemplateExpression);
+                nodeTranspiler = this.target.transpileTemplateExpression;
+                break;
             case ts.SyntaxKind.NumericLiteral:
-                return this.target.transpileNumericLiteral(node as ts.NumericLiteral);
+                nodeTranspiler = this.target.transpileNumericLiteral;
+                break;
             case ts.SyntaxKind.TrueKeyword:
             case ts.SyntaxKind.FalseKeyword:
             case ts.SyntaxKind.NullKeyword:
             case ts.SyntaxKind.UndefinedKeyword:
             case ts.SyntaxKind.ThisKeyword:
             case ts.SyntaxKind.SuperKeyword:
-                return this.target.transpileKeyword(node as any);
+                nodeTranspiler = this.target.transpileKeyword;
+                break;
             case ts.SyntaxKind.PostfixUnaryExpression:
-                return this.target.transpilePostfixUnaryExpression(node as ts.PostfixUnaryExpression);
+                nodeTranspiler = this.target.transpilePostfixUnaryExpression;
+                break;
             case ts.SyntaxKind.PrefixUnaryExpression:
-                return this.target.transpilePrefixUnaryExpression(node as ts.PrefixUnaryExpression);
+                nodeTranspiler = this.target.transpilePrefixUnaryExpression;
+                break;
             case ts.SyntaxKind.ArrayLiteralExpression:
-                return this.target.transpileArrayLiteralExpression(node as ts.ArrayLiteralExpression);
+                nodeTranspiler = this.target.transpileArrayLiteralExpression;
+                break;
             case ts.SyntaxKind.ObjectLiteralExpression:
-                return this.target.transpileObjectLiteralExpression(node as ts.ObjectLiteralExpression);
+                nodeTranspiler = this.target.transpileObjectLiteralExpression;
+                break;
             case ts.SyntaxKind.DeleteExpression:
-                return this.target.transpileDeleteExpression(node as ts.DeleteExpression);
+                nodeTranspiler = this.target.transpileDeleteExpression;
+                break;
             case ts.SyntaxKind.FunctionExpression:
             case ts.SyntaxKind.ArrowFunction:
-                return this.target.transpileFunctionExpression(node as ts.FunctionExpression);
+                nodeTranspiler = this.target.transpileFunctionExpression;
+                break;
             case ts.SyntaxKind.NewExpression:
-                return this.target.transpileNewExpression(node as ts.NewExpression);
+                nodeTranspiler = this.target.transpileNewExpression;
+                break;
             case ts.SyntaxKind.ComputedPropertyName:
-                return this.target.transpileComputedPropertyName(node as ts.ComputedPropertyName);
+                nodeTranspiler = this.target.transpileComputedPropertyName;
+                break;
             case ts.SyntaxKind.ParenthesizedExpression:
-                return this.target.transpileParenthesizedExpression(node as ts.ParenthesizedExpression);
+                nodeTranspiler = this.target.transpileParenthesizedExpression;
+                break;
             case ts.SyntaxKind.TypeAssertionExpression:
-                return this.target.transpileTypeAssertion(node as ts.TypeAssertion);
+                nodeTranspiler = this.target.transpileTypeAssertion;
+                break;
             case ts.SyntaxKind.AsExpression:
-                return this.target.transpileAsExpression(node as ts.AsExpression);
+                nodeTranspiler = this.target.transpileAsExpression;
+                break;
             case ts.SyntaxKind.TypeOfExpression:
-                return this.target.transpileTypeOfExpression(node as ts.TypeOfExpression);
+                nodeTranspiler = this.target.transpileTypeOfExpression;
+                break;
             case ts.SyntaxKind.EmptyStatement:
-                return this.target.transpileEmptyStatement(node as ts.EmptyStatement);
+                nodeTranspiler = this.target.transpileEmptyStatement;
+                break;
             case ts.SyntaxKind.ExportAssignment:
-                return this.target.transpileExportAssignment(node as ts.ExportAssignment);
+                nodeTranspiler = this.target.transpileExportAssignment;
+                break;
             case ts.SyntaxKind.ExportDeclaration:
-                return this.target.transpileExportDeclaration(node as ts.ExportDeclaration);
+                nodeTranspiler = this.target.transpileExportDeclaration;
+                break;
             case ts.SyntaxKind.ImportEqualsDeclaration:
-                return this.target.transpileImportEqualsDeclaration(node as ts.ImportEqualsDeclaration);
+                nodeTranspiler = this.target.transpileImportEqualsDeclaration;
+                break;
             case ts.SyntaxKind.SpreadElement:
-                return this.target.transpileSpreadElement(node as ts.SpreadElement);
+                nodeTranspiler = this.target.transpileSpreadElement;
+                break;
             case ts.SyntaxKind.ThrowStatement:
-                return this.target.transpileThrowStatement(node as ts.ThrowStatement);
+                nodeTranspiler = this.target.transpileThrowStatement;
+                break;
             case ts.SyntaxKind.RegularExpressionLiteral:
-                return this.target.transpileRegularExpressionLiteral(node as ts.RegularExpressionLiteral);
-            default:
-                throw new UnsupportedError(`Unsupported expression: ${ts.SyntaxKind[node.kind]}`, node);
+                nodeTranspiler = this.target.transpileRegularExpressionLiteral;
+                break;
+        }
+
+        // overwrite available?
+        const project = this.target.getProject();
+        if (project.overwrite && project.overwrite[node.kind]) {
+
+            // use the given overwrite to transpile
+            return project.overwrite[node.kind](node, n => this.transpileNode(n), n => nodeTranspiler(n));
+        } else if (nodeTranspiler) {
+
+            // use found node transpiler
+            return nodeTranspiler.bind(boundArg)(nodeArgument);
+        } else {
+
+            // no node transpiler found!
+            throw new UnsupportedError(`Unsupported expression: ${ts.SyntaxKind[node.kind]}`, node);
         }
     }
 }

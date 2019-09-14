@@ -5,7 +5,7 @@ import { LuaClassDeclaration } from "../../lua/traits";
 import { WowPathBuilder } from "../special";
 import { SourceFile } from "../../../compiler/SourceFile";
 
-export interface WowClassDeclaration extends BaseTarget<"wow">, Target, WowPathBuilder { }
+export interface WowClassDeclaration extends BaseTarget, Target, WowPathBuilder { }
 export class WowClassDeclaration implements Partial<LuaClassDeclaration> {
 
     public getClassNamespace(node: ts.ClassDeclaration): string {

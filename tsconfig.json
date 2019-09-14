@@ -11,6 +11,9 @@
         "target": "es5",
         "sourceMap": true,
         "strictBindCallApply": true,
+        "lib": [
+            "es2015"
+        ],
         "typeRoots": [
             "declarations",
             "node_modules/@types"

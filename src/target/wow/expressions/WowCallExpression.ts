@@ -5,7 +5,7 @@ import { UnsupportedError } from "../../../error/UnsupportedError";
 import { PreProcessorFunction } from "../../../compiler/PreProcessor";
 import { WowKeywords } from "../WowKeywords";
 
-export interface WowCallExpression extends BaseTarget<"wow">, Target { }
+export interface WowCallExpression extends BaseTarget, Target { }
 export class WowCallExpression implements Partial<Target> {
 
     /**

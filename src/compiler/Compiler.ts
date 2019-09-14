@@ -13,6 +13,7 @@ import { ErrorWithNode } from "../error/ErrorWithNode";
 import { ExternalModuleService } from "./ExternalModuleService";
 import { SourceFile } from "./SourceFile";
 import { QhunTranspilerMetadata } from "../target/QhunTranspilerMetadata";
+import { CompileResult } from "./CompileResult";
 
 // tslint:disable-next-line
 const packageJson = require("../../package.json");
@@ -35,6 +36,11 @@ export class Compiler {
     private keyValueStorage: { [key: string]: any } = {};
 
     /**
+     * contains the last target that has been used to transpile a file
+     */
+    private lastTarget: Target;
+
+    /**
      * @param project the project configuration
      */
     constructor(
@@ -51,7 +57,7 @@ export class Compiler {
      * @param files the files to compile and transpile
      * @returns the amount of successfully transpiled and written files. false on error
      */
-    public compile(files: string[]): number | boolean {
+    public compile(files: string[]): CompileResult[] | false {
 
         // create a typescript program
         const program = ts.createProgram(files, this.project.compilerOptions);
@@ -60,8 +66,9 @@ export class Compiler {
         // create the transpiling target
         const targetFactory = new TargetFactory();
         let lastSourceFile: ts.SourceFile;
-        let lastTarget: Target;
+        this.lastTarget = undefined;
         const transpilerMetadata: QhunTranspilerMetadata = this.getMetadata();
+        const transpileResult: CompileResult[] = [];
 
         // iterate over every source file
         try {
@@ -86,7 +93,7 @@ export class Compiler {
 
                 // declare last instances
                 lastSourceFile = sourceFile;
-                lastTarget = target;
+                this.lastTarget = target;
 
                 // transpile this file
                 let transpiledCode = transpiler.transpile(sourceFile);
@@ -94,26 +101,19 @@ export class Compiler {
                 // restore replacements
                 transpiledCode = TranspilerFunctions.restoreReservedChars(transpiledCode);
 
-                // output the transpiled code into the destination file
-                this.writeDestinationFile(sourceFile, transpiledCode, extension);
+                // save result
+                transpileResult.push(new CompileResult(
+                    sourceFile,
+                    transpiledCode,
+                    (code: string) => {
+                        this.writeDestinationFile(sourceFile, code, extension);
+                    }
+                ));
             });
-
-            let transpiledFilesAmount: number = 0;
-
-            // run post project transpile
-            if (lastTarget && lastTarget.postProjectTranspile(this.writtenFileStack)) {
-
-                transpiledFilesAmount = this.writtenFileStack.length;
-            } else if (!lastTarget) {
-
-                // no error has been thrown and no last target available,
-                // means that no files were transpiled.
-                transpiledFilesAmount = 0;
-            }
 
             // cleanup compiler vars and return the amount
             this.writtenFileStack = [];
-            return transpiledFilesAmount;
+            return transpileResult;
 
         } catch (e) {
 
@@ -123,6 +123,14 @@ export class Compiler {
 
         // compiling not successfill
         return false;
+    }
+
+    /**
+     * apply post project transpile
+     */
+    public postProjectTranspile(): boolean {
+
+        return this.lastTarget.postProjectTranspile(this.writtenFileStack);
     }
 
     /**

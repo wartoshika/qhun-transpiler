@@ -1,94 +1,19 @@
 import { Target } from "../Target";
-import { BaseTarget } from "../BaseTarget";
-import * as luaTrait from "./traits";
-import { use } from "typescript-mix";
 import { LuaKeywords } from "./LuaKeywords";
-import { SupportedTargets } from "../TargetFactory";
+import { Project } from "../../config/Project";
+import { BaseLuaTarget } from "./BaseLuaTarget";
 
-export interface LuaTarget<T extends keyof SupportedTargets = "lua"> extends BaseTarget<T>, Target,
-    luaTrait.LuaDeclarations, luaTrait.LuaDeclarations, luaTrait.LuaExpressions, luaTrait.LuaMisc,
-    luaTrait.LuaSpecial, luaTrait.LuaDecorators { }
+export interface LuaTarget extends BaseLuaTarget { }
 
 /**
  * the lua target
  */
-export class LuaTarget<T extends keyof SupportedTargets = "lua"> extends BaseTarget<T> implements Target {
+export class LuaTarget extends BaseLuaTarget implements Target {
 
     /**
-     * import traits
+     * overwrite the project var wo get a typed lua project
      */
-    @use(
-        // declarations
-        luaTrait.LuaClassDeclaration,
-        luaTrait.LuaEnumDeclaration,
-        luaTrait.LuaFunctionDeclaration,
-        luaTrait.LuaImportDeclaration,
-        luaTrait.LuaModuleDeclaration,
-        luaTrait.LuaTypeAliasDeclaration,
-        luaTrait.LuaInterfaceDeclaration,
-        luaTrait.LuaExportDeclaration,
-        luaTrait.LuaImportEqualsDeclaration,
-        luaTrait.LuaVariableDeclaration,
-        // statements
-        luaTrait.LuaVariableStatement,
-        luaTrait.LuaReturnStatement,
-        luaTrait.LuaIfStatement,
-        luaTrait.LuaWhileStatement,
-        luaTrait.LuaDoStatement,
-        luaTrait.LuaForStatement,
-        luaTrait.LuaForOfStatement,
-        luaTrait.LuaForInStatement,
-        luaTrait.LuaSwitchStatement,
-        luaTrait.LuaBreakStatement,
-        luaTrait.LuaTryStatement,
-        luaTrait.LuaThrowStatement,
-        luaTrait.LuaContinueStatement,
-        luaTrait.LuaEmptyStatement,
-        // expressions
-        luaTrait.LuaBinaryExpression,
-        luaTrait.LuaConditionalExpression,
-        luaTrait.LuaCallExpression,
-        luaTrait.LuaPropertyAccessExpression,
-        luaTrait.LuaElementAccessExpression,
-        luaTrait.LuaTemplateExpression,
-        luaTrait.LuaPostfixUnaryExpression,
-        luaTrait.LuaPrefixUnaryExpression,
-        luaTrait.LuaObjectLiteralExpression,
-        luaTrait.LuaArrayLiteralExpression,
-        luaTrait.LuaDeleteExpression,
-        luaTrait.LuaFunctionExpression,
-        luaTrait.LuaNewExpression,
-        luaTrait.LuaParenthesizedExpression,
-        luaTrait.LuaAsExpression,
-        luaTrait.LuaTypeOfExpression,
-        luaTrait.LuaClassExpression,
-        // misc
-        luaTrait.LuaBlock,
-        luaTrait.LuaEndOfFileToken,
-        luaTrait.LuaIdentifier,
-        luaTrait.LuaStringLiteral,
-        luaTrait.LuaNumericLiteral,
-        luaTrait.LuaKeyword,
-        luaTrait.LuaComputedPropertyName,
-        luaTrait.LuaTypeAssertion,
-        luaTrait.LuaExportAssignment,
-        luaTrait.LuaVariableDeclarationList,
-        luaTrait.LuaArrayBindingPattern,
-        luaTrait.LuaObjectBindingPattern,
-        luaTrait.LuaSpreadElement,
-        luaTrait.LuaRegularExpressionLiteral,
-        // special
-        luaTrait.LuaStringSpecial,
-        luaTrait.LuaObjectSpecial,
-        luaTrait.LuaArraySpecial,
-        luaTrait.LuaMathSpecial,
-        luaTrait.LuaFunctionSpecial,
-        // decorator
-        luaTrait.LuaClassDecorator,
-        luaTrait.LuaFunctionDecorator,
-        luaTrait.LuaParameterDecorator,
-        luaTrait.LuaPropertyDecorator
-    ) protected this: LuaTarget<T>;
+    protected project: Project<"lua">;
 
     /**
      * get the file extension of the target language

@@ -4,7 +4,7 @@ import * as path from "path";
 import { SourceFile } from "../../../compiler/SourceFile";
 import * as fs from "fs";
 
-export interface WowPathBuilder extends BaseTarget<"wow">, Target { }
+export interface WowPathBuilder extends BaseTarget, Target { }
 
 /**
  * a class that handles path building relative to the project root

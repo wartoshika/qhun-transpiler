@@ -16,7 +16,7 @@ declare type TypescriptExport = {
 /**
  * the base target class that implements cross language functionality
  */
-export abstract class BaseTarget<T extends keyof SupportedTargets = any> implements Partial<Target> {
+export abstract class BaseTarget implements Partial<Target> {
 
     /**
      * the node transpiler
@@ -36,12 +36,20 @@ export abstract class BaseTarget<T extends keyof SupportedTargets = any> impleme
     } = {};
 
     constructor(
-        protected project: Project<T>,
+        protected project: Project,
         protected typeChecker: ts.TypeChecker,
         protected sourceFile: SourceFile,
         protected qhunTranspilerMetadata: QhunTranspilerMetadata,
         protected keyValueStorage: { [key: string]: any }
     ) { }
+
+    /**
+     * get the current project
+     */
+    public getProject(): Project {
+
+        return this.project;
+    }
 
     /**
      * set the node transpiler function

@@ -1,10 +1,16 @@
 import * as ts from "typescript";
 import { CompilerWrittenFile } from "../compiler/CompilerWrittenFile";
+import { Project } from "../config/Project";
 
 /**
  * a transpiler target
  */
 export interface Target {
+
+    /**
+     * get the current project
+     */
+    getProject(): Project;
 
     /**
      * set the node transpiler function

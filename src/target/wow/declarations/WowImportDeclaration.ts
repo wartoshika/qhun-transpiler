@@ -6,7 +6,7 @@ import { WowPathBuilder } from "../special";
 import { SourceFile } from "../../../compiler/SourceFile";
 import { WowKeywords } from "../WowKeywords";
 
-export interface WowImportDeclaration extends BaseTarget<"wow">, Target, WowPathBuilder { }
+export interface WowImportDeclaration extends BaseTarget, Target, WowPathBuilder { }
 
 export class WowImportDeclaration implements Partial<Target> {
 

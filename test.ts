@@ -1,15 +1,10 @@
-import { QhunTranspilerApi } from "./src/QhunTranspilerApi";
+import { Api } from "./src/api/Api";
 import { SyntaxKind } from "typescript";
 
-new QhunTranspilerApi("lua", {
-    configuration: {
-        project: "package.json",
-        targetConfig: {}
-    },
-    overwrite: {
-        [SyntaxKind.BreakKeyword]: (node, transpile, original) => {
+new Api("lua", {
+    entrypoint: "./src/index.ts"
+}).transpile().subscribe(pipeline => {
 
-            return "break";
-        }
-    }
-}).transpile();
+    pipeline.persistAllFiles().prettyPrintResult().applyPostProjectTranspile();
+
+});

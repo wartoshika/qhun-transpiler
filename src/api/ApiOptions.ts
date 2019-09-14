@@ -7,6 +7,11 @@ import * as ts from "typescript";
 export interface ApiOptions<T extends keyof SupportedTargets> {
 
     /**
+     * relative path to the root file of your project
+     */
+    entrypoint: string;
+
+    /**
      * the configuration for the current transpiling project.
      */
     configuration?: ApiConfiguration<T>;
@@ -33,7 +38,7 @@ export interface ApiOptions<T extends keyof SupportedTargets> {
             /**
              * the node that should be transpiled
              */
-            node: P,
+            node: ts.Node,
             /**
              * a function that uses the transpiler to transpiler other nodes
              */
@@ -41,7 +46,7 @@ export interface ApiOptions<T extends keyof SupportedTargets> {
             /**
              * the original function that should have transpiled this node
              */
-            originalTranspilerFunction: (node: P) => string
+            originalTranspilerFunction: (node: ts.Node) => string
         ) => string
     };
 }

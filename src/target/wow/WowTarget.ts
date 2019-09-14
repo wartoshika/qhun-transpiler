@@ -1,28 +1,21 @@
-import { LuaTarget } from "../lua/LuaTarget";
 import { Target } from "../Target";
-import { use } from "typescript-mix";
-import * as wowTrait from "./traits";
 import { LuaKeywords } from "../lua/LuaKeywords";
 import { SourceFile } from "../../compiler/SourceFile";
 import { WowKeywords } from "./WowKeywords";
+import { BaseWowTarget } from "./BaseWowTarget";
+import { Project } from "../../config/Project";
 
-export interface WowTarget extends LuaTarget<"wow">, Target, wowTrait.WowDeclarations, wowTrait.WowSpecial, wowTrait.WowCallExpression { }
+export interface WowTarget extends BaseWowTarget { }
 
 /**
  * the wow target
  */
-export class WowTarget extends LuaTarget<"wow"> implements Target {
+export class WowTarget extends BaseWowTarget implements Target {
 
-    @use(
-        // call expressions overrides
-        wowTrait.WowCallExpression,
-        // declaration overrides
-        wowTrait.WowImportDeclaration,
-        wowTrait.WowClassDeclaration,
-        // specials
-        wowTrait.WowPathBuilder,
-        wowTrait.WowPostTranspile
-    ) protected this: WowTarget;
+    /**
+     * overwrite the project var wo get a typed wow project
+     */
+    protected project: Project<"wow">;
 
     /**
      * @Override LuaTarget.preTranspile()

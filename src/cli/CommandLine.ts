@@ -1,27 +1,19 @@
 import { OptionDefinition } from "command-line-usage";
 import * as commandLineUsage from "command-line-usage";
 import * as commandLineArgs from "command-line-args";
-import { TargetFactory, SupportedTargets } from "../target/TargetFactory";
-import { JsonReader } from "../config/json/JsonReader";
-import { Project } from "../config/Project";
-import { Reader } from "../config/Reader";
-import { ArgumentReader } from "../config/argument/ArgumentReader";
-import { Compiler } from "../compiler/Compiler";
-import { CommandLineColors } from "./CommandLineColors";
-import { ValidationError } from "../error/ValidationError";
-import { ExternalModuleService } from "../compiler/ExternalModuleService";
-import { FileWatcher } from "./FileWatcher";
 import { Logger } from "./Logger";
+import * as fs from "fs";
+import { CommandLineColors } from "./CommandLineColors";
 
 // tslint:disable-next-line
 const packageJson = require("../../package.json");
 
+// tslint:disable-next-line
+const initFile = require("./InitFile.txt");
+
 declare type ProgramArguments = {
     help: boolean,
-    project: string,
-    target: string,
-    file: string,
-    watch: boolean
+    init: boolean
 };
 
 export class CommandLine {
@@ -36,27 +28,9 @@ export class CommandLine {
             type: Boolean,
             description: "Display this help message"
         }, {
-            name: "project",
-            alias: "p",
-            type: String,
-            description: "A path to a qhun-transpiler.json file",
-            typeLabel: "<qhun-transpiler.json>"
-        }, {
-            name: "target",
-            alias: "t",
-            type: String,
-            description: "A target language. Can be: " + Object.keys(TargetFactory.supportedTargets).join(", ")
-        }, {
-            name: "file",
-            alias: "f",
-            type: String,
-            description: "The file that shoule be transpiled",
-            typeLabel: "<file.ts>"
-        }, {
-            name: "watch",
-            alias: "w",
+            name: "init",
             type: Boolean,
-            description: "Watches over edited and created files to automaticly trigger the transpiling process"
+            description: "Creates nessesary files to start transpiling your sourcecode"
         }
     ];
 
@@ -64,21 +38,6 @@ export class CommandLine {
      * the given program arguments
      */
     private programArguments: ProgramArguments;
-
-    /**
-     * the current project reference
-     */
-    private currentProject: Project;
-
-    /**
-     * the file watcher instance
-     */
-    private fileWatcher: FileWatcher;
-
-    /**
-     * the compiler instance
-     */
-    private compiler: Compiler;
 
     /**
      * @param args the arguments
@@ -104,94 +63,9 @@ export class CommandLine {
             return true;
         }
 
-        // get the project data
-        const project = this.getProjectConfig();
-
-        // check for a valid project var
-        if (project === false) {
-            return false;
-        }
-
-        // print an execution header
-        this.printProgramExecuteInfo();
-
-        // save project reference
-        this.currentProject = project;
-
-        // construct the compiler
-        this.compiler = new Compiler(this.currentProject);
-
-        // watch for file changes
-        if (this.programArguments.watch) {
-
-            this.fileWatcher = new FileWatcher(this.currentProject, this.execute.bind(this));
-        }
-    }
-
-    /**
-     * executes the command line tool with the given arguments
-     */
-    public execute(fileNames: string[] = this.currentProject.parsedCommandLine.fileNames): boolean {
-
-        // check if state is prepared
-        if (!this.currentProject) {
-            return false;
-        }
-
-        // start everything else
-        const result = this.compiler.compile(fileNames);
-
-        // print the final result
-        this.printResult(result);
-
-        return result !== false;
-    }
-
-    /**
-     * test if the cli is watching over files
-     */
-    public isWatchingFiles(): boolean {
-
-        return !!this.fileWatcher;
-    }
-
-    /**
-     * get the project config from either json reader or argument reader
-     */
-    private getProjectConfig(): Project | false {
-
-        // delcare reader var
-        let reader: Reader;
-
-        if (this.programArguments.project) {
-
-            reader = new JsonReader(this.programArguments.project);
-        } else {
-
-            // take the other arguments to build a project object
-            reader = new ArgumentReader({
-                target: this.programArguments.target as keyof SupportedTargets,
-                file: this.programArguments.file
-            });
-        }
-
-        // evaluate if a qhun-transpiler.json file is available
-        try {
-
-            // construct the project object
-            return reader.read();
-
-        } catch (e) {
-
-            // catch validation errors
-            if (e instanceof ValidationError) {
-
-                // write the error
-                Logger.error(e.message, undefined, CommandLineColors.RED);
-
-                // no transpiling!
-                return false;
-            }
+        if (this.programArguments.init) {
+            this.init();
+            return true;
         }
     }
 
@@ -218,40 +92,15 @@ export class CommandLine {
     }
 
     /**
-     * prints the final result
-     * @param result the result of the transpiling process
+     * initialized nessesary files for the transpiling process
      */
-    private printResult(result: number | boolean): void {
+    private init(): void {
 
-        if (typeof result === "number") {
-
-            // print the embeded external modules
-            const externalModuleService = ExternalModuleService.getInstance();
-            const embededModules = Object.keys(externalModuleService.getAvailableExternalModules());
-
-            // only print something about external modules when some are referenced
-            if (embededModules.length > 0) {
-                embededModules.forEach(moduleName => {
-                    Logger.log(`Added ${moduleName} as external module.`, undefined, CommandLineColors.GREEN);
-                });
-            }
-
-            Logger.log(`Successfully transpiled ${result} files.`, undefined, CommandLineColors.GREEN);
+        if (!fs.existsSync("./qhun-transpiler.ts")) {
+            fs.writeFileSync("./qhun-transpiler.ts", initFile.default);
+            Logger.log("The file  qhun-transpiler.ts  has been created!", "> ", CommandLineColors.GREEN);
         } else {
-            Logger.log(`An error occured while transpiling your files.`, undefined, CommandLineColors.GREEN);
+            Logger.log("This project allready contains a  qhun-transpiler.ts  file.", "> ", CommandLineColors.RED);
         }
-    }
-
-    /**
-     * print some program metadata for the command line
-     */
-    private printProgramExecuteInfo(): void {
-
-        // read package.json file
-        const packageObject = packageJson;
-
-        Logger.log();
-        Logger.log(`${packageObject.name} (${packageObject.version})`, "");
-        Logger.log();
     }
 }

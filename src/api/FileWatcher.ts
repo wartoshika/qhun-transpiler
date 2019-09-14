@@ -2,7 +2,8 @@ import { Project } from "../config/Project";
 import * as fs from "fs";
 import * as path from "path";
 import * as md5 from "md5";
-import { Logger } from "./Logger";
+import { Logger } from "../cli/Logger";
+import { CompileResult } from "../compiler/CompileResult";
 
 export class FileWatcher {
 
@@ -19,6 +20,8 @@ export class FileWatcher {
         }
     } = {};
 
+    private changeStack: ((result: CompileResult[]) => void)[] = [];
+
     constructor(
         private project: Project<any>,
         private executeOnChange: (filesChanged: string[]) => any
@@ -34,6 +37,10 @@ export class FileWatcher {
 
         // print info
         Logger.log("Starting to watch files in " + this.watchedRootPath);
+    }
+
+    public onChange(callable: (result: CompileResult[]) => void): void {
+        this.changeStack.push(callable);
     }
 
     /**
@@ -98,6 +105,7 @@ export class FileWatcher {
         Logger.log(""); // one empty line
         Logger.log("Detected file change: " + filename + " > Transpiling started.");
 
-        this.executeOnChange([absolutePath]);
+        const result = this.executeOnChange([absolutePath]);
+        this.changeStack.forEach(callable => callable(result));
     }
 }
