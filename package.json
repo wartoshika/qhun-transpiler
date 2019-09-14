@@ -4,9 +4,6 @@
   "description": "A tool to transpiles a Typescript project into lua.",
   "main": "dist/index.js",
   "types": "dist/api/main.d.ts",
-  "bin": {
-    "qhun-transpiler": "./dist/bin/qhun-transpiler.js"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/wartoshika/qhun-transpiler"
