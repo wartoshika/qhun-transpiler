@@ -10,5 +10,5 @@ dist/**/*.js.map
 .nycrc
 .travis.yml
 webpack.config.js
-tsconfig.json
+tsconfig*.json
 tslint.json
