@@ -3,8 +3,7 @@ import { SupportedTargets, SupportedTargetConfig } from "../target/TargetFactory
 export interface ApiConfiguration<T extends keyof SupportedTargets> {
 
     /**
-     * project related meta information. if this object is omited, details will be read from
-     * your package.json file.
+     * project related meta information. Missing details will be read from your package.json file.
      */
     project?: {
 
@@ -41,7 +40,7 @@ export interface ApiConfiguration<T extends keyof SupportedTargets> {
     printFileHeader?: boolean;
 
     /**
-     * a config block for different transpiler targets
+     * contains the target language as key
      */
     target?: T;
 

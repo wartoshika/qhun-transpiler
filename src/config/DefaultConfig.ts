@@ -41,9 +41,13 @@ export class DefaultConfig {
 
         if (!configuration.project) {
 
-            // read from package.json file
-            configuration.project = DefaultConfig.readPackageJson(rootDir);
+            // create the base object
+            configuration.project = {} as any;
         }
+
+        // merge with existing project settings
+        // read from package.json file
+        configuration.project = Object.assign(DefaultConfig.readPackageJson(rootDir), configuration.project);
 
         const configGetter = DefaultConfig.defaultConfigGetter(configuration.target);
 

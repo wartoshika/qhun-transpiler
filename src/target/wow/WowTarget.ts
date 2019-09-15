@@ -18,6 +18,13 @@ export class WowTarget extends BaseWowTarget implements Target {
     protected project: Project<"wow">;
 
     /**
+     * get the file extension of the target language
+     */
+    public getFileExtension(): string {
+        return "lua";
+    }
+
+    /**
      * @Override LuaTarget.preTranspile()
      */
     public preTranspile(): string | void {

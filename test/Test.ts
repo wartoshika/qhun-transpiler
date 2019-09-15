@@ -8,6 +8,7 @@ import * as path from "path";
 import { Target } from "../src/target/Target";
 import { DefaultConfig } from "../src/config/DefaultConfig";
 import { SourceFile } from "../src/compiler/SourceFile";
+import { ApiConfiguration } from "../src/api/ApiConfiguration";
 
 const libSource = fs.readFileSync(path.join(path.dirname(require.resolve("typescript")), "lib.es6.d.ts")).toString();
 
@@ -20,13 +21,15 @@ export abstract class Test {
     /**
      * get a test project object
      */
-    protected getProject<K extends keyof SupportedTargets>(target: K, config?: SupportedTargetConfig[K]): Project<SupportedTargetConfig[K]> {
+    protected getProject<K extends keyof SupportedTargets>(target: K, config?: ApiConfiguration<K>): Required<Project<K>> {
 
         // use default config constructor
-        return DefaultConfig.mergeDefaultProjectData({
-            config: config,
-            target: target
-        }) as Project<SupportedTargetConfig[K]>;
+        return DefaultConfig.apiOptionsToProject({
+            entrypoint: "",
+            configuration: Object.assign({
+                target: target
+            }, DefaultConfig.mergeDefaultConfiguration(config, "./"))
+        });
     }
 
     /**

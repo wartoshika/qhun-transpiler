@@ -1,24 +1,5 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "outDir": "dist",
-        "moduleResolution": "node",
-        "target": "es5",
-        "sourceMap": true,
-        "strictBindCallApply": true,
-        "lib": [
-            "es2015"
-        ],
-        "typeRoots": [
-            "declarations",
-            "node_modules/@types"
-        ]
-    },
+    "extends": "./tsconfig.base.json",
     "include": [
         "./src/**/*.ts"
     ]

@@ -13,7 +13,7 @@ export class Api<T extends keyof SupportedTargets> {
     /**
      * the currently used compiler instance
      */
-    private compiler: Compiler;
+    private compiler: Compiler<T>;
 
     constructor(
         target: T,

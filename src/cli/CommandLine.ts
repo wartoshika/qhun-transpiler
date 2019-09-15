@@ -9,7 +9,7 @@ import { CommandLineColors } from "./CommandLineColors";
 const packageJson = require("../../package.json");
 
 // tslint:disable-next-line
-const initFile = require("./InitFile.txt");
+const initFile = require("raw-loader!./InitFile.js");
 
 declare type ProgramArguments = {
     help: boolean,

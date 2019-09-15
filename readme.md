@@ -12,7 +12,7 @@ Coverage | [![Coverage Status](https://coveralls.io/repos/github/wartoshika/qhun
 
 ## **Description**
 
-This command line tool helps to transpile [Typescript](https://github.com/Microsoft/TypeScript) into other languages. The main goal was to support every aspect of Typescript. Typescript 2 and 3 are supported!
+This tool helps to transpile [Typescript](https://github.com/Microsoft/TypeScript) into other languages. The main goal was to support every aspect of Typescript. Typescript 2 and 3 are supported!
 
 **The following languages are currently supported:**
 - [LUA](https://www.lua.org/)
@@ -25,49 +25,84 @@ $ npm install -g --save-dev @wartoshika/qhun-transpiler
 $ qhun-transpiler -h
 ```
 
-There are two possible ways of transpiling your sourcecode into other languages.
-1. Creating a JSON file containing project relevant information (recommended).
-2. Passing required data via command line arguments.
+## **Setup**
 
-## **Requirements and usage when using the JSON based setup**
+You can run `qhun-transpiler --init` on the command line to automaticly create a `qhun-transpiler.js` file. This file will include the API
+and let you transpile all your files. The interfaces of the API are intellisense optimized and if you use a modern editor or IDE you should get
+information of the possible options.
 
-- You need to create a JSON file next to a `tsconfig.json` file.
-- Call the executable file of qhun-transpiler using the `-p` argument.
-    - *Example*: `$ qhun-transpiler -p ./qhun-transpiler.json`
-
-The `qhun-transpiler.json` file must have the following structure:
+This is an example of how your file could look like:
 
 ```js
-{
-    "name": "The name of your program/project",
-    "version": "The version number as string of your program/project",
-    "author": "Your name",
-    "licence": "Your licence",
-    "description": "A longer description of your program/project",
-    "printFileHeader": true, // a boolean value that indicates that a text will be added to each file.
-    "stripOutDir": "src",  // the name of the folder where you put your sourcecode in. Eg. src. Leave this empty if your code is not stored in one source folder
-    "target": "The target name. Eg. lua",
-    "tsconfig": "the relative path to the tsconfig.json file including its name",
-    "config": {
-        // A config block that varies between each target. See the target documentation for details
-    }
-}
+const Transpiler = require("@wartoshika/qhun-transpiler");
+
+new Transpiler.Api("lua", {
+    entrypoint: "./src/index.ts"
+}).transpile().subscribe(pipeline => {
+
+    pipeline.persistAllFiles()
+        .prettyPrintResult()
+        .applyPostProjectTranspile();
+
+});
 ```
 
-The `tsconfig.json` file will tell the transpiler wich files shoule be transpiled. Please refer to the [tsconfig.json Documentation](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html).
+**Some explanation**: The first argument will tell the transpiler what your target is. The second argument is completly optional but let you
+configure the process of transpiling. These are the supported options:
 
-Every file will be translated into the given target language. The directory where to put those files is stored in the `tsconfig.json` file. Please refer to its [documentation](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html).
+- **`entrypoint`?: string**: Relative path to the root file of your project
+- **`compilerOptions`?: CompilerOptions**: Advanced options used by the Typescript compiler. Use at your risk :)
+- **`watch`?: boolean**: Watches for file changes and automaticly trigger the transpiling process
+- **`overwrite`?: complex**: See the [overwrite](#Overwrite) section for details.
+- **`configuration`?: ApiConfiguration**: More configuration. See below.
 
-## **Requirements and usage when using arguments**
+**ApiConfiguration**
 
-- There are no requirements.
-- Call the executale and pass the following arguments:
-    - `-t` The target language. Eg. lua
-    - `-f` The path to the file that should be transpiled
+- **`project`?: complex**: Project related meta information. Missing details will be read from your package.json file.
+- **`printFileHeader`?: boolean**: Print a file header in each generated file. This include the owner, version and a description
+- **`targetConfig`?: complex**: A config block for different transpiler targets. See the [documentation](#Documentation) section for more details.
+- **`directoryWithSource`?: string**: Targets to the sub directory of your project where your sourcecode is located. Eg. src
 
-An example executable path could be `$ qhun-transpiler -t lua -f ./myTypescriptFile.ts`
+## **Overwrite**:
 
-The transpiles file will be placed next to the original file. The file extension will be changed to the target language's file extension.
+When the transpiled result does not fit your needs or you want to include a feature that is not directly supported by the transpiler, you can configure a feature overwrite within this configuration block.
+
+This is an example where the break-keyword transpiling is overwritten:
+
+```js
+const Transpiler = require("@wartoshika/qhun-transpiler");
+const ts = require("typescript");
+
+new Api("lua", {
+    entrypoint: "./src/index.ts",
+    overwrite: {
+        [ts.SyntaxKind.BreakKeyword]: (node, nodeTranspiler, original) => {
+
+            // yay, some info :)
+            console.log("There was a break keyword while transpiling!");
+
+            // use the original transpiler function to transpile a break keyword
+            const originalTranspiledCode = original(node);
+
+            // append some other transpiled sourcecode
+            // the nodeTranspiler function comes from within the transpiler and
+            // is able to transpile every ts.Node type object.
+            const appendNewCode = nodeTranspiler(
+                // this will transpile the numeric literal 2
+                ts.createNumericLiteral("2")
+            );
+
+            // add the new code after the break keyword
+            // the result in this example will be: break 2
+            return originalTranspiledCode + " " + appendNewCode;
+        }
+    }
+}).transpile().subscribe(pipeline => {
+
+    pipeline.persistAllFiles().prettyPrintResult().applyPostProjectTranspile();
+
+});
+```
 
 ## **Documentation**
 

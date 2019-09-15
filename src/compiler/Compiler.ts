@@ -4,7 +4,7 @@ import * as mkdirp from "mkdirp";
 import * as ts from "typescript";
 
 import { Project } from "../config/Project";
-import { TargetFactory } from "../target/TargetFactory";
+import { TargetFactory, SupportedTargets } from "../target/TargetFactory";
 import { Transpiler } from "../transpiler/Transpiler";
 import { CompilerWrittenFile } from "./CompilerWrittenFile";
 import { Target } from "../target/Target";
@@ -18,7 +18,7 @@ import { CompileResult } from "./CompileResult";
 // tslint:disable-next-line
 const packageJson = require("../../package.json");
 
-export class Compiler {
+export class Compiler<T extends keyof SupportedTargets> {
 
     /**
      * a stack of all written files
@@ -44,7 +44,7 @@ export class Compiler {
      * @param project the project configuration
      */
     constructor(
-        private project: Required<Project>
+        private project: Required<Project<T>>
     ) {
 
         // setup external module service

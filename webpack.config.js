@@ -13,7 +13,7 @@ fs.readdirSync('node_modules')
     });
 
 module.exports = {
-    entry: './src/index.ts',
+    entry: './src/cli/Cli.ts',
     target: 'node',
     mode: 'production',
     output: {
