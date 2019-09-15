@@ -1,6 +1,6 @@
 {
   "name": "@wartoshika/qhun-transpiler",
-  "version": "0.7.3",
+  "version": "1.0.0-alpha.1",
   "description": "A tool to transpiles a Typescript project into lua.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
