@@ -55,9 +55,9 @@ export class Compiler<T extends keyof SupportedTargets> {
     /**
      * compiles the given files and transpiles them into the target language
      * @param files the files to compile and transpile
-     * @returns the amount of successfully transpiled and written files. false on error
+     * @returns the amount of successfully transpiled and written files.
      */
-    public compile(files: string[]): CompileResult[] | false {
+    public compile(files: string[]): CompileResult[] {
 
         // create a typescript program
         const program = ts.createProgram(files, this.project.compilerOptions);
@@ -70,59 +70,47 @@ export class Compiler<T extends keyof SupportedTargets> {
         const transpilerMetadata: QhunTranspilerMetadata = this.getMetadata();
         const transpileResult: CompileResult[] = [];
 
-        // iterate over every source file
-        try {
+        // analyze all source files and detect external modules
+        this.externalModuleService.analyseSourceFilesAndCastToSourceFile(
 
-            // analyze all source files and detect external modules
-            this.externalModuleService.analyseSourceFilesAndCastToSourceFile(
+            // analyse all program sourcefiles
+            program.getSourceFiles()
+                // that are not declaration files
+                .filter(file => !file.isDeclarationFile)
+        ).forEach(sourceFile => {
 
-                // analyse all program sourcefiles
-                program.getSourceFiles()
-                    // that are not declaration files
-                    .filter(file => !file.isDeclarationFile)
-            ).forEach(sourceFile => {
+            // create the transpiler
+            const target = targetFactory.create(this.project.configuration.target,
+                this.project, typeChecker,
+                sourceFile, transpilerMetadata,
+                this.keyValueStorage
+            );
+            const extension = target.getFileExtension();
+            const transpiler = new Transpiler(target);
 
-                // create the transpiler
-                const target = targetFactory.create(this.project.configuration.target,
-                    this.project, typeChecker,
-                    sourceFile, transpilerMetadata,
-                    this.keyValueStorage
-                );
-                const extension = target.getFileExtension();
-                const transpiler = new Transpiler(target);
+            // declare last instances
+            lastSourceFile = sourceFile;
+            this.lastTarget = target;
 
-                // declare last instances
-                lastSourceFile = sourceFile;
-                this.lastTarget = target;
+            // transpile this file
+            let transpiledCode = transpiler.transpile(sourceFile);
 
-                // transpile this file
-                let transpiledCode = transpiler.transpile(sourceFile);
+            // restore replacements
+            transpiledCode = TranspilerFunctions.restoreReservedChars(transpiledCode);
 
-                // restore replacements
-                transpiledCode = TranspilerFunctions.restoreReservedChars(transpiledCode);
+            // save result
+            transpileResult.push(new CompileResult(
+                sourceFile,
+                transpiledCode,
+                (code: string) => {
+                    this.writeDestinationFile(sourceFile, code, extension);
+                }
+            ));
+        });
 
-                // save result
-                transpileResult.push(new CompileResult(
-                    sourceFile,
-                    transpiledCode,
-                    (code: string) => {
-                        this.writeDestinationFile(sourceFile, code, extension);
-                    }
-                ));
-            });
-
-            // cleanup compiler vars and return the amount
-            this.writtenFileStack = [];
-            return transpileResult;
-
-        } catch (e) {
-
-            // handle this error
-            this.handleCompileError(e, lastSourceFile);
-        }
-
-        // compiling not successfill
-        return false;
+        // cleanup compiler vars and return the amount
+        this.writtenFileStack = [];
+        return transpileResult;
     }
 
     /**

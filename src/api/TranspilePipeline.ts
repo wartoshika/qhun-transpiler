@@ -1,13 +1,12 @@
 import { CompileResult } from "../compiler/CompileResult";
 import { Logger } from "../cli/Logger";
 import { CommandLineColors } from "../cli/CommandLineColors";
-
-import * as ts from "typescript";
-import * as path from "path";
+import { Project } from "../config/Project";
 
 export class TranspilePipeline {
 
     constructor(
+        private project: Project<any>,
         private files: CompileResult[],
         private postProjectTranspile: () => boolean
     ) { }
@@ -17,24 +16,34 @@ export class TranspilePipeline {
      */
     public printResult(): TranspilePipeline {
 
+        Logger.log();
         Logger.log("Successfully transpiled " + this.files.length + " files", "> ", CommandLineColors.GREEN);
+        Logger.log();
         return this;
     }
 
+    /**
+     * prints the transpiling result more prettier :)
+     */
     public prettyPrintResult(): TranspilePipeline {
 
-        Logger.log("Transpiling successfull. Result: " + this.files.length + " files");
+        Logger.log();
+        Logger.log(`${this.files.length} file(s) transpiled`, "[Success] ", CommandLineColors.GREEN);
 
         const amountOfTopFiles = 8;
         this.files.slice(0, amountOfTopFiles).forEach(file => {
             const size = Math.round(file.generatedSourcecode.length / 1024);
-            Logger.log(path.basename(file.file.fileName) + " [" + size + " KB]", " + ", CommandLineColors.GREEN);
+            let fileName = file.file.fileName.replace(this.project.rootDir, "");
+            if (fileName[0] !== "/") {
+                fileName = "/" + fileName;
+            }
+            Logger.log(fileName + " [" + size + " KB]", " + ");
         });
 
         const otherFiles = this.files.length - amountOfTopFiles;
         if (otherFiles > 0) {
             const otherFilesLength = Math.round(this.files.slice(amountOfTopFiles).reduce<number>((a, b) => a + b.generatedSourcecode.length, 0) / 1024);
-            Logger.log("And " + otherFiles + " other files [" + otherFilesLength + " KB]", "   ", CommandLineColors.GREEN);
+            Logger.log("And " + otherFiles + " other file(s) [" + otherFilesLength + " KB]", "   ");
         }
 
         return this;
@@ -47,11 +56,13 @@ export class TranspilePipeline {
      */
     public applyPostProjectTranspile(): TranspilePipeline {
 
-        Logger.log("Applying postProjectTranspile ...");
+        Logger.log();
+        Logger.log("Applying postProjectTranspile ...", "> ");
         if (!this.postProjectTranspile()) {
             throw new Error("Error in the postProjectTranspile process!");
         }
-        Logger.log("PostProjectTranspile successfull", " + ", CommandLineColors.GREEN);
+        Logger.log("PostProjectTranspile done", "[Success] ", CommandLineColors.GREEN);
+        Logger.log();
         return this;
     }
 

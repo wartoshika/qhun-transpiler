@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "umd",
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,

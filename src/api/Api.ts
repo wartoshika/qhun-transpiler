@@ -5,10 +5,15 @@ import { DefaultConfig } from "../config/DefaultConfig";
 import { SupportedTargets } from "../target/TargetFactory";
 import { TranspilePipeline } from "./TranspilePipeline";
 import { CompileResult } from "../compiler/CompileResult";
+import { Logger } from "../cli/Logger";
+import { ErrorWithNode } from "../error/ErrorWithNode";
+import { CommandLineColors } from "../cli/CommandLineColors";
+import { CommandLine } from "../cli/CommandLine";
 
 import { Observable, TeardownLogic } from "rxjs";
+
 import * as fs from "fs";
-import { Logger } from "../cli/Logger";
+import * as ts from "typescript";
 
 export class Api<T extends keyof SupportedTargets> {
 
@@ -29,6 +34,9 @@ export class Api<T extends keyof SupportedTargets> {
 
         // save target
         this.options.configuration.target = target;
+
+        // print cli head
+        CommandLine.printHead();
     }
 
     /**
@@ -57,7 +65,7 @@ export class Api<T extends keyof SupportedTargets> {
                 this.compiler = new Compiler(project);
 
                 // other work will be done by the internal transpiler
-                observer.next(new TranspilePipeline(this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
+                observer.next(new TranspilePipeline(project, this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
 
                 // bind watcher if actiavted
                 if (this.options.watch) {
@@ -66,10 +74,9 @@ export class Api<T extends keyof SupportedTargets> {
                     new FileWatcher(project, () => {
 
                         try {
-                            observer.next(new TranspilePipeline(this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
+                            observer.next(new TranspilePipeline(project, this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
                         } catch (e) {
-                            Logger.error("Error in the transpile pipeline: " + e);
-                            observer.error(e);
+                            this.printError(e);
                         }
                     });
                 } else {
@@ -77,8 +84,7 @@ export class Api<T extends keyof SupportedTargets> {
                 }
 
             } catch (e) {
-                Logger.error("Error in the transpile pipeline: " + e);
-                observer.error(e);
+                this.printError(e);
                 observer.complete();
             }
 
@@ -108,4 +114,24 @@ export class Api<T extends keyof SupportedTargets> {
 
         return true;
     }
+
+    private printError(e: Error): void {
+
+        if (e instanceof ErrorWithNode) {
+
+            const sourceFile = e.node.getSourceFile();
+            const position = ts.getLineAndCharacterOfPosition(sourceFile, e.node.pos);
+
+            Logger.error();
+            Logger.error(e.message, "[Error] ", CommandLineColors.RED);
+            Logger.log(`File: ${sourceFile.fileName}`, " at ");
+            Logger.log(`Line: ${position.line + 1}, Column: ${position.character}`, " at ");
+            Logger.error();
+        } else {
+
+            Logger.error(e.message);
+        }
+    }
+
+
 }

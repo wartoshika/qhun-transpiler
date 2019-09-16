@@ -5,6 +5,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": "dist/bin/qhun-transpiler.js",
+  "bugs": {
+    "url": "https://github.com/wartoshika/qhun-transpiler/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/wartoshika/qhun-transpiler"
@@ -15,9 +18,9 @@
     "test-seperate": "./node_modules/.bin/mocha -r ts-node/register \"test/**/*.spec.sep.ts\"",
     "test:coverage": "./node_modules/.bin/nyc ./node_modules/.bin/mocha -r ts-node/register \"test/**/*.spec.ts\"",
     "coverage:send:coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "build-ts": "./node_modules/.bin/tsc",
+    "build-ts": "./node_modules/.bin/webpack --config ./webpack.api.config.js",
     "build-declaration": "./node_modules/.bin/tsc -p tsconfig.api.json",
-    "build-cli": "./node_modules/.bin/webpack --config ./webpack.config.js",
+    "build-cli": "./node_modules/.bin/webpack --config ./webpack.cli.config.js",
     "build": "./node_modules/.bin/npm-run-all build-ts build-cli build-declaration",
     "run-ts": "./node_modules/.bin/ts-node src/cli/Cli.ts",
     "postversion": "git push --follow-tags"

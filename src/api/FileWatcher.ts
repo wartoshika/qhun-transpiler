@@ -104,7 +104,7 @@ export class FileWatcher {
 
         // print some info
         Logger.log(""); // one empty line
-        Logger.log("Detected file change: " + filename + " > Transpiling started.");
+        Logger.log("Detected file change: " + filename.replace(this.project.rootDir, "") + " > Transpiling started.");
 
         const result = this.executeOnChange([absolutePath]);
         this.changeStack.forEach(callable => callable(result));

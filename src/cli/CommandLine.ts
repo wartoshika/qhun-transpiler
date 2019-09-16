@@ -52,6 +52,19 @@ export class CommandLine {
         }) as ProgramArguments;
     }
 
+    // tslint:disable-next-line member-ordering
+    public static printHead(): void {
+
+        Logger.log();
+        Logger.log(`${packageJson.name} (${packageJson.version})${CommandLineColors.RESET} by ${packageJson.author}`, "", CommandLineColors.BRIGHT);
+        Logger.log("--------------------------------------------------------------------------------------", "");
+        Logger.log(`Visit ${packageJson.repository.url} for a description and help.`, " - ");
+        Logger.log(`Please post issues at ${packageJson.bugs.url}`, " - ");
+        Logger.log("--------------------------------------------------------------------------------------", "");
+        Logger.log("Thanks for using!", "   ");
+        Logger.log();
+    }
+
     /**
      * prepares the execution of the transpiling process
      */
@@ -96,11 +109,16 @@ export class CommandLine {
      */
     private init(): void {
 
+        CommandLine.printHead();
+
         if (!fs.existsSync("./qhun-transpiler.js")) {
             fs.writeFileSync("./qhun-transpiler.js", initFile.default);
-            Logger.log("The file  qhun-transpiler.js  has been created!", "> ", CommandLineColors.GREEN);
+            Logger.log("The file  qhun-transpiler.js  has been created!", "[Success] ", CommandLineColors.GREEN);
         } else {
-            Logger.log("This project allready contains a  qhun-transpiler.js  file.", "> ", CommandLineColors.RED);
+            Logger.error("This project allready contains a  qhun-transpiler.js  file.", "[Error] ");
         }
+
+        // empty line
+        Logger.log();
     }
 }
