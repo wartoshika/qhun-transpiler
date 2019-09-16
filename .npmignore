@@ -12,3 +12,5 @@ dist/**/*.js.map
 webpack.config.js
 tsconfig*.json
 tslint.json
+qhun-transpiler.js
+luadist/

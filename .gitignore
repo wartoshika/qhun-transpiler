@@ -75,3 +75,6 @@ typings/
 
 # coveralls config
 .coveralls.yml
+
+qhun-transpiler.js
+luadist/

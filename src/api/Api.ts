@@ -6,7 +6,9 @@ import { SupportedTargets } from "../target/TargetFactory";
 import { TranspilePipeline } from "./TranspilePipeline";
 import { CompileResult } from "../compiler/CompileResult";
 
-import { Observable } from "rxjs";
+import { Observable, TeardownLogic } from "rxjs";
+import * as fs from "fs";
+import { Logger } from "../cli/Logger";
 
 export class Api<T extends keyof SupportedTargets> {
 
@@ -34,31 +36,54 @@ export class Api<T extends keyof SupportedTargets> {
      */
     public transpile(): Observable<TranspilePipeline> {
 
-        // build project
-        const project = DefaultConfig.apiOptionsToProject(this.options);
-
-        // construct the compiler
-        this.compiler = new Compiler(project);
-
         return new Observable(observer => {
 
-            // other work will be done by the internal transpiler
-            observer.next(new TranspilePipeline(this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
+            // tslint:disable-next-line no-unused-expression
+            const unsubscribe: TeardownLogic = { unsubscribe: () => undefined };
 
-            // bind watcher if actiavted
-            if (this.options.watch) {
+            try {
 
-                // tslint:disable-next-line no-unused-expression
-                new FileWatcher(project, () => {
+                // check if the options are valid
+                if (!this.assertOptions()) {
+                    observer.error("Given options are not valid!");
+                    observer.complete();
+                    return unsubscribe;
+                }
 
-                    observer.next(new TranspilePipeline(this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
-                });
-            } else {
+                // build project
+                const project = DefaultConfig.apiOptionsToProject(this.options);
+
+                // construct the compiler
+                this.compiler = new Compiler(project);
+
+                // other work will be done by the internal transpiler
+                observer.next(new TranspilePipeline(this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
+
+                // bind watcher if actiavted
+                if (this.options.watch) {
+
+                    // tslint:disable-next-line no-unused-expression
+                    new FileWatcher(project, () => {
+
+                        try {
+                            observer.next(new TranspilePipeline(this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
+                        } catch (e) {
+                            Logger.error("Error in the transpile pipeline: " + e);
+                            observer.error(e);
+                        }
+                    });
+                } else {
+                    observer.complete();
+                }
+
+            } catch (e) {
+                Logger.error("Error in the transpile pipeline: " + e);
+                observer.error(e);
                 observer.complete();
             }
 
-            // tslint:disable-next-line no-unused-expression
-            return { unsubscribe: () => undefined };
+            // return teardown logic
+            return unsubscribe;
         });
     }
 
@@ -71,5 +96,16 @@ export class Api<T extends keyof SupportedTargets> {
         }
 
         return result;
+    }
+
+    private assertOptions(): boolean {
+
+        // check if the entrypoint is valid
+        if (!fs.existsSync(this.options.entrypoint)) {
+            Logger.error("Unable to find your entry file. Searched for " + this.options.entrypoint);
+            return false;
+        }
+
+        return true;
     }
 }

@@ -2,6 +2,7 @@ import { Project } from "../config/Project";
 import * as fs from "fs";
 import * as path from "path";
 import * as md5 from "md5";
+import * as nodeWatch from "node-watch";
 import { Logger } from "../cli/Logger";
 import { CompileResult } from "../compiler/CompileResult";
 
@@ -31,7 +32,7 @@ export class FileWatcher {
         this.watchedRootPath = this.getPathToWatch();
 
         // start fs watching
-        fs.watch(this.watchedRootPath, {
+        nodeWatch.default(this.watchedRootPath, {
             recursive: true
         }, this.onFileChange.bind(this));
 
@@ -60,12 +61,12 @@ export class FileWatcher {
      */
     private onFileChange(event: string, filename: string): void {
 
-        if (event !== "change" || !filename) {
+        if (event !== "update" || !filename) {
             return;
         }
 
         // get md5 from file
-        const absolutePath = path.join(this.watchedRootPath, filename);
+        const absolutePath = filename;
         const buffer = fs.readFileSync(absolutePath);
         const fileMd5 = md5(buffer);
 

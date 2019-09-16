@@ -22,7 +22,7 @@ export class Logger {
     /**
      * logs error text onto the console
      */
-    public static error(message: string = "", prefix: string = "> ", color?: CommandLineColors): void {
+    public static error(message: string = "", prefix: string = "> ", color: CommandLineColors = CommandLineColors.RED): void {
 
         if (message === "") {
             prefix = "";

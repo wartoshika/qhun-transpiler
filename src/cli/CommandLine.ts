@@ -9,7 +9,7 @@ import { CommandLineColors } from "./CommandLineColors";
 const packageJson = require("../../package.json");
 
 // tslint:disable-next-line
-const initFile = require("raw-loader!./InitFile.js");
+const initFile = require("./InitFile.js");
 
 declare type ProgramArguments = {
     help: boolean,
@@ -96,11 +96,11 @@ export class CommandLine {
      */
     private init(): void {
 
-        if (!fs.existsSync("./qhun-transpiler.ts")) {
-            fs.writeFileSync("./qhun-transpiler.ts", initFile.default);
-            Logger.log("The file  qhun-transpiler.ts  has been created!", "> ", CommandLineColors.GREEN);
+        if (!fs.existsSync("./qhun-transpiler.js")) {
+            fs.writeFileSync("./qhun-transpiler.js", initFile.default);
+            Logger.log("The file  qhun-transpiler.js  has been created!", "> ", CommandLineColors.GREEN);
         } else {
-            Logger.log("This project allready contains a  qhun-transpiler.ts  file.", "> ", CommandLineColors.RED);
+            Logger.log("This project allready contains a  qhun-transpiler.js  file.", "> ", CommandLineColors.RED);
         }
     }
 }

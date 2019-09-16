@@ -51,7 +51,7 @@ export class TranspilePipeline {
         if (!this.postProjectTranspile()) {
             throw new Error("Error in the postProjectTranspile process!");
         }
-        Logger.log("PostProjectTranspile successfull", "+ ", CommandLineColors.GREEN);
+        Logger.log("PostProjectTranspile successfull", " + ", CommandLineColors.GREEN);
         return this;
     }
 
