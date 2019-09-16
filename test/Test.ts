@@ -23,12 +23,14 @@ export abstract class Test {
      */
     protected getProject<K extends keyof SupportedTargets>(target: K, config?: ApiConfiguration<K>): Required<Project<K>> {
 
+        const mergedConfig = Object.assign(config || {}, {
+            target: target
+        });
+
         // use default config constructor
         return DefaultConfig.apiOptionsToProject({
             entrypoint: "",
-            configuration: Object.assign({
-                target: target
-            }, DefaultConfig.mergeDefaultConfiguration(config, "./"))
+            configuration: DefaultConfig.mergeDefaultConfiguration(mergedConfig, "../..")
         });
     }
 
@@ -88,7 +90,9 @@ export abstract class Test {
 
         // generate a ts program
         this.lastProgram = this.generateProgram(code);
-        this.lastProject = this.getProject(target, config);
+        this.lastProject = this.getProject(target, {
+            targetConfig: config as SupportedTargetConfig[K]
+        });
 
         // build target
         const targetFactory = new TargetFactory();

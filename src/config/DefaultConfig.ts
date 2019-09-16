@@ -39,6 +39,11 @@ export class DefaultConfig {
 
     public static mergeDefaultConfiguration(configuration: ApiConfiguration<any>, rootDir: string): Required<ApiConfiguration<any>> {
 
+        // configuration given?
+        if (!configuration) {
+            configuration = {};
+        }
+
         if (!configuration.project) {
 
             // create the base object

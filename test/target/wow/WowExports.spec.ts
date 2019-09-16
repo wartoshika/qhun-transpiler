@@ -1,7 +1,6 @@
 import { suite, test, slow, timeout } from "mocha-typescript";
 import { UnitTest } from "../../UnitTest";
 import { WowKeywords } from "../../../src/target/wow/WowKeywords";
-import { WowConfig } from "../../../src/target/wow/WowConfig";
 import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
 
 @suite("[Unit] Target: Wow | Exports", slow(1000), timeout(10000)) class WowExports extends UnitTest {
@@ -9,7 +8,7 @@ import { LuaKeywords } from "../../../src/target/lua/LuaKeywords";
     public before() {
 
         // make sure that the project data is available
-        this.lastProject = this.getProject("wow", {} as WowConfig);
+        this.lastProject = this.getProject("wow");
     }
 
     @test "Function export"() {
