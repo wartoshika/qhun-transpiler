@@ -17,8 +17,7 @@ install:
   - npm install
 
 script:
-  - npm run build
-  - npm run test-ci
+  - npm run test:coverage
 
 after_success:
   - npm run coverage:send:coveralls
