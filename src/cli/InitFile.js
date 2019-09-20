@@ -1,4 +1,4 @@
-const Transpiler = require("@wartoshika/qhun-transpiler");
+var Transpiler = require("@wartoshika/qhun-transpiler");
 
 new Transpiler.Api("lua", {
     entrypoint: "./src/index.ts"

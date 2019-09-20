@@ -15,9 +15,6 @@ import { SourceFile } from "./SourceFile";
 import { QhunTranspilerMetadata } from "../target/QhunTranspilerMetadata";
 import { CompileResult } from "./CompileResult";
 
-// tslint:disable-next-line
-const packageJson = require("../../package.json");
-
 export class Compiler<T extends keyof SupportedTargets> {
 
     /**
@@ -188,7 +185,7 @@ export class Compiler<T extends keyof SupportedTargets> {
     private getMetadata(): QhunTranspilerMetadata {
 
         return {
-            version: packageJson.version
+            version: PJSON_VERSION
         };
     }
 }

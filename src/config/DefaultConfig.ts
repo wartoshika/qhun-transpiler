@@ -9,6 +9,7 @@ import { ApiConfiguration } from "../api/ApiConfiguration";
 
 import * as ts from "typescript";
 import * as fs from "fs";
+import * as path from "path";
 
 export class DefaultConfig {
 
@@ -83,7 +84,11 @@ export class DefaultConfig {
 
     private static readPackageJson(rootDir: string): ApiConfiguration<any>["project"] {
 
-        const packageJson = require(`${rootDir}/package.json`);
+        const pathToPackageJson = path.resolve(path.join(rootDir, "package.json"));
+        if (!fs.existsSync(pathToPackageJson)) {
+            throw new Error("Unable to find a package.json file in the project root dir! Looked for " + pathToPackageJson);
+        }
+        const packageJson = JSON.parse(fs.readFileSync(pathToPackageJson).toString()) as any;
         return {
             author: packageJson.author,
             description: packageJson.description,

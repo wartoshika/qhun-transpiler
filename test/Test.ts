@@ -5,6 +5,7 @@ import { Transpiler } from "../src/transpiler/Transpiler";
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
+import * as mockfs from "mock-fs";
 import { Target } from "../src/target/Target";
 import { DefaultConfig } from "../src/config/DefaultConfig";
 import { SourceFile } from "../src/compiler/SourceFile";
@@ -30,7 +31,7 @@ export abstract class Test {
         // use default config constructor
         return DefaultConfig.apiOptionsToProject({
             entrypoint: "",
-            configuration: DefaultConfig.mergeDefaultConfiguration(mergedConfig, "../..")
+            configuration: DefaultConfig.mergeDefaultConfiguration(mergedConfig, "")
         });
     }
 
@@ -117,10 +118,17 @@ export abstract class Test {
         // build transpiler
         const transpiler = new Transpiler(targetTranspiler);
 
+        mockfs({
+            "package.json": fs.readFileSync("../package.json")
+        });
+
         // return the transpiled code
-        return transpiler
+        const result = transpiler
             .transpile(this.lastProgram.getSourceFile("test.ts"), addDeclarations)
             .split("\n")
             .filter(line => !!line);
+
+        mockfs.restore();
+        return result;
     }
 }

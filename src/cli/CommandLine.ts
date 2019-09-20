@@ -6,9 +6,6 @@ import * as fs from "fs";
 import { CommandLineColors } from "./CommandLineColors";
 
 // tslint:disable-next-line
-const packageJson = require("../../package.json");
-
-// tslint:disable-next-line
 const initFile = require("./InitFile.js");
 
 declare type ProgramArguments = {
@@ -56,10 +53,10 @@ export class CommandLine {
     public static printHead(): void {
 
         Logger.log();
-        Logger.log(`${packageJson.name} (${packageJson.version})${CommandLineColors.RESET} by ${packageJson.author}`, "", CommandLineColors.BRIGHT);
+        Logger.log(`${PJSON_NAME} (${PJSON_VERSION})${CommandLineColors.RESET} by ${PJSON_AUTHOR}`, "", CommandLineColors.BRIGHT);
         Logger.log("--------------------------------------------------------------------------------------", "");
-        Logger.log(`Visit ${packageJson.repository.url} for a description and help.`, " - ");
-        Logger.log(`Please post issues at ${packageJson.bugs.url}`, " - ");
+        Logger.log(`Visit ${PJSON_URL} for a description and help.`, " - ");
+        Logger.log(`Please post issues at ${PJSON_BUG_URL}`, " - ");
         Logger.log("--------------------------------------------------------------------------------------", "");
         Logger.log("Thanks for using!", "   ");
         Logger.log();
@@ -87,19 +84,16 @@ export class CommandLine {
      */
     private printHelp(): void {
 
-        // read package.json file
-        const packageObject = packageJson;
-
         console.log(commandLineUsage([
             {
-                header: `${packageObject.name} (${packageObject.version})`,
-                content: packageObject.description
+                header: `${PJSON_NAME} (${PJSON_VERSION})`,
+                content: PJSON_DESCRIPTION
             }, {
                 header: "Command line arguments",
                 optionList: this.argumentDefinition
             }, {
                 header: "Info",
-                content: `{underline Licence}: ${packageObject.license}\n{underline Author}: ${packageObject.author}`
+                content: `{underline Licence}: ${PJSON_LICENSE}\n{underline Author}: ${PJSON_AUTHOR}`
             }
         ]));
     }

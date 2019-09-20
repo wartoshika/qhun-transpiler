@@ -4,7 +4,6 @@ test/
 .vscode/
 coverage/
 declarations/
-dist/**/*.js.map
 .gitignore
 .gitlab-ci.yml
 .nycrc
@@ -14,3 +13,11 @@ tsconfig*.json
 tslint.json
 qhun-transpiler.js
 luadist/
+webpack*
+
+dist/**/*.ts
+dist/**/*.js
+dist/**/*.js.map
+!dist/api.d.ts
+!dist/api.js
+!dist/bin/qhun-transpiler.js

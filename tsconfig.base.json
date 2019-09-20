@@ -1,16 +1,12 @@
 {
     "compilerOptions": {
-        "module": "umd",
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "outDir": "dist",
-        "declaration": false,
         "moduleResolution": "node",
         "target": "es5",
-        "sourceMap": true,
         "strictBindCallApply": true,
         "lib": [
             "es2015"

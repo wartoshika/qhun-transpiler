@@ -102,9 +102,12 @@ export class FileWatcher {
      */
     private executeFileChangeHandler(filename: string, absolutePath: string): void {
 
+        const resolvedFileName = path.resolve(filename);
+        const resolvedRoot = path.resolve(this.project.rootDir);
+
         // print some info
         Logger.log(""); // one empty line
-        Logger.log("Detected file change: " + filename.replace(this.project.rootDir, "") + " > Transpiling started.");
+        Logger.log("Detected file change: " + resolvedFileName.replace(resolvedRoot, "") + " > Transpiling started.");
 
         const result = this.executeOnChange([absolutePath]);
         this.changeStack.forEach(callable => callable(result));

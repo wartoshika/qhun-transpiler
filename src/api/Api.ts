@@ -65,7 +65,12 @@ export class Api<T extends keyof SupportedTargets> {
                 this.compiler = new Compiler(project);
 
                 // other work will be done by the internal transpiler
-                observer.next(new TranspilePipeline(project, this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
+                let transpileError: Error;
+                try {
+                    observer.next(new TranspilePipeline(project, this.internalTranspile(), this.compiler.postProjectTranspile.bind(this.compiler)));
+                } catch (e) {
+                    transpileError = e;
+                }
 
                 // bind watcher if actiavted
                 if (this.options.watch) {
@@ -81,6 +86,10 @@ export class Api<T extends keyof SupportedTargets> {
                     });
                 } else {
                     observer.complete();
+                }
+
+                if (transpileError) {
+                    throw transpileError;
                 }
 
             } catch (e) {
@@ -117,7 +126,7 @@ export class Api<T extends keyof SupportedTargets> {
 
     private printError(e: Error): void {
 
-        if (e instanceof ErrorWithNode) {
+        if (e instanceof ErrorWithNode && e.node) {
 
             const sourceFile = e.node.getSourceFile();
             const position = ts.getLineAndCharacterOfPosition(sourceFile, e.node.pos);
@@ -132,6 +141,5 @@ export class Api<T extends keyof SupportedTargets> {
             Logger.error(e.message);
         }
     }
-
 
 }

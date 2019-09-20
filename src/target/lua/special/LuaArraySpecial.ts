@@ -53,6 +53,8 @@ export class LuaArraySpecial {
                 return this.transpileSpecialArrayFunctionIndexOf(owner, argumentStack);
             case "splice":
                 return this.transpileSpecialArrayFunctionSplice(owner, argumentStack);
+            case "find":
+                return this.transpileSpecialArrayFunctionFind(owner, argumentStack);
             default:
                 throw new UnsupportedError(`The given array function ${name} is unsupported!`, null);
         }
@@ -335,5 +337,30 @@ export class LuaArraySpecial {
         );
 
         return `__array_splice(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
+    }
+
+    /**
+     * an impl. for the array.find function in lua
+     * @param owner the owner or base object
+     * @param argumentStack the given arguments
+     */
+    private transpileSpecialArrayFunctionFind(owner: string, argumentStack: ts.NodeArray<ts.Expression>): string {
+
+        // declare the array.push method
+        this.addDeclaration(
+            "array.find",
+            [
+                `local function __array_find(array, predicate)`,
+                this.addSpacesToString(`for k, v in pairs(array) do`, 2),
+                this.addSpacesToString(`if predicate(v, k, array) then`, 4),
+                this.addSpacesToString(`return v`, 6),
+                this.addSpacesToString(`end`, 4),
+                this.addSpacesToString(`end`, 2),
+                this.addSpacesToString(`return nil`, 2),
+                `end`
+            ].join("\n")
+        );
+
+        return `__array_find(${owner}, ${argumentStack.map(this.transpileNode).join(", ")})`;
     }
 }
