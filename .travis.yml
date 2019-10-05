@@ -22,6 +22,16 @@ script:
 after_success:
   - npm run coverage:send:coveralls
 
+before_deploy:
+  - npm run build
+
+deploy:
+  provider: npm
+  skip_cleanup: true
+  api_key: $NPM_API_KEY
+  on:
+    tags: true
+
 cache:
   directories:
   - node_modules

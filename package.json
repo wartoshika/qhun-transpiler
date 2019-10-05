@@ -5,6 +5,9 @@
   "main": "dist/api.js",
   "types": "dist/api.d.ts",
   "bin": "dist/bin/qhun-transpiler.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "bugs": {
     "url": "https://github.com/wartoshika/qhun-transpiler/issues"
   },
