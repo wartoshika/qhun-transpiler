@@ -182,6 +182,9 @@ export class Transpiler {
             case ts.SyntaxKind.TemplateExpression:
                 nodeTranspiler = this.target.transpileTemplateExpression;
                 break;
+            case ts.SyntaxKind.TaggedTemplateExpression:
+                nodeTranspiler = this.target.transpileTaggedTemplateExpression;
+                break;
             case ts.SyntaxKind.NumericLiteral:
                 nodeTranspiler = this.target.transpileNumericLiteral;
                 break;

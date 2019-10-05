@@ -7,10 +7,12 @@ export class LuaTemplateExpression implements Partial<Target> {
 
     public transpileTemplateExpression(node: ts.TemplateExpression): string {
 
-        // get the template head
-        const templates: string[] = [
-            this.transpileNode(ts.createStringLiteral(node.head.text))
-        ];
+        const templates: string[] = [];
+
+        // head available?
+        if (node.head) {
+            templates.push(this.transpileNode(ts.createStringLiteral(node.head.text)));
+        }
 
         // add every span
         templates.push(...node.templateSpans.map(

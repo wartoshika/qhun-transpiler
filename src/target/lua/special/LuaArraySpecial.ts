@@ -206,7 +206,7 @@ export class LuaArraySpecial {
                 this.addSpacesToString(`local newArray = {}`, 2),
                 this.addSpacesToString(`for k, v in pairs(array) do`, 2),
                 this.addSpacesToString(`if begin >= 0 and k >= begin and k <= stop then`, 4),
-                this.addSpacesToString(`table.insert(newArray, table.remove(array, k))`, 6),
+                this.addSpacesToString(`table.insert(newArray, array[k])`, 6),
                 this.addSpacesToString(`end`, 4),
                 this.addSpacesToString(`end`, 2),
                 this.addSpacesToString(`return newArray`, 2),

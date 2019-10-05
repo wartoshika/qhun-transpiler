@@ -89,7 +89,7 @@ import { UnitTest } from "../../UnitTest";
             expected: [
                 "local test = function (ctor)",
                 "  return (function () ",
-                "    local __classExpression_0 = ctor.__new()",
+                "    local __classExpression_0 = ctor.__new({})",
                 "    __classExpression_0.__super = ctor",
                 "    __classExpression_0.__index = __classExpression_0",
                 "    function __classExpression_0.__new(self, ...)",

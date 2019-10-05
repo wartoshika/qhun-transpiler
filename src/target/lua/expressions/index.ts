@@ -15,6 +15,7 @@ export * from "./LuaParenthesizedExpression";
 export * from "./LuaAsExpression";
 export * from "./LuaTypeOfExpression";
 export * from "./LuaClassExpression";
+export * from "./LuaTaggedTemplateExpression";
 
 // expression bundle
 export * from "./LuaExpressions";

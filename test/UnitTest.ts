@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { SupportedTargets, SupportedTargetConfig } from "../src/target/TargetFactory";
 import { UnsupportedError } from "../src/error/UnsupportedError";
 import { LuaReservedKeywordError } from "../src/error/lua/LuaReservedKeywordError";
+import "../src/constants";
 
 export declare type TestCodeAndResult = {
     code: string,

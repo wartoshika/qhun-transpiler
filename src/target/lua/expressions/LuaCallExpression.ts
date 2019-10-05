@@ -12,6 +12,10 @@ export class LuaCallExpression implements Partial<Target> {
 
     public transpileCallExpression(node: ts.CallExpression): string {
 
+        const GLOBAL_SPECIAL_FUNCTIONS: string[] = [
+            "parseInt"
+        ];
+
         // check if the call expression is from an access expression
         if (ts.isPropertyAccessExpression(node.expression)) {
             return this.transpileCallExpressionOnProperty(node);
@@ -30,6 +34,11 @@ export class LuaCallExpression implements Partial<Target> {
 
             // normal funcion call.
             base = this.transpileNode(node.expression);
+
+            // global special function?
+            if (GLOBAL_SPECIAL_FUNCTIONS.indexOf(base) >= 0) {
+                return this.transpileSpecialGlobalFunction(node, base);
+            }
 
             // check for preprocessor function
             if (Object.keys(PreProcessorFunction).indexOf(base) >= 0) {
@@ -173,5 +182,24 @@ export class LuaCallExpression implements Partial<Target> {
         }
 
         return hasThisParam;
+    }
+
+    /**
+     * transpiles special global funktions like parseInt
+     * @param node the node to transpile
+     * @param base the function name
+     */
+    private transpileSpecialGlobalFunction(node: ts.CallExpression, base: string): string {
+
+        switch (base) {
+
+            case "parseInt":
+                // transpile params
+                const params = node.arguments.map(this.transpileNode);
+                // put everything together
+                return `tonumber(${params.join(", ")})`;
+            default:
+                throw new UnsupportedError("The global function " + base + " is currently not supported!", node);
+        }
     }
 }

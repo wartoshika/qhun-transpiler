@@ -57,6 +57,7 @@ export abstract class BaseLuaTarget extends BaseTarget implements Target {
         luaTrait.LuaAsExpression,
         luaTrait.LuaTypeOfExpression,
         luaTrait.LuaClassExpression,
+        luaTrait.LuaTaggedTemplateExpression,
         // misc
         luaTrait.LuaBlock,
         luaTrait.LuaEndOfFileToken,
@@ -84,4 +85,12 @@ export abstract class BaseLuaTarget extends BaseTarget implements Target {
         luaTrait.LuaParameterDecorator,
         luaTrait.LuaPropertyDecorator
     ) protected this: BaseLuaTarget;
+
+    /**
+     * @inheritdoc
+     */
+    public transpileComment(comment: string): string {
+
+        return `-- ${comment}`;
+    }
 }

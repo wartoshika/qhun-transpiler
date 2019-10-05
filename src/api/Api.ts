@@ -128,13 +128,9 @@ export class Api<T extends keyof SupportedTargets> {
 
         if (e instanceof ErrorWithNode && e.node) {
 
-            const sourceFile = e.node.getSourceFile();
-            const position = ts.getLineAndCharacterOfPosition(sourceFile, e.node.pos);
-
             Logger.error();
             Logger.error(e.message, "[Error] ", CommandLineColors.RED);
-            Logger.log(`File: ${sourceFile.fileName}`, " at ");
-            Logger.log(`Line: ${position.line + 1}, Column: ${position.character}`, " at ");
+            Logger.logNodePosition(e.node);
             Logger.error();
         } else {
 

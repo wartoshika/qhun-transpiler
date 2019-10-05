@@ -5,5 +5,6 @@ export enum CommandLineColors {
     GREEN = "\x1b[32m",
     WHITE = "\x1b[37m",
     GREY = "\x1b[2m\x1b[37m",
-    BRIGHT = "\x1b[1m"
+    BRIGHT = "\x1b[1m",
+    YELLOW = "\x1b[33m"
 }

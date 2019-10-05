@@ -119,7 +119,7 @@ export abstract class Test {
         const transpiler = new Transpiler(targetTranspiler);
 
         mockfs({
-            "package.json": fs.readFileSync("../package.json")
+            "package.json": fs.readFileSync("./package.json")
         });
 
         // return the transpiled code

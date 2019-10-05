@@ -12,7 +12,7 @@ import { UnitTest } from "../../UnitTest";
                 expected: [`a`]
             }, {
                 code: `(obj as b).b = <T>result;`,
-                expected: [`(obj).b = result`]
+                expected: [`obj.b = result`]
             }
         ]);
 

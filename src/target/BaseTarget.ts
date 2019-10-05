@@ -5,7 +5,7 @@ import { Types } from "../transpiler/Types";
 import { CompilerWrittenFile } from "../compiler/CompilerWrittenFile";
 import { SourceFile } from "../compiler/SourceFile";
 import { QhunTranspilerMetadata } from "./QhunTranspilerMetadata";
-import { SupportedTargets } from "./TargetFactory";
+import * as path from "path";
 
 declare type TypescriptExport = {
     name: string,
@@ -67,12 +67,41 @@ export abstract class BaseTarget implements Partial<Target> {
     }
 
     /**
+     * @inheritdoc
+     */
+    public abstract transpileComment(comment: string): string;
+
+    /**
      * get the declaration code that shoule be put to the head of the file
      */
     public getDeclaration(): string[] {
 
-        return Object.keys(this.declarationStack)
-            .map(key => this.declarationStack[key]);
+        const result: string[] = [];
+
+        // add file info if option has been truned on
+        if (this.project.configuration.printFileHeader) {
+
+            // add file header
+            result.push(...[
+                `This file is part of ${this.project.configuration.project.name} written by ${this.project.configuration.project.author}`,
+                ``,
+                `This project is licensed under the terms of ${this.project.configuration.project.license}. Please view informations about`,
+                `this license if you want to use/modify/copy/redistribute the software.`,
+                ``,
+                `The original file ${path.basename(this.sourceFile.fileName)} has been transpiled using ${PJSON_NAME} version ${PJSON_VERSION} on ${new Date().toUTCString()}`,
+            ].map(c => this.transpileComment(c)));
+
+            // add a new line
+            result.push("");
+        }
+
+        // add declaration of functions
+        result.push(
+            ...Object.keys(this.declarationStack)
+                .map(key => this.declarationStack[key])
+        );
+
+        return result;
     }
 
     /**

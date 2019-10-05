@@ -405,4 +405,16 @@ export interface Target {
      * @param node the node to transpile
      */
     transpileRegularExpressionLiteral(node: ts.RegularExpressionLiteral): string;
+
+    /**
+     * transpiles a tagged template expression
+     * @param node the node to transpile
+     */
+    transpileTaggedTemplateExpression(node: ts.TaggedTemplateExpression): string;
+
+    /**
+     * transpiles the given raw comment
+     * @param comment the comment to transpile
+     */
+    transpileComment(comment: string): string;
 }
