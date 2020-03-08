@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "outDir": "dist/index.js",
+        "declaration": false,
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "moduleResolution": "node",
+        "target": "es5",
+        "strict": true,
+        "strictFunctionTypes": false,
+        "strictBindCallApply": true,
+        "strictNullChecks": true,
+        "lib": [
+            "es2015"
+        ],
+        "typeRoots": [
+            "declarations",
+            "node_modules/@types"
+        ]
+    },
+    "include": [
+        "./src/**/*.ts", "index.ts"
+    ]
+}
