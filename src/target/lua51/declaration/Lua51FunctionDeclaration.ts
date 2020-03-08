@@ -1,7 +1,6 @@
 import { PartialTranspiler } from "../../../transpiler/impl/PartialTranspiler";
 import { DeclarationTranspiler } from "../../../transpiler";
 import { FunctionDeclaration, SyntaxKind } from "typescript";
-import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
 
 export class Lua51FunctionDeclaration extends PartialTranspiler implements Partial<DeclarationTranspiler> {
 
@@ -114,11 +113,17 @@ export class Lua51FunctionDeclaration extends PartialTranspiler implements Parti
         // add the head before the body
         body = (bodyHead.length > 0 ? bodyHead.join(this.transpiler.break()) + this.transpiler.break() : "") + body;
 
+        // try to get the return type of the declared function
+        let returnType = node.type ? this.transpiler.typeOfNode(node.type) : "";
+        if (returnType.length > 0) {
+            returnType = `${this.transpiler.space()}${returnType.replace("[[", "[[ Returns")}`
+        }
+
         // put everything together
         const code: string[] = [];
         code.push(`local function ${name}${name.length > 0 ? this.transpiler.space() : ""}(${this.transpiler.space()}`);
         code.push(paramStack.join(`,${this.transpiler.space()}`));
-        code.push(`${paramStack.length > 0 ? this.transpiler.space() : ""})`);
+        code.push(`${paramStack.length > 0 ? this.transpiler.space() : ""})${returnType}`);
         code.push(this.transpiler.breakNoSpace());
         if (body.length > 0) {
             code.push(this.transpiler.addIntend(body));

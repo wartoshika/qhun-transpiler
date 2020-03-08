@@ -1,7 +1,7 @@
 import { PartialTranspiler } from "../../../../transpiler";
 import { PropertyAccessExpression } from "typescript";
 
-export class Lua51ArrayExpressionLength extends PartialTranspiler {
+export class Lua51SpecialArrayProperty extends PartialTranspiler {
 
     public getSupport(): string[] {
         return ["length"];

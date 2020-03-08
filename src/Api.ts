@@ -77,6 +77,7 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
             prettyPrint: typeof this.config.prettyPrint === "boolean" ? this.config.prettyPrint : true,
             intend: typeof this.config.intend === "number" && this.config.intend >= 0 ? this.config.intend : 2,
             obscurify: typeof this.config.obscurify === "boolean" ? this.config.obscurify : false,
+            emitComments: typeof this.config.emitComments === "boolean" ? this.config.emitComments : true,
             ...this.config
         } as Required<Config>);
     }

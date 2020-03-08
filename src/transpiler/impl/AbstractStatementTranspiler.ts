@@ -1,19 +1,9 @@
-import { PartialTranspiler } from "./PartialTranspiler";
+
 import { Node, VariableStatement, ReturnStatement, IfStatement, WhileStatement, DoStatement, ForStatement, ForOfStatement, ForInStatement, SwitchStatement, BreakStatement, TryStatement, ThrowStatement, ContinueStatement, EmptyStatement, ExpressionStatement } from "typescript";
-import { PartialTranspilerConstructor } from "../../constraint";
 import { StatementTranspiler } from "../StatementTranspiler";
+import { PartialSubTranspiler } from "./PartialSubTranspiler";
 
-declare type Statements = {
-    [P in keyof AbstractStatementTranspiler]: AbstractStatementTranspiler[P] extends (node: Node) => string ? PartialTranspilerConstructor<StatementTranspiler, P> : never;
-}
-
-export abstract class AbstractStatementTranspiler extends PartialTranspiler implements StatementTranspiler {
-
-    protected abstract transpilerFunctions: Statements;
-
-    private classStorage: {
-        [P in keyof Statements]?: any
-    } = {};
+export abstract class AbstractStatementTranspiler extends PartialSubTranspiler<AbstractStatementTranspiler> implements StatementTranspiler {
 
     /**
      * @inheritdoc
@@ -127,15 +117,4 @@ export abstract class AbstractStatementTranspiler extends PartialTranspiler impl
         return this.constructClass("expressionStatement").expressionStatement(node);
     }
 
-    /**
-     * constructs the given class and store the result. return from the cache if already constructed
-     * @param transpilerClass 
-     */
-    private constructClass<A extends keyof Statements>(part: A): InstanceType<Statements[A]> {
-
-        if (this.classStorage[part] === undefined) {
-            this.classStorage[part] = new this.transpilerFunctions[part](this.transpiler);
-        }
-        return this.classStorage[part];
-    }
 }

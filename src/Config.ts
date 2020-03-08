@@ -1,4 +1,5 @@
-import { CompilerOptions } from "typescript";
+import { CompilerOptions, Node } from "typescript";
+import { AllTranspilers } from "./constraint";
 
 export interface Config {
 
@@ -42,6 +43,28 @@ export interface Config {
      * @default 2
      * @validRange 0..infinity
      */
-    intend?: number
+    intend?: number,
+
+    /**
+     * **Inactive: currently work in progress**
+     * 
+     * tries to read all comments and emit them in a possible way
+     * @default true
+     */
+    emitComments?: boolean,
+
+    /**
+     * allows to add aditional functionality to the transpiling process by applying custom
+     * code to each statement.
+     * 
+     * 
+     * Parameters of the functions are:
+     * - `node` the typescript node element to transpile.
+     * - `transpileNode` a function that will transpile any kind of node to a string
+     * - `originalFunction` the original transpiler function. can be used to get a transpiled result as string.
+     */
+    transform?: {
+        [P in keyof AllTranspilers]?: (node: Parameters<AllTranspilers[P]>[0], transpileNode: (node: Node) => string, originalFunction: AllTranspilers[P]) => string
+    }
 
 }

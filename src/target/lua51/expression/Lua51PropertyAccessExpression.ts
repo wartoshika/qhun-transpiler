@@ -2,15 +2,15 @@ import { PartialTranspiler } from "../../../transpiler/impl/PartialTranspiler";
 import { ExpressionTranspiler } from "../../../transpiler";
 import { PropertyAccessExpression, TypeFlags } from "typescript";
 import { NodeContainingException } from "../../../exception/NodeContainingException";
-import { Lua51ArrayExpressionLength } from "./arrayExpression/Lua51ArrayExpressionLength";
+import { Lua51SpecialArrayProperty } from "./specialExpressions/Lua51SpecialArrayProperty";
 import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
 
 export class Lua51PropertyAccessExpression extends PartialTranspiler implements Partial<ExpressionTranspiler> {
 
-    private arrayLength = new Lua51ArrayExpressionLength(this.transpiler);
+    private arrayProperty = new Lua51SpecialArrayProperty(this.transpiler);
 
     private arrayPropertySupport = [
-        ...this.arrayLength.getSupport()
+        ...this.arrayProperty.getSupport()
     ];
 
     /**
@@ -86,7 +86,7 @@ export class Lua51PropertyAccessExpression extends PartialTranspiler implements 
         // look for special names
         switch (name) {
             case "length":
-                return this.arrayLength.arrayExpressionLength(node);
+                return this.arrayProperty.arrayExpressionLength(node);
             default:
                 throw new UnsupportedNodeException(`The given array property ${name} is unsupported!`, node);
         }

@@ -1,19 +1,9 @@
-import { PartialTranspiler } from "./PartialTranspiler";
 import { DeclarationTranspiler } from "../DeclarationTranspiler";
 import { FunctionDeclaration, ImportDeclaration, InterfaceDeclaration, TypeAliasDeclaration, ExportDeclaration, ImportEqualsDeclaration, ClassDeclaration, ModuleDeclaration, EnumDeclaration, VariableDeclarationList, VariableDeclaration, Node } from "typescript";
-import { PartialTranspilerConstructor } from "../../constraint";
+import { PartialSubTranspiler } from "./PartialSubTranspiler";
 
-declare type Declarations = {
-    [P in keyof AbstractDeclarationTranspiler]: AbstractDeclarationTranspiler[P] extends (node: Node) => string ? PartialTranspilerConstructor<DeclarationTranspiler, P> : never;
-}
 
-export abstract class AbstractDeclarationTranspiler extends PartialTranspiler implements DeclarationTranspiler {
-
-    protected abstract transpilerFunctions: Declarations;
-
-    private classStorage: {
-        [P in keyof Declarations]?: any
-    } = {};
+export abstract class AbstractDeclarationTranspiler extends PartialSubTranspiler<AbstractDeclarationTranspiler> implements DeclarationTranspiler {
 
     /**
      * @inheritdoc
@@ -90,17 +80,5 @@ export abstract class AbstractDeclarationTranspiler extends PartialTranspiler im
      */
     public variableDeclaration(node: VariableDeclaration): string {
         return this.constructClass("variableDeclaration").variableDeclaration(node);
-    }
-
-    /**
-     * constructs the given class and store the result. return from the cache if already constructed
-     * @param transpilerClass 
-     */
-    private constructClass<A extends keyof Declarations>(part: A): InstanceType<Declarations[A]> {
-
-        if (this.classStorage[part] === undefined) {
-            this.classStorage[part] = new this.transpilerFunctions[part](this.transpiler);
-        }
-        return this.classStorage[part];
     }
 }

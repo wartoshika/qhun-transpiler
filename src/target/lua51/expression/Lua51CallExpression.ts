@@ -2,10 +2,18 @@ import { PartialTranspiler } from "../../../transpiler/impl/PartialTranspiler";
 import { ExpressionTranspiler } from "../../../transpiler";
 import { CallExpression, isPropertyAccessExpression, SyntaxKind, createSuper, createNodeArray, createNode, Expression, PropertyAccessExpression, ParameterDeclaration } from "typescript";
 import { Lua51Keywords } from "../Lua51Keywords";
+import { Lua51SpecialArrayFunction } from "./specialExpressions/Lua51SpecialArrayFunction";
+import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
 
 export class Lua51CallExpression extends PartialTranspiler implements Partial<ExpressionTranspiler> {
 
     private readonly CLASS_INIT_FUNCTION_NAME = this.transpiler.getConfig().obscurify ? Lua51Keywords.CLASS_INIT_FUNCTION_NAME_OBSCURIFY : Lua51Keywords.CLASS_INIT_FUNCTION_NAME;
+
+    private arrayFunction = new Lua51SpecialArrayFunction(this.transpiler);
+
+    private arrayFunctionSupport = [
+        ...this.arrayFunction.getSupport()
+    ];
 
     /**
      * @inheritdoc
@@ -75,15 +83,15 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
             return this.transpileSpecialToStringFunction(ownerName, node.arguments);
         }*/
 
-        /* @todo: special functions
+        /* @todo: array special call expression
         // preperation for calls like "test".replace() or [1,2].map()
-        if (Types.isString(owner, this.typeChecker)) {
+        if (this.transpiler.typeHelper().isString(owner)) {
             ownerNameCheck = "String";
-        } else if (Types.isArray(owner, this.typeChecker, true)) {
+        } else if (this.transpiler.typeHelper().isArray(owner, true)) {
             ownerNameCheck = "Array";
-        } else if (Types.isFunction(owner, this.typeChecker)) {
+        } else if (this.transpiler.typeHelper().isFunction(owner)) {
             ownerNameCheck = "Function";
-        } else if (Types.isObject(owner, this.typeChecker)) {
+        } else if (this.transpiler.typeHelper().isObject(owner)) {
 
             // be sure to exclude object type special implementations
             if ([
@@ -95,7 +103,7 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
 
         // check if there are some special objects
         switch (ownerNameCheck) {
-            case "Object":
+            /*case "Object":
                 try {
                     return this.transpileSpecialObjectFunction(functionName, ownerName, node.arguments);
                 } catch (e) {
@@ -113,10 +121,15 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
                 return this.transpileSpecialFunctionFunction(functionName, ownerName, node.arguments);
             case "String":
                 return this.transpileSpecialStringFunction(functionName, ownerName, node.arguments);
+            
             case "Array":
-                return this.transpileSpecialArrayFunction(functionName, ownerName, node.arguments);
+                return this.transpileArrayFunction(node, functionName);
+
             case "Math":
                 return this.transpileSpecialMathFunction(functionName, ownerName, node.arguments);
+            
+            default:
+                throw new UnsupportedNodeException(`Directly calling ${functionName} on array type ${ownerName} is not supported!`, node);
         }*/
 
         // transpile params
@@ -153,5 +166,10 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
         }
 
         return hasThisParam;
+    }
+
+    private transpileArrayFunction(node: CallExpression, functionName: string): string {
+
+        return "@todo transpileArrayFunction";
     }
 }

@@ -11,11 +11,20 @@ export class Test {
         private name: string = "test"
     ) { }
 
+    /**
+     * get a value as test
+     * @return string value
+     */
     public getTest(): string {
-        const q = this.name === "test" ? 1 : 2;
-        return `${this.name} => hallo ${q}`;
+        try {
+            const q = this.name === "test" ? 1 : 2;
+            return `${this.name} => hallo ${q}`;
+        } catch (e) {
+            return "___";
+        }
     }
 
+    /* test function */
     public typeof(): string {
         return typeof "a";
     }

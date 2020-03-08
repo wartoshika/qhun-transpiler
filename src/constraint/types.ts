@@ -1,5 +1,5 @@
 import { Node, TypeChecker } from "typescript";
-import { Target, Transpiler } from "../transpiler";
+import { Target, Transpiler, ExpressionTranspiler, StatementTranspiler, MiscTranspiler, DecoratorTranspiler, DeclarationTranspiler } from "../transpiler";
 import { Config } from "../Config";
 import { PartialTranspiler } from "../transpiler/impl/PartialTranspiler";
 import { Obscurifier } from "../util/Obscurifier";
@@ -27,3 +27,5 @@ export declare type Imports = {
 export declare type KeysOfType<T, U> = { [K in keyof T]: T[K] extends U ? K : never }[keyof T];
 export declare type RequiredKeys<T> = Exclude<KeysOfType<T, Exclude<T[keyof T], undefined>>, undefined>;
 export declare type OptionalKeys<T> = Exclude<keyof T, RequiredKeys<T>>;
+
+export declare type AllTranspilers = ExpressionTranspiler & StatementTranspiler & MiscTranspiler & DecoratorTranspiler & DeclarationTranspiler;

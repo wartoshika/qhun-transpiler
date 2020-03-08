@@ -1,4 +1,4 @@
-import { TypeChecker, Node, isVariableDeclaration, SyntaxKind, TypeNode, isParameter, isTypeReferenceNode, isTypeNode, ArrayTypeNode, isTypeQueryNode, TypeFlags, isStringLiteral, isArrayLiteralExpression } from "typescript";
+import { TypeChecker, Node, isVariableDeclaration, SyntaxKind, TypeNode, isParameter, isTypeReferenceNode, isTypeNode, ArrayTypeNode, isTypeQueryNode, TypeFlags, isStringLiteral, isArrayLiteralExpression, isObjectLiteralElement } from "typescript";
 import { Transpiler } from "../transpiler";
 
 export class TypeHelper {
@@ -93,7 +93,6 @@ export class TypeHelper {
     /**
      * check if the given node is a string literal
      * @param type the type to check
-     * @param typeChecker the type checker instance
      */
     public isString(node: Node): boolean {
 
@@ -187,6 +186,35 @@ export class TypeHelper {
                 // search for deeper existing types in a call expression
                 isCallExpression && (node as any).expression && this.isArray((node as any).expression, isCallExpression)
             );
+    }
+
+    /**
+     * check if the given node is an object
+     * @param node the node to check
+     */
+    public isObject(node: Node): boolean {
+
+        // get the node type
+        const type = this.typeChecker.getTypeAtLocation(node);
+
+        return node && !!(type.flags & TypeFlags.Object) || isObjectLiteralElement(node);
+    }
+
+    /**
+     * check if the given node is a function
+     * @param node the node to check
+     */
+    public isFunction(node: Node): boolean {
+
+        // get the node type
+        const type = this.typeChecker.getTypeAtLocation(node);
+        const nodeType = this.typeChecker.typeToTypeNode(type);
+
+        // single function type kind check
+        if (nodeType) {
+            return nodeType.kind === SyntaxKind.FunctionType;
+        }
+        return false;
     }
 
     /**

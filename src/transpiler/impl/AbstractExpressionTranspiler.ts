@@ -1,19 +1,9 @@
-import { PartialTranspiler } from "./PartialTranspiler";
-import { Node, ClassExpression, BinaryExpression, ConditionalExpression, CallExpression, PropertyAccessExpression, ElementAccessExpression, TemplateExpression, PostfixUnaryExpression, PrefixUnaryExpression, ObjectLiteralExpression, ArrayLiteralExpression, DeleteExpression, FunctionExpression, ArrowFunction, NewExpression, ParenthesizedExpression, AsExpression, TypeOfExpression, RegularExpressionLiteral, TaggedTemplateExpression } from "typescript";
-import { PartialTranspilerConstructor } from "../../constraint";
+import { ClassExpression, BinaryExpression, ConditionalExpression, CallExpression, PropertyAccessExpression, ElementAccessExpression, TemplateExpression, PostfixUnaryExpression, PrefixUnaryExpression, ObjectLiteralExpression, ArrayLiteralExpression, DeleteExpression, FunctionExpression, ArrowFunction, NewExpression, ParenthesizedExpression, AsExpression, TypeOfExpression, RegularExpressionLiteral, TaggedTemplateExpression } from "typescript";
 import { ExpressionTranspiler } from "../ExpressionTranspiler";
+import { PartialSubTranspiler } from "./PartialSubTranspiler";
 
-declare type Expressions = {
-    [P in keyof AbstractExpressionTranspiler]: AbstractExpressionTranspiler[P] extends (node: Node) => string ? PartialTranspilerConstructor<ExpressionTranspiler, P> : never;
-}
 
-export abstract class AbstractExpressionTranspiler extends PartialTranspiler implements ExpressionTranspiler {
-
-    protected abstract transpilerFunctions: Expressions;
-
-    private classStorage: {
-        [P in keyof Expressions]?: any
-    } = {};
+export abstract class AbstractExpressionTranspiler extends PartialSubTranspiler<AbstractExpressionTranspiler> implements ExpressionTranspiler {
 
     /**
      * @inheritdoc
@@ -148,15 +138,4 @@ export abstract class AbstractExpressionTranspiler extends PartialTranspiler imp
         return this.constructClass("taggedTemplateExpression").taggedTemplateExpression(node);
     }
 
-    /**
-     * constructs the given class and store the result. return from the cache if already constructed
-     * @param transpilerClass 
-     */
-    private constructClass<A extends keyof Expressions>(part: A): InstanceType<Expressions[A]> {
-
-        if (this.classStorage[part] === undefined) {
-            this.classStorage[part] = new this.transpilerFunctions[part](this.transpiler);
-        }
-        return this.classStorage[part];
-    }
 }
