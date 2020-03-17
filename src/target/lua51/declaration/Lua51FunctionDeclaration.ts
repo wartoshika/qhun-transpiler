@@ -84,7 +84,7 @@ export class Lua51FunctionDeclaration extends PartialTranspiler implements Parti
 
         // add rest argument if available
         if (restArgumentName.length > 0) {
-            bodyHead.push(`local ${restArgumentName}${this.transpiler.space()}=${this.transpiler.space()}{${this.transpiler.space()}...${this.transpiler.space()}}`);
+            bodyHead.push(`local ${restArgumentName}»=»{»...»}`);
         }
 
         // add parameters with visibility modifier
@@ -92,7 +92,7 @@ export class Lua51FunctionDeclaration extends PartialTranspiler implements Parti
             .filter(this.transpiler.typeHelper().hasExplicitVisibility)
             .map(param => {
                 const paramName = this.transpiler.transpileNode(param.name);
-                return `self.${paramName}${this.transpiler.space()}=${this.transpiler.space()}${paramName}`;
+                return `self.${paramName}»=»${paramName}`;
             });
 
         // add those params
@@ -116,13 +116,13 @@ export class Lua51FunctionDeclaration extends PartialTranspiler implements Parti
         // try to get the return type of the declared function
         let returnType = node.type ? this.transpiler.typeOfNode(node.type) : "";
         if (returnType.length > 0) {
-            returnType = `${this.transpiler.space()}${returnType.replace("[[", "[[ Returns")}`
+            returnType = `»${returnType.replace("[[", "[[ Returns")}`
         }
 
         // put everything together
         const code: string[] = [];
-        code.push(`local function ${name}${name.length > 0 ? this.transpiler.space() : ""}(${this.transpiler.space()}`);
-        code.push(paramStack.join(`,${this.transpiler.space()}`));
+        code.push(`local function ${name}${name.length > 0 ? this.transpiler.space() : ""}(»`);
+        code.push(paramStack.join(`,»`));
         code.push(`${paramStack.length > 0 ? this.transpiler.space() : ""})${returnType}`);
         code.push(this.transpiler.breakNoSpace());
         if (body.length > 0) {

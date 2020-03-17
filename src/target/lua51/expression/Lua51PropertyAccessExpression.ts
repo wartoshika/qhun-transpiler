@@ -3,7 +3,6 @@ import { ExpressionTranspiler } from "../../../transpiler";
 import { PropertyAccessExpression, TypeFlags } from "typescript";
 import { NodeContainingException } from "../../../exception/NodeContainingException";
 import { Lua51SpecialArrayProperty } from "./specialExpressions/Lua51SpecialArrayProperty";
-import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
 import { Lua51SpecialStringProperty } from "./specialExpressions/Lua51SpecialStringProperty";
 
 export class Lua51PropertyAccessExpression extends PartialTranspiler implements Partial<ExpressionTranspiler> {

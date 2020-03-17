@@ -36,7 +36,7 @@ export class Lua51ImportDeclaration extends PartialTranspiler implements Partial
                     const moduleName = element.propertyName ? this.transpiler.transpileNode(element.propertyName) : givenName;
 
                     // build the import
-                    return `local ${givenName}${this.transpiler.space()}=${this.transpiler.space()}require(${path}).${moduleName}`;
+                    return `local ${givenName}»=»require(${path}).${moduleName}`;
                 });
             } else if (isNamespaceImport(imports)) {
 
@@ -44,7 +44,7 @@ export class Lua51ImportDeclaration extends PartialTranspiler implements Partial
                 const givenName = this.transpiler.transpileNode(imports.name);
 
                 importedElements = [
-                    `local ${givenName}${this.transpiler.space()}=${this.transpiler.space()}require(${path})`
+                    `local ${givenName}»=»require(${path})`
                 ];
             } else {
                 // unsupported import type

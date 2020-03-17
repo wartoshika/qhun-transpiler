@@ -39,10 +39,10 @@ export class Lua51ObjectLiteralExpression extends PartialTranspiler implements P
             */
 
             // add the property
-            propertyStack.push(`${nameOrKey}${this.transpiler.space()}=${this.transpiler.space()}${initializer}`);
+            propertyStack.push(`${nameOrKey}»=»${initializer}`);
         });
 
         // wrap all properties
-        return `{${this.transpiler.space()}${propertyStack.join(`,${this.transpiler.space()}`)}${this.transpiler.space()}}`;
+        return `{»${propertyStack.join(`,»`)}»}`;
     }
 }

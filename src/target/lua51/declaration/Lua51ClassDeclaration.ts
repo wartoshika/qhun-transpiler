@@ -78,14 +78,14 @@ export class Lua51ClassDeclaration extends PartialTranspiler implements Partial<
 
         // add the lua class initializer
         if (superClass) {
-            classHead.push(`local ${className}${this.transpiler.space()}=${this.transpiler.space()}${superClass}.${this.CLASS_NEW_FUNCTION_NAME}(${this.transpiler.space()}{}${this.transpiler.space()})`);
-            classHead.push(`${className}.${this.CLASS_SUPER_REFERENCE_NAME}${this.transpiler.space()}=${this.transpiler.space()}${superClass}`);
+            classHead.push(`local ${className}»=»${superClass}.${this.CLASS_NEW_FUNCTION_NAME}(»{}»)`);
+            classHead.push(`${className}.${this.CLASS_SUPER_REFERENCE_NAME}»=»${superClass}`);
         } else {
-            classHead.push(`local ${className}${this.transpiler.space()}=${this.transpiler.space()}{}`);
+            classHead.push(`local ${className}»=»{}`);
         }
 
         // add the reference index
-        classHead.push(`${className}.__index${this.transpiler.space()}=${this.transpiler.space()}${className}`);
+        classHead.push(`${className}.__index»=»${className}`);
 
         /* @todo: reflection!
         // add class name when reflection is set
@@ -102,13 +102,13 @@ export class Lua51ClassDeclaration extends PartialTranspiler implements Partial<
         classHead.push(...staticInitProperties.filter(prop => !!(prop.initializer)).map(prop => {
             const propertyName = this.transpiler.transpileNode(prop.name);
             const initializer = this.transpiler.transpileNode(prop.initializer!);
-            return `${className}.${propertyName}${this.transpiler.space()}=${this.transpiler.space()}${initializer}`;
+            return `${className}.${propertyName}»=»${initializer}`;
         }));
 
         // add static class initializer function
         classHead.push(...[
-            `function ${className}.${this.CLASS_NEW_FUNCTION_NAME}(${Lua51Keywords.CLASS_THIS_KEYWORD},${this.transpiler.space()}...)`,
-            this.transpiler.addIntend(`local ${this.CLASS_INSTANCE_LOCAL_NAME}${this.transpiler.space()}=${this.transpiler.space()}setmetatable(${this.transpiler.space()}{},${this.transpiler.space()}${className}${this.transpiler.space()})`),
+            `function ${className}.${this.CLASS_NEW_FUNCTION_NAME}(${Lua51Keywords.CLASS_THIS_KEYWORD},»...)`,
+            this.transpiler.addIntend(`local ${this.CLASS_INSTANCE_LOCAL_NAME}»=»setmetatable(»{},»${className}»)`),
             // add property decorators
             this.transpiler.addIntend(node.members
                 .filter(isPropertyDeclaration)
@@ -118,11 +118,11 @@ export class Lua51ClassDeclaration extends PartialTranspiler implements Partial<
                 .join(this.transpiler.break())),
             // add prepare non static function
             this.transpiler.addIntend(`if ${Lua51Keywords.CLASS_THIS_KEYWORD} and ${className}.${this.CLASS_PREPARE_NON_STATIC} then`),
-            this.transpiler.addIntend(`${className}.${this.CLASS_PREPARE_NON_STATIC}(${this.transpiler.space()}${this.CLASS_INSTANCE_LOCAL_NAME}${this.transpiler.space()})`, 2),
+            this.transpiler.addIntend(`${className}.${this.CLASS_PREPARE_NON_STATIC}(»${this.CLASS_INSTANCE_LOCAL_NAME}»)`, 2),
             this.transpiler.addIntend(`end`),
             // add the constructor call
             this.transpiler.addIntend(`if ${Lua51Keywords.CLASS_THIS_KEYWORD} and ${className}.${this.CLASS_INIT_FUNCTION_NAME} then`),
-            this.transpiler.addIntend(`${className}.${this.CLASS_INIT_FUNCTION_NAME}(${this.transpiler.space()}${this.CLASS_INSTANCE_LOCAL_NAME},${this.transpiler.space()}...${this.transpiler.space()})`, 2),
+            this.transpiler.addIntend(`${className}.${this.CLASS_INIT_FUNCTION_NAME}(»${this.CLASS_INSTANCE_LOCAL_NAME},»...»)`, 2),
             this.transpiler.addIntend(`end`),
             // return the constructed instance
             this.transpiler.addIntend(`return ${this.CLASS_INSTANCE_LOCAL_NAME}`),
@@ -132,13 +132,13 @@ export class Lua51ClassDeclaration extends PartialTranspiler implements Partial<
         // add non static initializer function
         if (nonStaticInitProperties.length > 0) {
             classHead.push(...[
-                `function ${className}.${this.CLASS_PREPARE_NON_STATIC}(${this.transpiler.space()}${Lua51Keywords.CLASS_THIS_KEYWORD}${this.transpiler.space()})`,
+                `function ${className}.${this.CLASS_PREPARE_NON_STATIC}(»${Lua51Keywords.CLASS_THIS_KEYWORD}»)`,
                 // add non static properties
                 this.transpiler.addIntend(
                     nonStaticInitProperties.filter(p => !!(p.initializer)).map(p => {
                         const propertyName = this.transpiler.transpileNode(p.name);
                         const initializer = this.transpiler.transpileNode(p.initializer!);
-                        return `${Lua51Keywords.CLASS_THIS_KEYWORD}.${propertyName}${this.transpiler.space()}=${this.transpiler.space()}${initializer}`;
+                        return `${Lua51Keywords.CLASS_THIS_KEYWORD}.${propertyName}»=»${initializer}`;
                     }).join(this.transpiler.break())),
                 `end`
             ]);

@@ -22,6 +22,6 @@ export class Lua51NewExpression extends PartialTranspiler implements Partial<Exp
         ];
 
         // use the new method on the class
-        return `${className}.${this.CLASS_NEW_FUNCTION_NAME}(${this.transpiler.space()}${paramStack.join(`,${this.transpiler.space()}`)}${this.transpiler.space()})`;
+        return `${className}.${this.CLASS_NEW_FUNCTION_NAME}(»${paramStack.join(`,»`)}»)`;
     }
 }

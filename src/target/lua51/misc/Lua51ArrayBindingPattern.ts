@@ -30,6 +30,6 @@ export class Lua51ArrayBindingPattern extends PartialTranspiler implements Parti
             }
 
             // join by commata divider
-        }).join(`,${this.transpiler.space()}`);
+        }).join(`,»`);
     }
 }

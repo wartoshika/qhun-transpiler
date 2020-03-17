@@ -59,12 +59,12 @@ export class Lua51BinaryExpression extends PartialTranspiler implements Partial<
         const parenRight = typeof operator !== "undefined";
 
         // put everything together
-        let res = `${left}${this.transpiler.space()}${op}${this.transpiler.space()}${right}`;
+        let res = `${left}»${op}»${right}`;
 
         // add parenthes for assignment expressions to avoid wrong results for numeric expressions
         if (parenRight) {
-            res = res.replace(`${left}${this.transpiler.space()}${op}${this.transpiler.space()}`, `${left}${this.transpiler.space()}${op}${this.transpiler.space()}(${this.transpiler.space()}`);
-            res += `${this.transpiler.space()})`;
+            res = res.replace(`${left}»${op}»`, `${left}»${op}»(»`);
+            res += `»)`;
         }
 
         return res;

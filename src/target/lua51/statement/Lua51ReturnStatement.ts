@@ -42,6 +42,6 @@ export class Lua51ReturnStatement extends PartialTranspiler implements Partial<S
         return node.elements.map(element => {
 
             return this.transpiler.transpileNode(element);
-        }).join(`,${this.transpiler.space()}`);
+        }).join(`,»`);
     }
 }

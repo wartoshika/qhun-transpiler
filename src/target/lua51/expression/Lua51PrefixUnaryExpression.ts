@@ -21,7 +21,7 @@ export class Lua51PrefixUnaryExpression extends PartialTranspiler implements Par
                 operator = SyntaxKind.MinusToken;
                 break;
             case SyntaxKind.ExclamationToken:
-                return `(${this.transpiler.space()}not ${this.transpiler.transpileNode(node.operand)}${this.transpiler.space()})`;
+                return `(»not ${this.transpiler.transpileNode(node.operand)}»)`;
             case SyntaxKind.MinusToken:
                 return `-${this.transpiler.transpileNode(node.operand)}`;
             /*case SyntaxKind.TildeToken:

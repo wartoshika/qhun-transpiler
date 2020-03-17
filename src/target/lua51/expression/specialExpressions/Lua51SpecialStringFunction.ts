@@ -5,7 +5,7 @@ export class Lua51SpecialStringFunction extends AbstractSpecialHandler<CallExpre
 
     protected handleToString(node: CallExpression): string {
 
-        return `tostring${this.transpiler.space()}(${this.transpiler.space()}${this.getOwnerName(node)}${this.transpiler.space()})`;
+        return `tostring»(»${this.getOwnerName(node)}»)`;
     }
 
     protected handleSplit(node: CallExpression): string {

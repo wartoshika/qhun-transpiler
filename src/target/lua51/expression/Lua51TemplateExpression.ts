@@ -36,7 +36,7 @@ export class Lua51TemplateExpression extends PartialTranspiler implements Partia
                 );
                 let end = "";
                 if (text.length > 0 && text !== "\"\"" && text !== "''") {
-                    end = `${this.transpiler.space()}..${this.transpiler.space()}${text}`;
+                    end = `»..»${text}`;
                 }
                 return start + end;
             }
@@ -45,7 +45,7 @@ export class Lua51TemplateExpression extends PartialTranspiler implements Partia
         // join templates by string concat token
         const result = templates
             .filter(val => val.length > 0 && val !== "\"\"" && val !== "''")
-            .join(`${this.transpiler.space()}..${this.transpiler.space()}`);
+            .join(`»..»`);
 
         // when the initial template string was empty, add an empty string to restore functionality
         if (result.length == 0) {

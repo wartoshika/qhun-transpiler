@@ -5,6 +5,6 @@ export class Lua51SpecialStringProperty extends AbstractSpecialHandler<PropertyA
 
     protected handleLength(node: PropertyAccessExpression): string {
 
-        return `string.len(${this.transpiler.space()}${this.transpiler.transpileNode(node.expression)}${this.transpiler.space()})`;
+        return `string.len(»${this.transpiler.transpileNode(node.expression)}»)`;
     }
 }

@@ -47,10 +47,10 @@ export class Lua51ElementAccessExpression extends PartialTranspiler implements P
     private getElementAccessStringCase(element: string, index: string): string {
 
         // lua is index 1 based, increment the index
-        index = `(tonumber(${index})${this.transpiler.space()}+${this.transpiler.space()}1)`;
+        index = `(tonumber(${index})»+»1)`;
 
         // the string accessor must return a char, use string.sub to get the char
-        return `string.sub(${element},${index})${this.transpiler.space()}${index})`;
+        return `string.sub(${element},${index})»${index})`;
     }
 
     /**
@@ -62,7 +62,7 @@ export class Lua51ElementAccessExpression extends PartialTranspiler implements P
 
         // array access is mostly equal to the object access.
         // just the index must be incremented because of the base 1 index
-        index = `(tonumber(${index})${this.transpiler.space()}+${this.transpiler.space()}1)`;
+        index = `(tonumber(${index})»+»1)`;
 
         // use the object based access with the new index
         return `${element}[${index}]`;

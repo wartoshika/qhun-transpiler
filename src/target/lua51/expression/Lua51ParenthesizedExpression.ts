@@ -19,6 +19,6 @@ export class Lua51ParenthesizedExpression extends PartialTranspiler implements P
         }
 
         // wrap the inner expression
-        return `(${this.transpiler.space()}${expression}${this.transpiler.space()})`;
+        return `(»${expression}»)`;
     }
 }

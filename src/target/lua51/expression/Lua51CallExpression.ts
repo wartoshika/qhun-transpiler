@@ -55,7 +55,7 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
         const params = node.arguments.map(n => this.transpiler.transpileNode(n, node));
 
         // put everything together
-        return `${base}(${this.transpiler.space()}${params.join(`,${this.transpiler.space()}`)}${params.length > 0 ? this.transpiler.space() : ""})`;
+        return `${base}(»${params.join(`,»`)}${params.length > 0 ? this.transpiler.space() : ""})`;
     }
 
     /**
@@ -123,7 +123,7 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
         const hasThisParam = this.doesMethodDeclarationHasThisParam(node);
 
         // use the default access pattern
-        return `${ownerName}${hasThisParam ? "." : ":"}${functionName}(${this.transpiler.space()}${params.join(`,${this.transpiler.space()}`)}${params.length > 0 ? this.transpiler.space() : ""})`;
+        return `${ownerName}${hasThisParam ? "." : ":"}${functionName}(»${params.join(`,»`)}${params.length > 0 ? this.transpiler.space() : ""})`;
     }
 
     /**

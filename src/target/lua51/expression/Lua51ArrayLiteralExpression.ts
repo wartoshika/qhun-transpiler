@@ -13,6 +13,6 @@ export class Lua51ArrayLiteralExpression extends PartialTranspiler implements Pa
         const elementList: string[] = node.elements.map(element => this.transpiler.transpileNode(element));
 
         // join them by the commata symbol
-        return `{${this.transpiler.space()}${elementList.join(`,${this.transpiler.space()}`)}${this.transpiler.space()}}`;
+        return `{»${elementList.join(`,»`)}»}`;
     }
 }

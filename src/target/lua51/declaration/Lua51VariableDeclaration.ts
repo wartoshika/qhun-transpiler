@@ -52,7 +52,7 @@ export class Lua51VariableDeclaration extends PartialTranspiler implements Parti
                 right = createTranspiledExpression(
                     node.initializer.elements
                         .map(element => this.transpiler.transpileNode(element))
-                        .join(`,${this.transpiler.space()}`)
+                        .join(`,»`)
                 );
             }
         }
