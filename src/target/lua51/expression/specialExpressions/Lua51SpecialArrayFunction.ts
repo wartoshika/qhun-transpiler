@@ -1,19 +1,15 @@
-import { PartialTranspiler } from "../../../../transpiler";
-import { PropertyAccessExpression } from "typescript";
+import { CallExpression } from "typescript";
+import { AbstractSpecialHandler } from "../../../../transpiler/impl/AbstractSpecialHandler";
 
-export class Lua51SpecialArrayFunction extends PartialTranspiler {
+export class Lua51SpecialArrayFunction extends AbstractSpecialHandler<CallExpression> {
 
-    public getSupport(): string[] {
-        return ["push", "unshift"];
+    private handlePush(node: CallExpression): string {
+
+        return `@todo: array.push`;
     }
 
-    public arrayExpressionPush(node: PropertyAccessExpression): string {
+    private handleUnshift(node: CallExpression): string {
 
-        return `#${this.transpiler.transpileNode(node.expression)}`;
-    }
-
-    public arrayExpressionUnshift(node: PropertyAccessExpression): string {
-
-        return `#${this.transpiler.transpileNode(node.expression)}`;
+        return `@todo: array.unshift`;
     }
 }

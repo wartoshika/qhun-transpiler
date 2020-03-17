@@ -7,6 +7,7 @@ import { Node, Identifier, SourceFile, BindingName } from "typescript";
 import { Imports } from "../constraint";
 import { TypeHelper } from "../util/TypeHelper";
 import { Config } from "../Config";
+import { Target } from "./Target";
 
 export interface Transpiler<C extends Required<Config> = Required<Config>> {
 
@@ -48,6 +49,13 @@ export interface Transpiler<C extends Required<Config> = Required<Config>> {
     transpileNode(node: Node, originalNode?: Node): string;
 
     /**
+     * transpiles the given typescript sourcecode
+     * @param code the code to transpile
+     * @param onError error handler. return param is returned to parent call
+     */
+    transpileCode(code: string, onError?: (error: Error) => string): string;
+
+    /**
      * registers all given variable names
      * @param variables the variables to register
      */
@@ -76,6 +84,12 @@ export interface Transpiler<C extends Required<Config> = Required<Config>> {
      * @param sourceFile the new sourceFile
      */
     setSourceFile(sourceFile: SourceFile): void;
+
+    /**
+     * set the current target
+     * @param target the current target
+     */
+    setTarget(target: Target): void;
 
     /**
      * get the identifier name for the given identifier node or raw string.

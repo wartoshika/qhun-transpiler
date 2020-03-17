@@ -10,6 +10,7 @@ import { Lua51ModuleDeclaration } from "./Lua51ModuleDeclaration";
 import { Lua51EnumDeclaration } from "./Lua51EnumDeclaration";
 import { Lua51VariableDeclarationList } from "./Lua51VariableDeclarationList";
 import { Lua51VariableDeclaration } from "./Lua51VariableDeclaration";
+import { Lua51MissingDeclaration } from "./Lua51MissingDeclaration";
 
 export class Lua51DeclarationTranspiler extends AbstractDeclarationTranspiler {
 
@@ -24,6 +25,7 @@ export class Lua51DeclarationTranspiler extends AbstractDeclarationTranspiler {
         moduleDeclaration: Lua51ModuleDeclaration,
         enumDeclaration: Lua51EnumDeclaration,
         variableDeclarationList: Lua51VariableDeclarationList,
-        variableDeclaration: Lua51VariableDeclaration
+        variableDeclaration: Lua51VariableDeclaration,
+        missingDeclaration: Lua51MissingDeclaration
     };
 }

@@ -1,4 +1,4 @@
-import { TypeChecker, Node, isVariableDeclaration, SyntaxKind, TypeNode, isParameter, isTypeReferenceNode, isTypeNode, ArrayTypeNode, isTypeQueryNode, TypeFlags, isStringLiteral, isArrayLiteralExpression, isObjectLiteralElement } from "typescript";
+import { TypeChecker, Node, isVariableDeclaration, SyntaxKind, TypeNode, isParameter, isTypeReferenceNode, isTypeNode, ArrayTypeNode, isTypeQueryNode, TypeFlags, isStringLiteral, isArrayLiteralExpression, isObjectLiteralElement, isParenthesizedExpression } from "typescript";
 import { Transpiler } from "../transpiler";
 
 export class TypeHelper {
@@ -113,6 +113,76 @@ export class TypeHelper {
             return node.modifiers.some(mod => mod.kind === SyntaxKind.StaticKeyword);
         }
         return false;
+    }
+
+    public getInferedType(node: Node): "class" | "object" | "array" | "number" | "string" | "undefined" | "unknown" {
+
+        // if the node is a ParenthesizedExpression, resolve the body
+        if (isParenthesizedExpression(node)) {
+            return this.getInferedType(node.expression);
+        }
+
+        const kindChecker = (kind: SyntaxKind) => {
+            switch (kind) {
+                case SyntaxKind.ObjectBindingPattern:
+                case SyntaxKind.ObjectLiteralExpression:
+                    return "object";
+                case SyntaxKind.ArrayLiteralExpression:
+                case SyntaxKind.ArrayBindingPattern:
+                    return "array";
+                case SyntaxKind.ArrayType:
+                    return "array";
+                case SyntaxKind.StringKeyword:
+                    return "string";
+                case SyntaxKind.NumberKeyword:
+                    return "number";
+                case SyntaxKind.NullKeyword:
+                    return "object";
+                case SyntaxKind.UndefinedKeyword:
+                    return "undefined";
+            }
+        }
+
+        const type = this.typeChecker.getTypeAtLocation(node);
+        if (type.isClass()) {
+            return "class";
+        } else if (type.isStringLiteral()) {
+            return "string";
+        } else if (type.isNumberLiteral()) {
+            return "number";
+        } else if (node.kind === SyntaxKind.TypeOfExpression) {
+            return "string";
+        } else {
+
+            const pattern = type.pattern;
+            if (pattern) {
+                const guess = kindChecker(pattern.kind);
+                if (guess) {
+                    return guess;
+                }
+            }
+            const typeNode = this.typeChecker.typeToTypeNode(type);
+            if (typeNode) {
+                const guess = kindChecker(typeNode.kind);
+                if (guess) {
+                    return guess;
+                }
+            }
+
+            if (type.symbol) {
+                return this.getInferedType(type.symbol.valueDeclaration);
+            }
+        }
+
+        const nodeType = this.typeChecker.typeToTypeNode(type);
+        if (nodeType) {
+            const guess = kindChecker(nodeType.kind);
+            if (guess) {
+                return guess;
+            }
+        }
+
+        return "unknown";
     }
 
     /**

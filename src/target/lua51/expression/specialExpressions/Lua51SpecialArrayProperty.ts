@@ -1,13 +1,9 @@
-import { PartialTranspiler } from "../../../../transpiler";
 import { PropertyAccessExpression } from "typescript";
+import { AbstractSpecialHandler } from "../../../../transpiler/impl/AbstractSpecialHandler";
 
-export class Lua51SpecialArrayProperty extends PartialTranspiler {
+export class Lua51SpecialArrayProperty extends AbstractSpecialHandler<PropertyAccessExpression> {
 
-    public getSupport(): string[] {
-        return ["length"];
-    }
-
-    public arrayExpressionLength(node: PropertyAccessExpression): string {
+    protected handleLength(node: PropertyAccessExpression): string {
 
         return `#${this.transpiler.transpileNode(node.expression)}`;
     }

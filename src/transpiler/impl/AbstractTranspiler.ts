@@ -5,11 +5,12 @@ import { DecoratorTranspiler } from "../DecoratorTranspiler";
 import { StatementTranspiler } from "../StatementTranspiler";
 import { MiscTranspiler } from "../MiscTranspiler";
 import { NodeKindMapper, Imports } from "../../constraint";
-import { SyntaxKind, Node, TypeChecker, Identifier, SourceFile, BindingName } from "typescript";
+import { SyntaxKind, Node, TypeChecker, Identifier, SourceFile, BindingName, createSourceFile, ScriptTarget } from "typescript";
 import { UnsupportedNodeException } from "../../exception/UnsupportedNodeException";
 import { TypeHelper } from "../../util/TypeHelper";
 import { Config } from "../../Config";
 import { Obscurifier } from "../../util/Obscurifier";
+import { Target } from "../Target";
 
 export abstract class AbstractTranspiler<C extends Required<Config> = Required<Config>> implements Transpiler<C> {
 
@@ -26,6 +27,7 @@ export abstract class AbstractTranspiler<C extends Required<Config> = Required<C
         [SyntaxKind.EnumDeclaration]: () => [this.declaration(), this.declaration().enumDeclaration],
         [SyntaxKind.VariableDeclarationList]: () => [this.declaration(), this.declaration().variableDeclarationList],
         [SyntaxKind.VariableDeclaration]: () => [this.declaration(), this.declaration().variableDeclaration],
+        [SyntaxKind.MissingDeclaration]: () => [this.declaration(), this.declaration().missingDeclaration],
         // STATEMENTS
         [SyntaxKind.FirstStatement]: () => [this.statement(), this.statement().firstStatement],
         [SyntaxKind.VariableStatement]: () => [this.statement(), this.statement().variableStatement],
@@ -97,6 +99,7 @@ export abstract class AbstractTranspiler<C extends Required<Config> = Required<C
     protected exportVariables: string[] = [];
     protected imports: Imports[] = [];
     protected classes: string[] = [];
+    protected target: Target | undefined;
     private _typeHelper = new TypeHelper(this.typeChecker, this);
     private currentSourceFile!: SourceFile;
 
@@ -157,6 +160,26 @@ export abstract class AbstractTranspiler<C extends Required<Config> = Required<C
             return res;
         } else {
             throw new UnsupportedNodeException(`The current node type ${SyntaxKind[node.kind]}(${node.kind}) is not supported in the current target.`, node, originalNode);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public transpileCode(code: string, onError?: (error: Error) => string): string {
+
+        if (!this.target) {
+            throw new Error("Target has not been set within the transpiler class. Invalid program state! Please report an issue and explain what you have done.");
+        }
+
+        // create an inline source file to transpile the given code and reuse everything
+        try {
+            return this.target.transpileSourceFile(createSourceFile("inlineCode", code, ScriptTarget.Latest));
+        } catch (e) {
+            if (typeof onError === "function") {
+                return onError(e);
+            }
+            throw e;
         }
     }
 
@@ -231,6 +254,10 @@ export abstract class AbstractTranspiler<C extends Required<Config> = Required<C
      */
     public setSourceFile(sourceFile: SourceFile): void {
         this.currentSourceFile = sourceFile;
+    }
+
+    public setTarget(target: Target): void {
+        this.target = target;
     }
 
     /**

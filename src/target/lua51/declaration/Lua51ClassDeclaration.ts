@@ -3,7 +3,6 @@ import { DeclarationTranspiler } from "../../../transpiler";
 import { ClassDeclaration, isPropertyDeclaration, SyntaxKind, isConstructorDeclaration, isMethodDeclaration, createConstructor, createBlock, ParameterDeclaration, createParameter, createFunctionDeclaration, createNodeArray, createIf, createBinary, createIdentifier, createToken, createPropertyAccess, createExpressionStatement, createCall } from "typescript";
 import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
 import { Lua51Keywords } from "../Lua51Keywords";
-import { createTranspiledIdentifier } from "../extendedTypes/TranspiledIdentifier";
 
 export class Lua51ClassDeclaration extends PartialTranspiler implements Partial<DeclarationTranspiler> {
 

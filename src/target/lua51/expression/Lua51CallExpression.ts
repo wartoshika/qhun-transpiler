@@ -3,17 +3,14 @@ import { ExpressionTranspiler } from "../../../transpiler";
 import { CallExpression, isPropertyAccessExpression, SyntaxKind, createSuper, createNodeArray, createNode, Expression, PropertyAccessExpression, ParameterDeclaration } from "typescript";
 import { Lua51Keywords } from "../Lua51Keywords";
 import { Lua51SpecialArrayFunction } from "./specialExpressions/Lua51SpecialArrayFunction";
-import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
+import { Lua51SpecialStringFunction } from "./specialExpressions/Lua51SpecialStringFunction";
 
 export class Lua51CallExpression extends PartialTranspiler implements Partial<ExpressionTranspiler> {
 
     private readonly CLASS_INIT_FUNCTION_NAME = this.transpiler.getConfig().obscurify ? Lua51Keywords.CLASS_INIT_FUNCTION_NAME_OBSCURIFY : Lua51Keywords.CLASS_INIT_FUNCTION_NAME;
 
     private arrayFunction = new Lua51SpecialArrayFunction(this.transpiler);
-
-    private arrayFunctionSupport = [
-        ...this.arrayFunction.getSupport()
-    ];
+    private stringFunction = new Lua51SpecialStringFunction(this.transpiler);
 
     /**
      * @inheritdoc
@@ -75,32 +72,19 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
         // supports special functions
         const owner = (node.expression as PropertyAccessExpression).expression;
         const ownerName = this.transpiler.transpileNode(owner);
-        let ownerNameCheck = this.transpiler.transpileNode(owner);
 
-        /* @todo: special toString function
         // check the generic toString(...) function
         if (functionName === "toString") {
-            return this.transpileSpecialToStringFunction(ownerName, node.arguments);
-        }*/
-
-        /* @todo: array special call expression
-        // preperation for calls like "test".replace() or [1,2].map()
-        if (this.transpiler.typeHelper().isString(owner)) {
-            ownerNameCheck = "String";
-        } else if (this.transpiler.typeHelper().isArray(owner, true)) {
-            ownerNameCheck = "Array";
-        } else if (this.transpiler.typeHelper().isFunction(owner)) {
-            ownerNameCheck = "Function";
-        } else if (this.transpiler.typeHelper().isObject(owner)) {
-
-            // be sure to exclude object type special implementations
-            if ([
-                "Math"
-            ].indexOf(ownerName) === -1) {
-                ownerNameCheck = "Object";
-            }
+            return this.stringFunction.handle(functionName, node);
         }
 
+        const baseType = this.transpiler.typeHelper().getInferedType(owner);
+        switch (baseType) {
+            case "string":
+                return this.stringFunction.handle(functionName, node);
+        }
+
+        /*
         // check if there are some special objects
         switch (ownerNameCheck) {
             /*case "Object":

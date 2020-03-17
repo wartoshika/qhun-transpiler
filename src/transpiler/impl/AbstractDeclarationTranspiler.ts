@@ -1,5 +1,5 @@
 import { DeclarationTranspiler } from "../DeclarationTranspiler";
-import { FunctionDeclaration, ImportDeclaration, InterfaceDeclaration, TypeAliasDeclaration, ExportDeclaration, ImportEqualsDeclaration, ClassDeclaration, ModuleDeclaration, EnumDeclaration, VariableDeclarationList, VariableDeclaration, Node } from "typescript";
+import { FunctionDeclaration, ImportDeclaration, InterfaceDeclaration, TypeAliasDeclaration, ExportDeclaration, ImportEqualsDeclaration, ClassDeclaration, ModuleDeclaration, EnumDeclaration, VariableDeclarationList, VariableDeclaration, Node, MissingDeclaration } from "typescript";
 import { PartialSubTranspiler } from "./PartialSubTranspiler";
 
 
@@ -80,5 +80,12 @@ export abstract class AbstractDeclarationTranspiler extends PartialSubTranspiler
      */
     public variableDeclaration(node: VariableDeclaration): string {
         return this.constructClass("variableDeclaration").variableDeclaration(node);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public missingDeclaration(node: MissingDeclaration): string {
+        return this.constructClass("missingDeclaration").missingDeclaration(node);
     }
 }

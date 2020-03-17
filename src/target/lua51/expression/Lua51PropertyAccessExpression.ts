@@ -4,14 +4,12 @@ import { PropertyAccessExpression, TypeFlags } from "typescript";
 import { NodeContainingException } from "../../../exception/NodeContainingException";
 import { Lua51SpecialArrayProperty } from "./specialExpressions/Lua51SpecialArrayProperty";
 import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
+import { Lua51SpecialStringProperty } from "./specialExpressions/Lua51SpecialStringProperty";
 
 export class Lua51PropertyAccessExpression extends PartialTranspiler implements Partial<ExpressionTranspiler> {
 
     private arrayProperty = new Lua51SpecialArrayProperty(this.transpiler);
-
-    private arrayPropertySupport = [
-        ...this.arrayProperty.getSupport()
-    ];
+    private stringProperty = new Lua51SpecialStringProperty(this.transpiler);
 
     /**
      * @inheritdoc
@@ -31,7 +29,7 @@ export class Lua51PropertyAccessExpression extends PartialTranspiler implements 
                 case TypeFlags.Object:
 
                     // check if this is an array
-                    if (this.transpiler.typeHelper().isArray(node.expression) && this.arrayPropertySupport.indexOf(name) !== -1) {
+                    if (this.transpiler.typeHelper().isArray(node.expression)) {
                         return this.transpileSpecialArrayProperty(node);
                     }
             }
@@ -61,17 +59,11 @@ export class Lua51PropertyAccessExpression extends PartialTranspiler implements 
      */
     private transpileSpecialStringProperty(node: PropertyAccessExpression): string {
 
-        return "@todo: transpileSpecialStringProperty";
-        /*// get the accessor name
-        const name = this.transpileNode(node.name);
+        // get the accessor name
+        const name = this.transpiler.transpileNode(node.name);
 
         // look for special names
-        switch (name) {
-            case "length":
-                return this.transpileSpecialStringPropertyLength(node);
-            default:
-                throw new UnsupportedError(`The given string property ${name} is unsupported!`, node);
-        }*/
+        return this.stringProperty.handle(name, node);
     }
 
     /**
@@ -84,11 +76,6 @@ export class Lua51PropertyAccessExpression extends PartialTranspiler implements 
         const name = this.transpiler.transpileNode(node.name);
 
         // look for special names
-        switch (name) {
-            case "length":
-                return this.arrayProperty.arrayExpressionLength(node);
-            default:
-                throw new UnsupportedNodeException(`The given array property ${name} is unsupported!`, node);
-        }
+        return this.arrayProperty.handle(name, node);
     }
 }

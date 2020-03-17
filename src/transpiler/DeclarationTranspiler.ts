@@ -1,4 +1,4 @@
-import { FunctionDeclaration, ImportDeclaration, InterfaceDeclaration, TypeAliasDeclaration, ExportDeclaration, ImportEqualsDeclaration, ClassDeclaration, ModuleDeclaration, EnumDeclaration, VariableDeclarationList, VariableDeclaration } from "typescript";
+import { FunctionDeclaration, ImportDeclaration, InterfaceDeclaration, TypeAliasDeclaration, ExportDeclaration, ImportEqualsDeclaration, ClassDeclaration, ModuleDeclaration, EnumDeclaration, VariableDeclarationList, VariableDeclaration, MissingDeclaration } from "typescript";
 import { PartialTranspiler } from "./impl/PartialTranspiler";
 
 export interface DeclarationTranspiler extends PartialTranspiler {
@@ -32,6 +32,12 @@ export interface DeclarationTranspiler extends PartialTranspiler {
      * @param node the node to transpile
      */
     exportDeclaration(node: ExportDeclaration): string;
+
+    /**
+     * transpiles a missing declaration
+     * @param node the node to transpile
+     */
+    missingDeclaration(node: MissingDeclaration): string;
 
     /**
      * transpiles an import equals declaration

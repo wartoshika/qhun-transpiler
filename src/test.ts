@@ -18,7 +18,7 @@ export class Test {
     public getTest(): string {
         try {
             const q = this.name === "test" ? 1 : 2;
-            return `${this.name} => hallo ${q}`;
+            return `${this.name} => hallo ${q} ${this.n()}`;
         } catch (e) {
             return "___";
         }
@@ -26,7 +26,16 @@ export class Test {
 
     /* test function */
     public typeof(): string {
-        return typeof "a";
+        return (typeof "a").split("").join("");
+    }
+
+    private n() {
+        const str = "c";
+        (str.split("hallo")).length;
+        const arr = [1, 2];
+        arr.map(n => n).join("").split("");
+        const a = "".split("1").toString();
+        return "test".length;
     }
 }
 new Test("hallo").getTest();

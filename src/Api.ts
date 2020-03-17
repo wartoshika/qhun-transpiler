@@ -1,7 +1,7 @@
 import { TargetConstructor, ConfigOfTarget } from "./constraint";
 import { Target, TranspileResult, TranspilerFactory } from "./transpiler";
 import { Observable } from "rxjs";
-import { createProgram } from "typescript";
+import { createProgram, SourceFile } from "typescript";
 import { Config } from "./Config";
 import { NodeContainingException } from "./exception/NodeContainingException";
 import { Obscurifier } from "./util/Obscurifier";
@@ -48,8 +48,9 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
         const targetInstance = new this.target(transpiler, this.config, typeChecker);
         obscurifier.setCaseSensitive(targetInstance.isCaseSensitive());
 
-        // update fileWriter
+        // update instances
         fileWriter.setFileExtension(targetInstance.getFileExtension());
+        transpiler.setTarget(targetInstance);
 
         // iterate over source files
         program.getSourceFiles()
