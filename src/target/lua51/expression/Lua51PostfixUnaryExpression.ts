@@ -21,7 +21,11 @@ export class Lua51PostfixUnaryExpression extends PartialTranspiler implements Pa
                 operator = SyntaxKind.MinusToken;
                 break;
             default:
-                throw new UnsupportedNodeException(`Unsupported postfix unary expression with operator ${SyntaxKind[node.operator]}!`, node);
+                this.transpiler.registerError({
+                    node: node,
+                    message: `Unsupported postfix unary expression with operator ${SyntaxKind[node.operator]}!`
+                });
+                return "[ERROR]";
         }
 
         // create a function that increments the variable and directly return the old one (postfix)

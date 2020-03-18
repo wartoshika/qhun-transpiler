@@ -8,7 +8,7 @@ export class Lua51EmptyStatement extends PartialTranspiler implements Partial<St
      */
     public emptyStatement(node: EmptyStatement): string {
 
-        // empty statement is ..... empty
-        return "EMPTY";
+        // an empty statement will result in an empty string
+        return "";
     }
 }

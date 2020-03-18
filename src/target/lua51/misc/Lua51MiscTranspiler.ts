@@ -5,6 +5,7 @@ import { Lua51StringLiteral } from "./Lua51StringLiteral";
 import { Lua51FirstLiteralToken } from "./Lua51FirstLiteralToken";
 import { Lua51Keyword } from "./Lua51Keyword";
 import { Lua51ArrayBindingPattern } from "./Lua51ArrayBindingPattern";
+import { Lua51SpreadElement } from "./Lua51SpreadElement";
 
 export class Lua51MiscTranspiler extends AbstractMiscTranspiler {
 
@@ -14,7 +15,8 @@ export class Lua51MiscTranspiler extends AbstractMiscTranspiler {
         stringLiteral: Lua51StringLiteral,
         firstLiteralToken: Lua51FirstLiteralToken,
         keyword: Lua51Keyword,
-        arrayBindingPattern: Lua51ArrayBindingPattern
+        arrayBindingPattern: Lua51ArrayBindingPattern,
+        spreadElement: Lua51SpreadElement
     };
 
 }

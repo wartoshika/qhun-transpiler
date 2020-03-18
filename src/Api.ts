@@ -1,11 +1,14 @@
-import { TargetConstructor, ConfigOfTarget } from "./constraint";
+import { TargetConstructor, ConfigOfTarget, TranspileMessage } from "./constraint";
 import { Target, TranspileResult, TranspilerFactory } from "./transpiler";
 import { Observable } from "rxjs";
-import { createProgram, SourceFile } from "typescript";
+import { createProgram } from "typescript";
 import { Config } from "./Config";
 import { NodeContainingException } from "./exception/NodeContainingException";
 import { Obscurifier } from "./util/Obscurifier";
 import { FileWriter } from "./util/FileWriter";
+import { tap, catchError } from "rxjs/operators";
+import * as path from "path";
+import { CommandLineColors } from "./util/CommandLineColors";
 
 export class Api<I extends Target, T extends TargetConstructor<I>> {
 
@@ -16,19 +19,23 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
 
     /**
      * transpiles the sourcecode using the given configuration
+     * @param operatorFun allows to change the behaviour after one batch of files have been transpiled
      */
-    public transpile(): Observable<TranspileResult> {
+    public transpile(operatorFun?: (observable: Observable<TranspileResult>) => Observable<TranspileResult>): void {
 
-        return new Observable(obs => {
+        const internalOperatorFun = typeof operatorFun === "function" ? operatorFun : this.finalize;
 
+        new Observable(obs => {
             try {
                 obs.next(this.internalTranspile());
                 obs.complete();
             } catch (e) {
-                console.error(`Error: ${e.message}`);
-                console.error(e.stack);
+                obs.error(e);
             }
-        });
+        })
+            .pipe(internalOperatorFun)
+            .subscribe();
+
     }
 
     private internalTranspile(): TranspileResult {
@@ -40,9 +47,9 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
         const typeChecker = program.getTypeChecker();
         const transpiler = new TranspilerFactory().create(typeChecker, filledConfig, this.target.transpilerClass, obscurifier);
         const fileWriter = new FileWriter(module!.parent!.filename, filledConfig);
-
-        // remove outputDir if available
-        fileWriter.removeDestinationFolder();
+        let transpileWarnings: TranspileMessage[] = [];
+        let transpileErrors: TranspileMessage[] = [];
+        let transpileResult = new TranspileResult(fileWriter, () => transpileWarnings, () => transpileErrors);
 
         // create target
         const targetInstance = new this.target(transpiler, this.config, typeChecker);
@@ -52,23 +59,54 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
         fileWriter.setFileExtension(targetInstance.getFileExtension());
         transpiler.setTarget(targetInstance);
 
+        // execute before batch
+        if (typeof targetInstance.beforeBatch === "function") {
+            targetInstance.beforeBatch();
+        }
+
         // iterate over source files
         program.getSourceFiles()
             // ignore declaration files
             .filter(file => !file.isDeclarationFile)
             .forEach(file => {
 
-                console.log("File: ", file.fileName);
+                // execute before file
+                if (typeof targetInstance.beforeFileTranspile === "function") {
+                    file = targetInstance.beforeFileTranspile(file);
+                }
+
                 transpiler.setSourceFile(file);
                 NodeContainingException.currentSourceFile = file;
 
-                const transpiledCode = targetInstance.transpileSourceFile(file);
+                let transpiledCode = targetInstance.transpileSourceFile(file);
+                const destinationPath = fileWriter.getFileDestination(file);
 
-                console.log(transpiledCode);
-                fileWriter.writeTranspiledResult(transpiledCode, file);
+                // execute after file
+                if (typeof targetInstance.afterFileTranspile === "function") {
+                    transpiledCode = targetInstance.afterFileTranspile(file, transpiledCode);
+                }
+
+                // add transpiled result to the result stack
+                transpileResult.addFile({
+                    sourceFile: file,
+                    originalFilePath: path.resolve(path.normalize(file.fileName)),
+                    originalFileName: path.basename(file.fileName),
+                    newFilePath: destinationPath,
+                    newFileName: path.basename(destinationPath),
+                    transpiledCode: targetInstance.replaceMagicConstants(transpiledCode)
+                });
             });
 
-        return null!;
+        // assign transpiler warnings and errors
+        transpileWarnings = transpiler.getWarnings();
+        transpileErrors = transpiler.getErrors();
+
+        // execute after batch
+        if (typeof targetInstance.afterBatch === "function") {
+            transpileResult = targetInstance.afterBatch(transpileResult);
+        }
+
+        return transpileResult;
     }
 
     private fillConfig(): Required<Config> {
@@ -81,6 +119,29 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
             emitComments: typeof this.config.emitComments === "boolean" ? this.config.emitComments : true,
             ...this.config
         } as Required<Config>);
+    }
+
+    private finalize(observable: Observable<TranspileResult>): Observable<TranspileResult> {
+
+        return observable.pipe(
+            tap(result => {
+                result.checkForErrors();
+                result.persist();
+                result.printStatistic();
+            }),
+            catchError((e, c) => {
+                console.error(CommandLineColors.RED, `============================`, CommandLineColors.RESET);
+                console.error(CommandLineColors.RED, `Unexpected exception occured`, CommandLineColors.RESET);
+                console.error(CommandLineColors.RED, `============================`, CommandLineColors.RESET);
+                console.error(CommandLineColors.RED, e.message, CommandLineColors.RESET);
+                console.error(CommandLineColors.RED, e.stack, CommandLineColors.RESET);
+                console.info();
+                console.info("Please submit a bug report if you think that this is an error. In most cases this message is displayed when you have some kind of syntax errors within your source code.");
+                console.info();
+                process.exit(1);
+                return c;
+            })
+        )
     }
 
 }

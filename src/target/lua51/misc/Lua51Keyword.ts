@@ -26,13 +26,21 @@ export class Lua51Keyword extends PartialTranspiler implements Partial<MiscTrans
                 // get last parsed class name
                 const classes = this.transpiler.getRegisteredClasses();
                 if (classes.length === 0) {
-                    throw new UnsupportedNodeException(`Trying to access a super object while not beeing in a class context is unsupported!`, node);
+                    this.transpiler.registerError({
+                        node: node,
+                        message: `Trying to access a super object while not beeing in a class context is unsupported!`
+                    });
+                    return "[ERROR]";
                 }
 
                 const className = classes[classes.length - 1];
                 return `${className}.${Lua51Keywords.CLASS_SUPER_REFERENCE_NAME}`;
             default:
-                throw new UnsupportedNodeException(`Current keyword ${SyntaxKind[node.kind]} is not supported!`, node);
+                this.transpiler.registerError({
+                    node: node,
+                    message: `Current keyword ${SyntaxKind[node.kind]} is not supported!`
+                });
+                return "[ERROR]";
         }
     }
 }

@@ -4,6 +4,10 @@ import { CallExpression, isPropertyAccessExpression, SyntaxKind, createSuper, cr
 import { Lua51Keywords } from "../Lua51Keywords";
 import { Lua51SpecialArrayFunction } from "./specialExpressions/Lua51SpecialArrayFunction";
 import { Lua51SpecialStringFunction } from "./specialExpressions/Lua51SpecialStringFunction";
+import { Lua51SpecialObjectFunction } from "./specialExpressions/Lua51SpecialObjectFunction";
+import { Lua51SpecialFunctionFunction } from "./specialExpressions/Lua51SpecialFunctionFunction";
+import { NodeContainingException } from "../../../exception/NodeContainingException";
+import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
 
 export class Lua51CallExpression extends PartialTranspiler implements Partial<ExpressionTranspiler> {
 
@@ -11,6 +15,8 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
 
     private arrayFunction = new Lua51SpecialArrayFunction(this.transpiler);
     private stringFunction = new Lua51SpecialStringFunction(this.transpiler);
+    private objectFunction = new Lua51SpecialObjectFunction(this.transpiler);
+    private functionFunction = new Lua51SpecialFunctionFunction(this.transpiler);
 
     /**
      * @inheritdoc
@@ -66,7 +72,17 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
 
         // get the called function name
         const functionObj = node.expression as PropertyAccessExpression;
-        const functionName = this.transpiler.transpileNode(functionObj.name);
+
+        // get the name of the function
+        let functionName;
+
+        // if the function name is a reserved keyword, do not use transpileNode because
+        // this meight throw a keyword exception
+        if ((functionObj.name as any).escapedText) {
+            functionName = (functionObj.name as any).escapedText;
+        } else {
+            functionName = this.transpiler.transpileNode(functionObj.name);
+        }
 
         // check if the function call comes from an known object that
         // supports special functions
@@ -78,43 +94,33 @@ export class Lua51CallExpression extends PartialTranspiler implements Partial<Ex
             return this.stringFunction.handle(functionName, node);
         }
 
+        // check if the owner is a function
+        if (this.transpiler.typeHelper().isFunction(owner)) {
+            return this.functionFunction.handle(functionName, node);
+        }
+
         const baseType = this.transpiler.typeHelper().getInferedType(owner);
         switch (baseType) {
             case "string":
                 return this.stringFunction.handle(functionName, node);
-        }
-
-        /*
-        // check if there are some special objects
-        switch (ownerNameCheck) {
-            /*case "Object":
-                try {
-                    return this.transpileSpecialObjectFunction(functionName, ownerName, node.arguments);
-                } catch (e) {
-
-                    // if this method does not exists on object, use the normal object call pattern
-                    // because in most cases the function is declared on the object so dont
-                    // throw an exception here. check the bubble boolean to decide if this exception must
-                    // be forwarded
-                    if (e instanceof UnsupportedError && e.bubble) {
-                        throw e;
-                    }
+            case "array":
+                return this.arrayFunction.handle(functionName, node);
+            case "unknown":
+            case "object":
+                // only transpile if the owner name is the static Object
+                // or known by the objectFunction transpiler.
+                // this prevent error throwing for all kind of declared object methods
+                if (ownerName === "Object" || this.objectFunction.isSupported(functionName)) {
+                    return this.objectFunction.handle(functionName, node);
+                } else if (ownerName === "Math") {
+                    this.transpiler.registerError({
+                        node: node,
+                        message: `Math functions are currently not supported!`
+                    });
+                    return "[ERROR]";
                 }
                 break;
-            case "Function":
-                return this.transpileSpecialFunctionFunction(functionName, ownerName, node.arguments);
-            case "String":
-                return this.transpileSpecialStringFunction(functionName, ownerName, node.arguments);
-            
-            case "Array":
-                return this.transpileArrayFunction(node, functionName);
-
-            case "Math":
-                return this.transpileSpecialMathFunction(functionName, ownerName, node.arguments);
-            
-            default:
-                throw new UnsupportedNodeException(`Directly calling ${functionName} on array type ${ownerName} is not supported!`, node);
-        }*/
+        }
 
         // transpile params
         const params = node.arguments.map(n => this.transpiler.transpileNode(n, node));

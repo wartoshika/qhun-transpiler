@@ -48,7 +48,11 @@ export class Lua51ImportDeclaration extends PartialTranspiler implements Partial
                 ];
             } else {
                 // unsupported import type
-                throw new UnsupportedNodeException(`The given import type is not supported!`, node);
+                this.transpiler.registerError({
+                    node: node,
+                    message: `The given import type is not supported!`
+                });
+                return "[ERROR]";
             }
         }
 

@@ -46,7 +46,7 @@ export class Lua51Identifier extends PartialTranspiler implements Partial<MiscTr
         }
 
         // check for reserved keywords
-        this.checkForReservedIdentifierToken(identifier, node);
+        identifier = this.checkForReservedIdentifierToken(identifier, node);
 
         // get the identifier name
         return identifier;
@@ -56,12 +56,17 @@ export class Lua51Identifier extends PartialTranspiler implements Partial<MiscTr
      * check if the identifier is a reserved lua keyword
      * @param nodeContent the transpiled node content
      */
-    private checkForReservedIdentifierToken(nodeContent: string, node: Node): void {
+    private checkForReservedIdentifierToken(nodeContent: string, node: Node): string {
 
         // make the test
         if (this.reservedStack.indexOf(nodeContent) !== -1) {
-            throw new ReservedKeywordException(nodeContent, node);
+            this.transpiler.registerError({
+                node: node,
+                message: `The following identifier can not be used because it is a reserved keyword: ${nodeContent}`
+            });
+            return "[ERROR]";
         }
+        return nodeContent;
     }
 
     private isReservedKeyword(text: string): boolean {

@@ -1,5 +1,6 @@
 import { TypeChecker, Node, isVariableDeclaration, SyntaxKind, TypeNode, isParameter, isTypeReferenceNode, isTypeNode, ArrayTypeNode, isTypeQueryNode, TypeFlags, isStringLiteral, isArrayLiteralExpression, isObjectLiteralElement, isParenthesizedExpression } from "typescript";
 import { Transpiler } from "../transpiler";
+import { isSymbol } from "util";
 
 export class TypeHelper {
 
@@ -115,11 +116,15 @@ export class TypeHelper {
         return false;
     }
 
-    public getInferedType(node: Node): "class" | "object" | "array" | "number" | "string" | "undefined" | "unknown" {
+    public getInferedType(node: Node, depth: number = 0): "class" | "object" | "array" | "number" | "string" | "undefined" | "unknown" {
+
+        if (depth === 5) {
+            return "unknown";
+        }
 
         // if the node is a ParenthesizedExpression, resolve the body
         if (isParenthesizedExpression(node)) {
-            return this.getInferedType(node.expression);
+            return this.getInferedType(node.expression, depth + 1);
         }
 
         const kindChecker = (kind: SyntaxKind) => {
@@ -170,7 +175,9 @@ export class TypeHelper {
             }
 
             if (type.symbol) {
-                return this.getInferedType(type.symbol.valueDeclaration);
+                if (type.symbol.valueDeclaration !== undefined) {
+                    return this.getInferedType(type.symbol.valueDeclaration, depth + 1);
+                }
             }
         }
 
@@ -196,6 +203,27 @@ export class TypeHelper {
         const type = this.typeChecker.getTypeAtLocation(node);
         const nodeType = this.typeChecker.typeToTypeNode(type);
         const symbol = this.typeChecker.getSymbolAtLocation(node);
+
+        // some symbols are bad ...
+        const originalKeyword = (node as any).expression.originalKeywordKind;
+        if (originalKeyword === SyntaxKind.SymbolKeyword) {
+            return false;
+        }
+
+        // some type casts are bad
+        if ((node as any).expression) {
+            const kind = (node as any).expression.kind;
+            if (kind === SyntaxKind.AsExpression) {
+                return false;
+            }
+            const name = (node as any).name;
+            if (name) {
+                const kind = (node as any).name.originalKeywordKind;
+                if (kind === SyntaxKind.SymbolKeyword) {
+                    return false;
+                }
+            }
+        }
 
         let typeLiteralArrayTypes: SyntaxKind[] = [];
 
@@ -244,7 +272,7 @@ export class TypeHelper {
         // make the test
         return nodeType
             // is an array literal
-            && (
+            && !isSymbol(nodeType) && this.getInferedType(node) === "array" && (
                 isArrayLiteralExpression(node)
                 // is a typescript 3 type literal
                 || (typeLiteralArrayTypes

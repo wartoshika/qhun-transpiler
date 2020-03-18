@@ -9,6 +9,7 @@ export class Lua51TypeAliasDeclaration extends PartialTranspiler implements Part
      */
     public typeAliasDeclaration(node: TypeAliasDeclaration): string {
 
-        return "TypeAliasDeclaration";
+        // a type alias must be skipped in lua
+        return "";
     }
 }

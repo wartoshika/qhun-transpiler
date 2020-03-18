@@ -10,8 +10,10 @@ export class Lua51MissingDeclaration extends PartialTranspiler implements Partia
      */
     public missingDeclaration(node: MissingDeclaration): string {
 
-        throw new UnsupportedNodeException(
-            `Typescript ast indicated that a node is a MissingDeclaration. There should be a syntax error.`, node
-        );
+        this.transpiler.registerError({
+            node: node,
+            message: `Typescript ast indicated that a node is a MissingDeclaration. There should be a syntax error!`
+        });
+        return "[ERROR]";
     }
 }

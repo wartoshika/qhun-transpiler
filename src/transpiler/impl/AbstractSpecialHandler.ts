@@ -1,6 +1,5 @@
-import { Node, CallExpression, PropertyAccessExpression } from "typescript";
+import { Node, CallExpression, PropertyAccessExpression, Expression } from "typescript";
 import { PartialTranspiler } from "./PartialTranspiler";
-import { UnsupportedNodeException } from "../../exception/UnsupportedNodeException";
 
 export abstract class AbstractSpecialHandler<T extends Node> extends PartialTranspiler {
 
@@ -18,12 +17,16 @@ export abstract class AbstractSpecialHandler<T extends Node> extends PartialTran
             return (this as any)[handlerName](node);
         }
 
-        throw new UnsupportedNodeException(`Property/Method ${name} is not supported on the current object type!`, node);
+        this.transpiler.registerError({
+            node: node,
+            message: `Property/Method ${name} is not supported on this type!`
+        });
+        return "[ERROR]";
     }
 
-    protected getTranspiledArguments(node: CallExpression): string {
+    protected getTranspiledArguments(args: Expression[]): string {
 
-        return node.arguments
+        return args
             .map(arg => this.transpiler.transpileNode(arg))
             .join("," + this.transpiler.space());
     }
@@ -34,14 +37,45 @@ export abstract class AbstractSpecialHandler<T extends Node> extends PartialTran
         return this.transpiler.transpileNode(owner);
     }
 
-    protected generateCallable(node: CallExpression, args: string[], body: string[]): string {
+    protected generateCallable(node: CallExpression, args: string[], body: string[], options: {
+        defaultArgumentsWhenEmpty?: string,
+        ignoreOwner?: boolean,
+        argsAsObject?: boolean,
+        skipArgs?: number
+    } = {}): string {
+
+        options.defaultArgumentsWhenEmpty = options.defaultArgumentsWhenEmpty || "";
+        options.ignoreOwner = typeof options.ignoreOwner === "boolean" ? options.ignoreOwner : false;
+        options.argsAsObject = typeof options.argsAsObject === "boolean" ? options.argsAsObject : false;
+        options.skipArgs = typeof options.skipArgs === "number" ? options.skipArgs : 0;
+
+        let nodeArgs = this.getTranspiledArguments(node.arguments.filter(
+            (node, index) => {
+                if (index < options.skipArgs!) {
+                    return false
+                }
+                return true;
+            }
+        ));
+        if (nodeArgs.length === 0) {
+            nodeArgs = options.defaultArgumentsWhenEmpty;
+        }
+
+        if (options.argsAsObject) {
+            nodeArgs = `{»${nodeArgs}»}`;
+        }
+
+        const callParams: string[] = [nodeArgs];
+        if (!options.ignoreOwner) {
+            callParams.unshift(this.getOwnerName(node));
+        }
 
         return [
             `(»function»(»${args.join(",»")}${args.length > 0 ? "»" : ""})`,
             this.transpiler.addIntend(
                 body.join(this.transpiler.break())
             ),
-            `end»)»(»${this.getOwnerName(node)},»${this.getTranspiledArguments(node)}»)`
+            `end»)»(»${callParams.join(",»")}»)`
         ].join(this.transpiler.break())
     }
 }

@@ -4,13 +4,14 @@ import { DeclarationTranspiler } from "../DeclarationTranspiler";
 import { DecoratorTranspiler } from "../DecoratorTranspiler";
 import { StatementTranspiler } from "../StatementTranspiler";
 import { MiscTranspiler } from "../MiscTranspiler";
-import { NodeKindMapper, Imports } from "../../constraint";
+import { NodeKindMapper, Imports, TranspileMessage } from "../../constraint";
 import { SyntaxKind, Node, TypeChecker, Identifier, SourceFile, BindingName, createSourceFile, ScriptTarget } from "typescript";
-import { UnsupportedNodeException } from "../../exception/UnsupportedNodeException";
 import { TypeHelper } from "../../util/TypeHelper";
 import { Config } from "../../Config";
 import { Obscurifier } from "../../util/Obscurifier";
 import { Target } from "../Target";
+import { NodeUtil } from "../../util/NodeUtil";
+import { NodeContainingException } from "../../exception/NodeContainingException";
 
 export abstract class AbstractTranspiler<C extends Required<Config> = Required<Config>> implements Transpiler<C> {
 
@@ -78,6 +79,7 @@ export abstract class AbstractTranspiler<C extends Required<Config> = Required<C
         [SyntaxKind.ThisKeyword]: () => [this.misc(), this.misc().keyword],
         [SyntaxKind.SuperKeyword]: () => [this.misc(), this.misc().keyword],
         [SyntaxKind.ArrayBindingPattern]: () => [this.misc(), this.misc().arrayBindingPattern],
+        [SyntaxKind.SpreadElement]: () => [this.misc(), this.misc().spreadElement],
 
     };
 
@@ -99,7 +101,10 @@ export abstract class AbstractTranspiler<C extends Required<Config> = Required<C
     protected exportVariables: string[] = [];
     protected imports: Imports[] = [];
     protected classes: string[] = [];
+    protected warnings: TranspileMessage[] = [];
+    protected errors: TranspileMessage[] = [];
     protected target: Target | undefined;
+    private uniqueVariableCounter = 0;
     private _typeHelper = new TypeHelper(this.typeChecker, this);
     private currentSourceFile!: SourceFile;
 
@@ -148,6 +153,15 @@ export abstract class AbstractTranspiler<C extends Required<Config> = Required<C
     /**
      * @inheritdoc
      */
+    public generateUniqueIdentifier(prefix: string): string {
+
+        const name = prefix.startsWith("__") ? prefix : "__" + prefix;
+        return `${name}_${this.uniqueVariableCounter++}`;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public transpileNode(node: Node, originalNode?: Node): string {
 
         const nodeTranspiler = this.transpilerNodeMapping[node.kind];
@@ -155,11 +169,26 @@ export abstract class AbstractTranspiler<C extends Required<Config> = Required<C
             const [context, executable] = nodeTranspiler();
             let res = executable.bind(context)(node);
             if (res.length === 0) {
-                console.warn("Node has no content: ", SyntaxKind[node.kind]);
+                const concreteNode = NodeUtil.getNodeWithConcretePosition(node, originalNode);
+                if (concreteNode) {
+                    this.registerWarning({
+                        node: concreteNode,
+                        message: "Node has no content: " + SyntaxKind[node.kind]
+                    });
+                }
             }
             return res;
         } else {
-            throw new UnsupportedNodeException(`The current node type ${SyntaxKind[node.kind]}(${node.kind}) is not supported in the current target.`, node, originalNode);
+
+            const concreteNode = NodeUtil.getNodeWithConcretePosition(node, originalNode);
+            if (!concreteNode) {
+                throw new NodeContainingException(`Error while trying to handle a not supported node type ${SyntaxKind[node.kind]}(${node.kind})`, node, originalNode);
+            }
+            this.registerError({
+                node: concreteNode,
+                message: `The current node type ${SyntaxKind[node.kind]}(${node.kind}) is not supported in the current target.`
+            });
+            return "[ERROR]";
         }
     }
 
@@ -213,6 +242,64 @@ export abstract class AbstractTranspiler<C extends Required<Config> = Required<C
     public registerClass(...classNames: string[]): ThisType<Transpiler> {
         this.classes.push(...classNames);
         return this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public registerWarning(...warnings: TranspileMessage[]): ThisType<Transpiler> {
+        this.warnings.push(...warnings);
+        return this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public registerError(...errors: TranspileMessage[]): ThisType<Transpiler> {
+        this.errors.push(...errors);
+        return this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public getExports(): string[] {
+        return this.exportVariables;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public getVariables(): string[] {
+        return this.variableNames;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public getClasses(): string[] {
+        return this.classes;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public getImports(): Imports[] {
+        return this.imports;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public getWarnings(): TranspileMessage[] {
+        return this.warnings;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public getErrors(): TranspileMessage[] {
+        return this.errors;
     }
 
     /**

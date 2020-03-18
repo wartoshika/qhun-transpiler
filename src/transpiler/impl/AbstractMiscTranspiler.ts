@@ -1,4 +1,4 @@
-import { Node, Identifier, Block, StringLiteral, ArrayBindingPattern } from "typescript";
+import { Node, Identifier, Block, StringLiteral, ArrayBindingPattern, SpreadElement } from "typescript";
 import { MiscTranspiler } from "../MiscTranspiler";
 import { PartialSubTranspiler } from "./PartialSubTranspiler";
 
@@ -44,6 +44,13 @@ export abstract class AbstractMiscTranspiler extends PartialSubTranspiler<Abstra
      */
     public arrayBindingPattern(node: ArrayBindingPattern): string {
         return this.constructClass("arrayBindingPattern").arrayBindingPattern(node);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public spreadElement(node: SpreadElement): string {
+        return this.constructClass("spreadElement").spreadElement(node);
     }
 
 }

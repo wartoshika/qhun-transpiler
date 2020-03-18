@@ -30,12 +30,21 @@ export class FileWriter {
      */
     public writeTranspiledResult(code: string, file: SourceFile): void {
 
-        const absoluteFilePath = normalize(resolve(file.fileName));
-        const destination = this.getDestination(absoluteFilePath);
+        const destination = this.getFileDestination(file);
         this.createFileDirectories(destination);
         writeFileSync(destination, code, {
             encoding: "utf8"
         });
+    }
+
+    /**
+     * get the destination path for the given sourceFile
+     * @param file the file to get the destination for
+     */
+    public getFileDestination(file: SourceFile): string {
+
+        const absoluteFilePath = normalize(resolve(file.fileName));
+        return this.getDestination(absoluteFilePath);
     }
 
     /**

@@ -8,6 +8,17 @@ export class Lua51WhileStatement extends PartialTranspiler implements Partial<St
      */
     public whileStatement(node: WhileStatement): string {
 
-        return "WhileStatement";
+        // parse the condition
+        const condition = this.transpiler.transpileNode(node.expression);
+
+        // transpile the body
+        const body = this.transpiler.addIntend(this.transpiler.transpileNode(node.statement));
+
+        // put everything together
+        return [
+            `while ${condition} do`,
+            body,
+            `end`
+        ].join(this.transpiler.break());
     }
 }

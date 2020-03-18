@@ -45,7 +45,11 @@ export class Lua51BinaryExpression extends PartialTranspiler implements Partial<
             case SyntaxKind.SlashEqualsToken:
                 return `${left} = ${this.generateResult(node, SyntaxKind.SlashToken)}`;
             default:
-                throw new UnsupportedNodeException(`The given binary assignment operation operator ${SyntaxKind[node.operatorToken.kind]} is unsupported!`, node);
+                this.transpiler.registerError({
+                    node: node,
+                    message: `The given binary assignment operation operator ${SyntaxKind[node.operatorToken.kind]} is unsupported!`
+                });
+                return "[ERROR]";
         }
     }
 
@@ -123,7 +127,11 @@ export class Lua51BinaryExpression extends PartialTranspiler implements Partial<
                     return "+";
                 }
             default:
-                throw new UnsupportedNodeException(`The given Binary operator token ${SyntaxKind[node.operatorToken.kind]} is not supported!`, node);
+                this.transpiler.registerError({
+                    node: node,
+                    message: `The given Binary operator token ${SyntaxKind[node.operatorToken.kind]} is not supported!`
+                });
+                return "[ERROR]";
         }
     }
 }

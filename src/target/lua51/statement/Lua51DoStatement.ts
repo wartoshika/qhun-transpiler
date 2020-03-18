@@ -8,6 +8,18 @@ export class Lua51DoStatement extends PartialTranspiler implements Partial<State
      */
     public doStatement(node: DoStatement): string {
 
-        return "DoStatement";
+        // get the footer condition
+        const condition = this.transpiler.transpileNode(node.expression);
+
+        // get the body
+        const body = this.transpiler.transpileNode(node.statement);
+
+        // put everything together
+        return [
+            `repeat`,
+            this.transpiler.addIntend(body),
+            // the condition must be negated!
+            `until not (»${condition}»)`
+        ].join(this.transpiler.break());
     }
 }

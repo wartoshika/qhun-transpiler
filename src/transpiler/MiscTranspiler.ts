@@ -1,4 +1,4 @@
-import { Identifier, Block, StringLiteral, Node, ArrayBindingPattern } from "typescript";
+import { Identifier, Block, StringLiteral, Node, ArrayBindingPattern, SpreadElement } from "typescript";
 import { PartialTranspiler } from "./impl/PartialTranspiler";
 
 export interface MiscTranspiler extends PartialTranspiler {
@@ -34,8 +34,14 @@ export interface MiscTranspiler extends PartialTranspiler {
     keyword(node: Node): string;
 
     /**
-     * transpiles aan array binding pattern
-     * @param node the keyword node to transpile
+     * transpiles an array binding pattern
+     * @param node the node to transpile
      */
     arrayBindingPattern(node: ArrayBindingPattern): string;
+
+    /**
+     * transpiles a spread element
+     * @param node the node to transpile
+     */
+    spreadElement(node: SpreadElement): string;
 }

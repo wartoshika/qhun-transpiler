@@ -8,6 +8,7 @@ export class Lua51BreakStatement extends PartialTranspiler implements Partial<St
      */
     public breakStatement(node: BreakStatement): string {
 
-        return "BreakStatement";
+        // break in ts is equal to lua's impl.
+        return "break";
     }
 }

@@ -1,35 +1,14 @@
-import { Node, getLineAndCharacterOfPosition, SourceFile } from "typescript";
-
-const getNode = (a: Node, b?: Node) => {
-    try {
-        const sf = a.getSourceFile();
-        getLineAndCharacterOfPosition(sf, a.pos);
-        return a;
-    } catch (e) {
-        if (b) {
-            try {
-
-                const sf = b.getSourceFile();
-                getLineAndCharacterOfPosition(sf, b.pos);
-                return b;
-            } catch (e) {
-                return null;
-            }
-        }
-    }
-    return null;
-};
+import { Node, SourceFile } from "typescript";
+import { NodeUtil } from "../util/NodeUtil";
 
 const getPosition = (a: Node, b?: Node) => {
 
-    const node = getNode(a, b);
+    const node = NodeUtil.getNodeWithConcretePosition(a, b);
     if (!node) {
         return "";
     }
 
-    const sf = node.getSourceFile();
-
-    return `(${sf.fileName}:${getLineAndCharacterOfPosition(sf, node.pos).line + 1}:${getLineAndCharacterOfPosition(sf, node.pos).character})`;
+    return NodeUtil.getNodeFileAndPosition(node);
 }
 
 export class NodeContainingException extends Error {

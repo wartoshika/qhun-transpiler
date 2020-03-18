@@ -4,7 +4,7 @@ import { DecoratorTranspiler } from "./DecoratorTranspiler";
 import { StatementTranspiler } from "./StatementTranspiler";
 import { MiscTranspiler } from "./MiscTranspiler";
 import { Node, Identifier, SourceFile, BindingName } from "typescript";
-import { Imports } from "../constraint";
+import { Imports, TranspileMessage } from "../constraint";
 import { TypeHelper } from "../util/TypeHelper";
 import { Config } from "../Config";
 import { Target } from "./Target";
@@ -40,6 +40,12 @@ export interface Transpiler<C extends Required<Config> = Required<Config>> {
      * get the type helper instance
      */
     typeHelper(): TypeHelper;
+
+    /**
+     * generates a unique variable name
+     * @param prefix the prefix to use for this variable
+     */
+    generateUniqueIdentifier(prefix: string): string;
 
     /**
      * transpiles all kind of typescript nodes
@@ -78,6 +84,48 @@ export interface Transpiler<C extends Required<Config> = Required<Config>> {
      * @param imports the imports to register
      */
     registerImport(...imports: Imports[]): ThisType<Transpiler>;
+
+    /**
+     * register all given warnings
+     * @param imports the warnings to register
+     */
+    registerWarning(...warnings: TranspileMessage[]): ThisType<Transpiler>;
+
+    /**
+     * register all given errors
+     * @param imports the warnings to register
+     */
+    registerError(...errors: TranspileMessage[]): ThisType<Transpiler>;
+
+    /**
+     * get all registeted exports
+     */
+    getExports(): string[];
+
+    /**
+     * get all registered variables
+     */
+    getVariables(): string[];
+
+    /**
+     * get all registeted classes
+     */
+    getClasses(): string[];
+
+    /**
+     * get all registered imports
+     */
+    getImports(): Imports[];
+
+    /**
+     * get all registered warnings
+     */
+    getWarnings(): TranspileMessage[];
+
+    /**
+     * get all registered errors
+     */
+    getErrors(): TranspileMessage[];
 
     /**
      * set the currently transpiling sourceFile

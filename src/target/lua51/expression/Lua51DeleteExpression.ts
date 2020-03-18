@@ -9,6 +9,8 @@ export class Lua51DeleteExpression extends PartialTranspiler implements Partial<
      */
     public deleteExpression(node: DeleteExpression): string {
 
-        return "DeleteExpression";
+        // nillify the expression
+        const expression = this.transpiler.transpileNode(node.expression);
+        return `${expression}»=»nil`;
     }
 }

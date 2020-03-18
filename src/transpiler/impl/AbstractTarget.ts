@@ -30,8 +30,15 @@ export abstract class AbstractTarget implements Target {
 
         return file.statements.map(
             statement => this.transpiler.transpileNode(statement)
-        ).join(this.transpiler.break())
-            .replace(new RegExp(`\\${this.MAGIC_OPTIONAL_SPACE_CHAR}`, "g"), this.transpiler.space());
+        ).join(this.transpiler.break());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public replaceMagicConstants(code: string): string {
+
+        return code.replace(new RegExp(`\\${this.MAGIC_OPTIONAL_SPACE_CHAR}`, "g"), this.transpiler.space());
     }
 
 }

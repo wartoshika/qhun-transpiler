@@ -29,7 +29,11 @@ export class Lua51PrefixUnaryExpression extends PartialTranspiler implements Par
                 binary.declareFunctionsFor(LuaBinaryOperationsFunctions.NOT, this);
                 return `${LuaBinaryOperationsFunctions.NOT}(${this.transpileNode(node.operand)})`;*/
             default:
-                throw new UnsupportedNodeException(`Unsupported ${SyntaxKind[SyntaxKind.PrefixUnaryExpression]} with operator ${SyntaxKind[node.operator]}!`, node)
+                this.transpiler.registerError({
+                    node: node,
+                    message: `Unsupported ${SyntaxKind[SyntaxKind.PrefixUnaryExpression]} with operator ${SyntaxKind[node.operator]}!`
+                });
+                return "[ERROR]";
         }
 
         // create a function that increments the variable and directly return the old one (postfix)

@@ -1,6 +1,7 @@
 import { PartialTranspiler } from "../../../transpiler/impl/PartialTranspiler";
 import { DeclarationTranspiler } from "../../../transpiler";
 import { ModuleDeclaration } from "typescript";
+import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
 
 export class Lua51ModuleDeclaration extends PartialTranspiler implements Partial<DeclarationTranspiler> {
 
@@ -9,6 +10,10 @@ export class Lua51ModuleDeclaration extends PartialTranspiler implements Partial
      */
     public moduleDeclaration(node: ModuleDeclaration): string {
 
-        return "ModuleDeclaration";
+        this.transpiler.registerError({
+            node: node,
+            message: `Module declarations are unsupported!`
+        });
+        return "[ERROR]";
     }
 }

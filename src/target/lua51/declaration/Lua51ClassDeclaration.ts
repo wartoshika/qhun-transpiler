@@ -19,7 +19,11 @@ export class Lua51ClassDeclaration extends PartialTranspiler implements Partial<
 
         // check if this is an unnamed class
         if (!node.name) {
-            throw new UnsupportedNodeException("Classes without a name are not supported!", node);
+            this.transpiler.registerError({
+                node: node,
+                message: `Classes without a name are not supported!`
+            });
+            return "[ERROR]";
         }
 
         // get the name of the class
@@ -170,7 +174,11 @@ export class Lua51ClassDeclaration extends PartialTranspiler implements Partial<
 
         // start by checking the amount of constructors
         if (constructors.length > 1) {
-            throw new UnsupportedNodeException("Multiple class construcor functions with a body are unsupported!", node);
+            this.transpiler.registerError({
+                node: node,
+                message: `Multiple class construcor functions with a body are unsupported!`
+            });
+            return "[ERROR]";
         }
 
         // check if there are no constructors available

@@ -1,6 +1,5 @@
 import { PartialTranspiler, StatementTranspiler } from "../../../transpiler";
 import { ForStatement, VariableDeclarationList, SyntaxKind } from "typescript";
-import { UnsupportedNodeException } from "../../../exception/UnsupportedNodeException";
 
 export class Lua51ForStatement extends PartialTranspiler implements Partial<StatementTranspiler> {
 
@@ -10,12 +9,32 @@ export class Lua51ForStatement extends PartialTranspiler implements Partial<Stat
     public forStatement(node: ForStatement): string {
 
         // get all initializers
-        const initializerStack: string[] = (node.initializer as VariableDeclarationList).declarations
-            .map(init => this.transpiler.transpileNode(init));
+        const initializerStack: string[] = [];
+        if (node.initializer && node.initializer.kind === SyntaxKind.BinaryExpression) {
+
+            initializerStack.push(this.transpiler.transpileNode(node.initializer));
+        } else if (node.initializer && node.initializer.kind === SyntaxKind.VariableDeclarationList) {
+
+            initializerStack.push(
+                ...(node.initializer as VariableDeclarationList).declarations
+                    .map(init => this.transpiler.transpileNode(init))
+            );
+        } else {
+
+            this.transpiler.registerError({
+                node: node.initializer ? node.initializer : node,
+                message: `Given initializer for a for statement is not supported!`
+            });
+            initializerStack.push("[ERROR]");
+        }
 
         // get condition
         if (!node.condition) {
-            throw new UnsupportedNodeException(`${SyntaxKind[SyntaxKind.ForStatement]} without a condition is not supported!`, node);
+            this.transpiler.registerError({
+                node: node,
+                message: `${SyntaxKind[SyntaxKind.ForStatement]} without a condition is not supported!`
+            });
+            return "[ERROR]";
         }
         const condition = this.transpiler.transpileNode(node.condition);
 
@@ -24,7 +43,11 @@ export class Lua51ForStatement extends PartialTranspiler implements Partial<Stat
 
         // get incrementor
         if (!node.incrementor) {
-            throw new UnsupportedNodeException(`${SyntaxKind[SyntaxKind.ForStatement]} without an incrementor is not supported!`, node);
+            this.transpiler.registerError({
+                node: node,
+                message: `${SyntaxKind[SyntaxKind.ForStatement]} without an incrementor is not supported!`
+            });
+            return "[ERROR]";
         }
         const incrementor = this.transpiler.transpileNode(node.incrementor);
 

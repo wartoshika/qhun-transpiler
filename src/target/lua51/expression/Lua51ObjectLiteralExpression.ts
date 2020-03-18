@@ -15,7 +15,11 @@ export class Lua51ObjectLiteralExpression extends PartialTranspiler implements P
         node.properties.forEach(property => {
 
             if (!property.name) {
-                throw new UnsupportedNodeException(`Unsupported ${SyntaxKind[SyntaxKind.ObjectLiteralExpression]} containing a property with no name!`, node);
+                this.transpiler.registerError({
+                    node: property,
+                    message: `Unsupported ${SyntaxKind[SyntaxKind.ObjectLiteralExpression]} containing a property with no name!`
+                });
+                return "[ERROR]";
             }
 
             let nameOrKey = this.transpiler.transpileNode(property.name);
@@ -26,7 +30,11 @@ export class Lua51ObjectLiteralExpression extends PartialTranspiler implements P
                 initializer = this.transpiler.transpileNode(property.initializer);
 
             } else {
-                throw new UnsupportedNodeException(`ObjectLiterals Element ${SyntaxKind[property.kind]} is unsupported!`, property);
+                this.transpiler.registerError({
+                    node: property,
+                    message: `ObjectLiterals Element ${SyntaxKind[property.kind]} is unsupported!`
+                });
+                return "[ERROR]";
             }
 
             /* @todo: computed properties!

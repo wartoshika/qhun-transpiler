@@ -26,6 +26,9 @@ export class Test {
 
     /* test function */
     public typeof(): string {
+
+        const c = "".match(/a/g);
+
         return (typeof "a").split("").join("");
     }
 

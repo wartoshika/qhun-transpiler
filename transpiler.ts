@@ -2,7 +2,7 @@ import { Api } from "./src/Api";
 import { Lua51Target } from "./src/target/lua51/Lua51Target";
 
 new Api(Lua51Target, {
-    entryPoint: "src/test.ts",
+    entryPoint: "src/test2.ts",
     outputDir: "dist",
     outputRemoveSourceFolderName: "src",
     prettyPrint: true,
@@ -14,7 +14,4 @@ new Api(Lua51Target, {
             return "--[[ CUSTOM TRY ]] " + original(node);
         }
     }
-}).transpile().subscribe(result => {
-
-    console.log("Result: ", result);
-});
+}).transpile();
