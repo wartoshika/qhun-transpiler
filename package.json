@@ -1,17 +1,37 @@
 {
-  "name": "candidate1",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "@wartoshika/qhun-transpiler",
+  "version": "2.0.0",
+  "description": "A tool to transpiles a Typescript project into lua.",
+  "main": "dist/api.js",
+  "types": "dist/api.d.ts",
+  "author": "wartoshika <dev@qhun.de>",
+  "license": "MIT",
+  "keywords": [
+    "transpiler",
+    "lua",
+    "typescript",
+    "qhun",
+    "wow"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "bugs": {
+    "url": "https://github.com/wartoshika/qhun-transpiler/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wartoshika/qhun-transpiler"
   },
   "engines": {
     "node": ">=10.12"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
+  "scripts": {
+    "build": "npm-run-all build-ts build-declaration build-declaration-module",
+    "build-ts": "webpack --config webpack.config.js",
+    "build-declaration": "tsc -p tsconfig.declaration.json",
+    "build-declaration-module": "replace-in-file \"/declare module .index./\" \"declare module '@wartoshika/qhun-transpiler'\" ./dist/api.d.ts --isRegex"
+  },
   "dependencies": {
     "rxjs": "^6.5.4",
     "rxjs-compat": "^6.5.4",
@@ -19,7 +39,14 @@
   },
   "devDependencies": {
     "@types/node": "^13.7.4",
+    "npm-run-all": "^4.1.5",
+    "raw-loader": "^4.0.0",
+    "replace-in-file": "^5.0.2",
     "ts-lint": "^4.5.1",
-    "ts-node": "^8.6.2"
+    "ts-loader": "^6.2.1",
+    "ts-node": "^8.6.2",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-node-externals": "^1.7.2"
   }
 }

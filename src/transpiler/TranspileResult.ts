@@ -3,8 +3,9 @@ import { FileWriter } from "../util/FileWriter";
 import { TranspileMessage } from "../constraint";
 import { CommandLineColors } from "../util/CommandLineColors";
 import { NodeUtil } from "../util/NodeUtil";
+import { Output } from "../util/Output";
 
-interface FileResult {
+export interface FileResult {
 
     /**
      * the source file that has been transpiled
@@ -35,6 +36,16 @@ interface FileResult {
      * the transpiled source code of the source file
      */
     transpiledCode: string;
+
+    /**
+     * indicator if this file contains warning messages
+     */
+    hasWarnings: boolean;
+
+    /**
+     * indicator if this file contains error messages
+     */
+    hasErrors: boolean;
 }
 
 export class TranspileResult {
@@ -117,7 +128,7 @@ export class TranspileResult {
 
         const errors = this.getErrors();
         if (errors.length > 0) {
-            this.printTranspilerMessage("Error while transpiling your code", CommandLineColors.RED, errors);
+            Output.transpilerMessage("Error while transpiling your code", CommandLineColors.RED, errors);
 
             // empty line
             console.log();
@@ -135,20 +146,21 @@ export class TranspileResult {
      */
     public printStatistic(full: boolean = false, ignoreWarnings: boolean = false): this {
 
-        // console.log(this.result[0]);
+        const maxFiles = full ? this.result.length : 15;
+        this.result
+            .filter((_, i) => i < maxFiles)
+            .forEach((file, i) => Output.fileOutputMessage(file, i));
+
+        // empty line
+        console.log();
 
         const warnings = this.getWarnings();
         if (ignoreWarnings === false && warnings.length > 0) {
 
-            this.printTranspilerMessage("Finished with warnings", CommandLineColors.YELLOW, warnings);
+            Output.transpilerMessage("Finished with warnings", CommandLineColors.YELLOW, warnings);
         } else if (warnings.length === 0) {
 
-            // small success message
-            console.info(
-                CommandLineColors.GREEN, "Successfully transpiled", CommandLineColors.RESET,
-                this.result.length,
-                CommandLineColors.GREEN, `file${this.result.length > 1 ? "s" : ""}`, CommandLineColors.RESET
-            );
+            Output.finalSuccessMessage(this.result.length);
         }
 
         // empty line
@@ -157,16 +169,5 @@ export class TranspileResult {
         return this;
     }
 
-    private printTranspilerMessage(title: string, color: CommandLineColors, messages: TranspileMessage[]): void {
 
-        console.warn(color, "=".repeat(title.length), CommandLineColors.RESET);
-        console.warn(color, title, CommandLineColors.RESET);
-        console.warn(color, "=".repeat(title.length), CommandLineColors.RESET);
-
-        // print each message
-        messages.forEach((message, index) => {
-            const position = NodeUtil.getNodeFileAndPosition(message.node);
-            console.warn(color, `[${index + 1}] `, message.message, position, CommandLineColors.RESET);
-        });
-    }
 }

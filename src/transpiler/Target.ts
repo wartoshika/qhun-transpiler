@@ -1,5 +1,5 @@
 import { SourceFile } from "typescript";
-import { TranspileResult } from "./TranspileResult";
+import { TranspileResult, FileResult } from "./TranspileResult";
 
 export interface Target {
 
@@ -34,11 +34,12 @@ export interface Target {
 
     /**
      * ability to execute code after the given source file has been transpiled.
+     * @param fileResult a handy class for getting all wanted information from the transpiling process
      * @param sourceFile the file that has been transpiled
      * @param code the transpiled code of the file
      * @returs original or modified code
      */
-    afterFileTranspile?(sourceFile: SourceFile, code: string): string;
+    afterFileTranspile?(fileResult: FileResult, sourceFile: SourceFile, code: string): string;
 
     /**
      * ability to execute code before any transpiling will run

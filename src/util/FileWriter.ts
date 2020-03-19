@@ -2,18 +2,16 @@ import { Config } from "../Config";
 import { SourceFile } from "typescript";
 import { resolve, normalize, dirname, join, sep as DIRECTORY_SEPERATOR } from "path";
 import { mkdirSync, rmdirSync, existsSync, writeFileSync } from "fs";
+import { PathUtil } from "./PathUtil";
 
 export class FileWriter {
 
-    private projectRoot: string;
+    private projectRoot = PathUtil.getProjectRoot();
     private fileExtension: string = "ts";
 
     constructor(
-        parentModule: string,
         private config: Required<Config>
-    ) {
-        this.projectRoot = normalize(dirname(resolve(parentModule)));
-    }
+    ) { }
 
     /**
      * sets the new file extension for all created files

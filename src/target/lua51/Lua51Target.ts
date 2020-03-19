@@ -1,5 +1,5 @@
 import { AbstractTarget } from "../../transpiler/impl/AbstractTarget";
-import { Transpiler, Target } from "../../transpiler";
+import { Transpiler, Target, FileResult } from "../../transpiler";
 import { Lua51Config } from "./Lua51Config";
 import { OptionalConfigOfTarget } from "../../constraint";
 import { Lua51Transpiler } from "./Lua51Transpiler";
@@ -41,7 +41,7 @@ export class Lua51Target extends AbstractTarget implements Target {
     /**
      * @inheritdoc
      */
-    public afterFileTranspile(sourceFile: SourceFile, code: string): string {
+    public afterFileTranspile(fileResult: FileResult, sourceFile: SourceFile, code: string): string {
 
         // @todo: namespace exports!
 

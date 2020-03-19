@@ -1,5 +1,5 @@
 import { TargetConstructor, ConfigOfTarget, TranspileMessage } from "./constraint";
-import { Target, TranspileResult, TranspilerFactory } from "./transpiler";
+import { Target, TranspileResult, TranspilerFactory, FileResult } from "./transpiler";
 import { Observable } from "rxjs";
 import { createProgram } from "typescript";
 import { Config } from "./Config";
@@ -7,8 +7,8 @@ import { NodeContainingException } from "./exception/NodeContainingException";
 import { Obscurifier } from "./util/Obscurifier";
 import { FileWriter } from "./util/FileWriter";
 import { tap, catchError } from "rxjs/operators";
-import * as path from "path";
-import { CommandLineColors } from "./util/CommandLineColors";
+import { Output } from "./util/Output";
+import { PathUtil } from "./util/PathUtil";
 
 export class Api<I extends Target, T extends TargetConstructor<I>> {
 
@@ -24,6 +24,9 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
     public transpile(operatorFun?: (observable: Observable<TranspileResult>) => Observable<TranspileResult>): void {
 
         const internalOperatorFun = typeof operatorFun === "function" ? operatorFun : this.finalize;
+
+        // print welcome info
+        Output.welcome();
 
         new Observable(obs => {
             try {
@@ -46,9 +49,9 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
         const program = createProgram([this.config.entryPoint], this.config.compilerOptions || {});
         const typeChecker = program.getTypeChecker();
         const transpiler = new TranspilerFactory().create(typeChecker, filledConfig, this.target.transpilerClass, obscurifier);
-        const fileWriter = new FileWriter(module!.parent!.filename, filledConfig);
-        let transpileWarnings: TranspileMessage[] = [];
-        let transpileErrors: TranspileMessage[] = [];
+        const fileWriter = new FileWriter(filledConfig);
+        const transpileWarnings: TranspileMessage[] = [];
+        const transpileErrors: TranspileMessage[] = [];
         let transpileResult = new TranspileResult(fileWriter, () => transpileWarnings, () => transpileErrors);
 
         // create target
@@ -81,25 +84,38 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
                 let transpiledCode = targetInstance.transpileSourceFile(file);
                 const destinationPath = fileWriter.getFileDestination(file);
 
+                // get warnings
+                const fileWarnings = transpiler.getWarnings();
+                const hasWarnings = fileWarnings.length > transpileWarnings.length;
+                transpileWarnings.push(...fileWarnings);
+
+                // get errors
+                const filErrors = transpiler.getErrors();
+                const hasErrors = filErrors.length > transpileErrors.length;
+                transpileErrors.push(...filErrors);
+
+                // build file result
+                const fileResult: FileResult = {
+                    sourceFile: file,
+                    originalFilePath: PathUtil.resolveNormalize(file.fileName),
+                    originalFileName: PathUtil.filename(file.fileName),
+                    newFilePath: destinationPath,
+                    newFileName: PathUtil.filename(destinationPath),
+                    transpiledCode: transpiledCode,
+                    hasErrors, hasWarnings
+                };
+
                 // execute after file
                 if (typeof targetInstance.afterFileTranspile === "function") {
-                    transpiledCode = targetInstance.afterFileTranspile(file, transpiledCode);
+                    fileResult.transpiledCode = targetInstance.afterFileTranspile(fileResult, file, transpiledCode);
                 }
 
-                // add transpiled result to the result stack
-                transpileResult.addFile({
-                    sourceFile: file,
-                    originalFilePath: path.resolve(path.normalize(file.fileName)),
-                    originalFileName: path.basename(file.fileName),
-                    newFilePath: destinationPath,
-                    newFileName: path.basename(destinationPath),
-                    transpiledCode: targetInstance.replaceMagicConstants(transpiledCode)
-                });
-            });
+                // replace constants
+                fileResult.transpiledCode = targetInstance.replaceMagicConstants(fileResult.transpiledCode);
 
-        // assign transpiler warnings and errors
-        transpileWarnings = transpiler.getWarnings();
-        transpileErrors = transpiler.getErrors();
+                // add transpiled result to the result stack
+                transpileResult.addFile(fileResult);
+            });
 
         // execute after batch
         if (typeof targetInstance.afterBatch === "function") {
@@ -130,18 +146,11 @@ export class Api<I extends Target, T extends TargetConstructor<I>> {
                 result.printStatistic();
             }),
             catchError((e, c) => {
-                console.error(CommandLineColors.RED, `============================`, CommandLineColors.RESET);
-                console.error(CommandLineColors.RED, `Unexpected exception occured`, CommandLineColors.RESET);
-                console.error(CommandLineColors.RED, `============================`, CommandLineColors.RESET);
-                console.error(CommandLineColors.RED, e.message, CommandLineColors.RESET);
-                console.error(CommandLineColors.RED, e.stack, CommandLineColors.RESET);
-                console.info();
-                console.info("Please submit a bug report if you think that this is an error. In most cases this message is displayed when you have some kind of syntax errors within your source code.");
-                console.info();
+
+                Output.pipelineError(e);
                 process.exit(1);
                 return c;
             })
         )
     }
-
 }

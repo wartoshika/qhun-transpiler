@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outFile": "dist/api.d.ts",
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "removeComments": false,
+        "noEmitOnError": true
+    },
+    "include": [
+        "./src/**/*.ts"
+    ]
+}

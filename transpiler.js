@@ -1,7 +1,8 @@
-import { Api } from "./src/Api";
-import { Lua51Target } from "./src/target/lua51/Lua51Target";
+// import { Api, Lua51Target } from "dist/api.js";
+var transpiler = require("./dist/api");
+// import { Lua51Target } from "./src/target/lua51/Lua51Target";
 
-new Api(Lua51Target, {
+new transpiler.Api(transpiler.Lua51Target, {
     entryPoint: "test2.ts",
     outputDir: "test_dist",
     outputRemoveSourceFolderName: "src",
